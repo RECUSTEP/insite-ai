@@ -1,0 +1,37 @@
+[?9001h[?1004h[?25l[2J[m[2;1H> management@0.1.0 build C:\Users\yamas\insiteai\apps\management
+> next build[5;1H]0;C:\Windows\system32\cmd.exe[?25h  [38;2;173;127;168m[1m▲ Next.js 14.2.5
+[m
+ [37m[1m [m Creating an optimized production build ...
+ [32m[1m✓[m Compiled successfully
+ [37m[1m [m Linting and checking validity of types  [36m.[?25l[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [32m[1m✓[m Linting and checking validity of types    
+ [37m[1m [m Collecting page data  [36m.[m[K[126C [37m[1m [m Collecting page data  [36m..[m[K[126C [37m[1m [m Collecting page data  [36m...[m[K[126C [33m[1m⚠[m Using edge runtime on a page currently disables static generation for that page
+ [37m[1m [m Collecting page data  [36m.[m[K[126C [32m[1m✓[m Collecting page data    
+[?25h[?25l [37m[1m [m Generating static pages (0/4)  [36m[    ][m[K[126C [32m[1m✓[m Generating static pages (4/4)[K
+[?25h[?25l [37m[1m [m Finalizing page optimization  [36m. [37m[1m [m Collecting build traces  [36m.[m[K[126C [37m[1m [m Collecting build traces  [36m..[K[96C[m[K[126C [37m[1m [m Collecting build traces  [36m...[K[95C[m[K[126C [37m[1m [m Collecting build traces  [36m.[K[97C[m[K[126C [37m[1m [m Collecting build traces  [36m..[K[96C[m[K[126C [37m[1m [m Collecting build traces  [36m...[K[95C[m[K[126C [37m[1m [m Collecting build traces  [36m.[K[97C[m[K[126C [37m[1m [m Collecting build traces  [36m..[K[96C[m[K[126C [37m[1m [m Collecting build traces  [36m...[K[95C[m[K[126C [37m[1m [m Collecting build traces  [36m.[K[97C[m[K[126C [37m[1m [m Collecting build traces  [36m..[K[96C[m[K[126C [37m[1m [m Collecting build traces  [36m...[K[95C[m[K[126C [32m[1m✓[m Collecting build traces    
+ [32m[1m✓[m Finalizing page optimization[K
+[?25h
+[4mRoute (app)[24m[30X[4m[30CSize[24m     [4mFirst Load JS[24m[K
+┌ ƒ /                                    150 B[37m[1m[10C87.3 kB[m[K
+├ ƒ /_not-found                          150 B[37m[1m[10C87.3 kB[m[K
+├ ƒ /(.)new                              2.44 kB[37m[1m[9C214 kB[m[K
+├ ƒ /(.)projects/[id]                    2.44 kB[37m[1m[9C214 kB[m[K
+├ ƒ /application-setting                 1.96 kB[37m[1m[9C200 kB[m[K
+├ ƒ /help                                2.39 kB[37m[1m[9C200 kB[m[K
+├ ○ /icon.png                            0 B[37m[1m[16C0 B[m[K
+├ ƒ /login                               905 B[37m[1m[11C199 kB[m[K
+├ ƒ /new                                 1.13 kB[37m[1m[9C199 kB[m[K
+├ ƒ /projects/[id]                       1.13 kB[37m[1m[9C199 kB[m[K
+├ ƒ /prompt                              2.52 kB[37m[1m[9C200 kB[m[K
+└ ○ /robots.txt                          0 B[37m[1m[16C0 B[m[K
++ First Load JS shared by all[37m[1m[12C87.2 kB[m[K
+  ├ chunks/472c5861-5fc652b2163e138f.js  53.6 kB
+  ├ chunks/690-e2db81c06fd211a9.js       31.6 kB
+  └ other shared chunks (total)          1.98 kB
+
+
+ƒ Middleware[37m[1m[29C32.2 kB[m[K
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+[?9001l[?1004l

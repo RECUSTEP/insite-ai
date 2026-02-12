@@ -1,0 +1,15 @@
+export const aiTypeMap = {
+  market: "分析AI",
+  competitor: "分析AI",
+  account: "分析AI",
+  insight: "分析AI",
+  improvement: "AI店舗運営",
+  "improvement-no-image": "AI店舗運営",
+  writing: "ライティングAI（Instagram）",
+  "writing-no-image": "ライティングAI（Instagram）",
+  "feed-post": "ライティングAI（Instagram）",
+  "reel-and-stories": "ライティングAI（Instagram）",
+  profile: "ライティングAI（Instagram）",
+  "google-map": "ライティングAI（Google Map）",
+  "google-map-no-image": "ライティングAI（Google Map）",
+} as const;

@@ -1,0 +1,19 @@
+{
+  "name": "@repo/configuration",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "biome lint .",
+    "lint:fix": "biome lint . --write",
+    "check": "biome check .",
+    "check:fix": "biome check . --write",
+    "format": "biome format . --write"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^20",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,50 @@
+[?9001h[?1004h[?25l[2J[m[2;1H> web@0.1.0 build C:\Users\yamas\insiteai\apps\web
+> next build[5;1H]0;C:\Windows\system32\cmd.exe[?25h  [38;2;173;127;168m[1m▲ Next.js 14.2.5
+[m
+ [37m[1m [m Creating an optimized production build ...
+ ⚠ For production Image Optimization with Next.js, the optional 'sharp' package is strongly recommended. Run 'npm i sharp', and Next.js will use it automatically for Image Optimization.
+Read more: https://nextjs.org/docs/messages/sharp-missing-in-production
+ ⚠ For production Image Optimization with Next.js, the optional 'sharp' package is strongly recommended. Run 'npm i sharp', and Next.js will use it automatically for Image Optimization.
+Read more: https://nextjs.org/docs/messages/sharp-missing-in-production
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+🐼 info [hrtime] Extracted in (79.82ms)
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ [32m[1m✓[m Compiled successfully
+ [37m[1m [m Linting and checking validity of types  [36m.[?25l[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [37m[1m [m Linting and checking validity of types  [36m..[m[K[126C [37m[1m [m Linting and checking validity of types  [36m...[m[K[126C [37m[1m [m Linting and checking validity of types  [36m.[m[K[126C [32m[1m✓[m Linting and checking validity of types    [?25h
+ [37m[1m [m Collecting page data  [36m.[K[?25l[100C[m[K[126C [37m[1m [m Collecting page data  [36m..[m[K[126C [37m[1m [m Collecting page data  [36m...[m[K[126C [33m[1m⚠[m Using edge runtime on a page currently disables static generation for that page[?25h
+ [37m[1m [m Collecting page data  [36m.[K[?25l[100C[m[K[126C [32m[1m✓[m Collecting page data    [?25h
+[?25l [37m[1m [m Generating static pages (0/5)  [36m[    ][m[K[126C [37m[1m [m Generating static pages (0/5)  [36m[=   ][m[K[126C [32m[1m✓[m Generating static pages (5/5)[?25h
+[?25l [37m[1m [m Finalizing page optimization  [36m. [37m[1m [m Collecting build traces  [36m.[m[K[126C [37m[1m [m Collecting build traces  [36m..[K[96C[m[K[126C [37m[1m [m Collecting build traces  [36m...[K[95C[m[K[126C [37m[1m [m Collecting build traces  [36m.[K[97C[m[K[126C [37m[1m [m Collecting build traces  [36m..[K[96C[m[K[126C [37m[1m [m Collecting build traces  [36m...[K[95C[m[K[126C [37m[1m [m Collecting build traces  [36m.[K[97C[m[K[126C [37m[1m [m Collecting build traces  [36m..[K[96C[m[K[126C [37m[1m [m Collecting build traces  [36m...[K[95C[m[K[126C [37m[1m [m Collecting build traces  [36m.[K[97C[m[K[126C [37m[1m [m Collecting build traces  [36m..[K[96C[m[K[126C [32m[1m✓[m Collecting build traces    [?25h
+ [32m[1m✓[m Finalizing page optimization[K
+
+[4mRoute (app)[24m[30X[4m[30CSize[24m     [4mFirst Load JS[24m[K
+┌ ƒ /                                    2.45 kB[37m[1m[9C203 kB[m[K
+├ ƒ /_not-found                          160 B[37m[1m[10C87.5 kB[m[K
+├ ○ /announce                            160 B[37m[1m[10C87.5 kB[m[K
+├ ƒ /api/[...route]                      0 B[37m[1m[16C0 B[m[K
+├ ƒ /competitor-analysis                 629 B[37m[1m[11C201 kB[m[K
+├ ƒ /google-map                          476 B[37m[1m[11C201 kB[m[K
+├ ƒ /history                             24.7 kB[37m[1m[9C160 kB[m[K
+├ ƒ /history/(.)[id]                     2.67 kB[37m[1m[9C131 kB[m[K
+├ ƒ /history/[id]                        182 B[37m[1m[10C94.4 kB[m[K
+├ ○ /icon.png                            0 B[37m[1m[16C0 B[m[K
+├ ƒ /improvement-proposal                476 B[37m[1m[11C201 kB[m[K
+├ ƒ /login                               849 B[37m[1m[11C208 kB[m[K
+├ ○ /robots.txt                          0 B[37m[1m[16C0 B[m[K
+└ ƒ /writing                             476 B[37m[1m[11C201 kB[m[K
++ First Load JS shared by all[37m[1m[12C87.4 kB[m[K
+  ├ chunks/472c5861-b085d2710e64beda.js  53.6 kB
+  ├ chunks/690-fb5081717d978a64.js       31.7 kB
+  └ other shared chunks (total)          1.99 kB
+
+
+ƒ Middleware[37m[1m[29C32.3 kB[m[K
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+[?9001l[?1004l

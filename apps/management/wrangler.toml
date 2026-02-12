@@ -1,0 +1,30 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "insiteai-management"
+compatibility_date = "2024-07-25"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".vercel/output/static"
+
+[vars]
+API_URL = "http://localhost:8787"
+
+[env.production.vars]
+API_URL = "https://insiteai-api.nakata-haruka.workers.dev"
+DEPLOYMENT_ENV = "production"
+
+[env.preview.vars]
+API_URL = "https://insiteai-api-preview.nakata-haruka.workers.dev"
+DEPLOYMENT_ENV = "preview"
+
+[[services]]
+binding = "API_SERVICE"
+service = "insiteai-api"
+
+[[env.production.services]]
+binding = "API_SERVICE"
+service = "insiteai-api"
+environment = "production"
+
+[[env.preview.services]]
+binding = "API_SERVICE"
+service = "insiteai-api-preview"
+environment = "production"

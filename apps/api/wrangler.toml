@@ -1,0 +1,25 @@
+name = "insiteai-api"
+compatibility_date = "2024-07-30"
+main = "src/index.ts"
+
+[vars]
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "password"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "insiteai"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "database"
+database_id = "88fa7318-dd4a-4812-926e-3d718351c52d"
+
+[[env.preview.r2_buckets]]
+binding = "BUCKET"
+bucket_name = "insiteai"
+
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "database"
+database_id = "08086678-d2c3-4c24-8657-16a51d0a204b"

@@ -1,0 +1,6 @@
+{
+  "file_upload": {
+    "max_file_size_mb": 20,
+    "accept_extensions": ["jpeg", "png"]
+  }
+}

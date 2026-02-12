@@ -1,0 +1,10 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+catalog:
+  drizzle-orm: ^0.32.1
+  drizzle-kit: ^0.23.0
+  hono: ^4.5.3
+  wrangler: ^3.72.2
+  "@cloudflare/workers-types": ^4.20240821.1

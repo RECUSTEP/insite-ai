@@ -1,0 +1,47 @@
+name: Deploy API (Wrangler)
+
+on:
+  push:
+    branches:
+      - prd
+      - stg
+
+env:
+  CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      # 1) ソースチェックアウト
+      - uses: actions/checkout@v4
+
+      # 2) Node.js + pnpm
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: corepack enable
+
+      # 3) モノレポ全体の依存をインストール
+      - run: pnpm install -r
+
+      # 4) apps/api 配下でも依存を補完（hono などがある workspace）
+      - run: pnpm --filter apps/api install
+
+      # 5) Wrangler 4 CLI で確実にデプロイ
+      - name: Publish Worker via CLI
+        run: |
+          cd apps/api
+          if [ "${{ github.ref_name }}" = "prd" ]; then
+            npx wrangler@4 deploy --config wrangler.toml
+          else
+            npx wrangler@4 deploy --config wrangler.toml --env preview
+          fi
+        env:
+          CLOUDFLARE_API_TOKEN:   ${{ env.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID:  ${{ env.CLOUDFLARE_ACCOUNT_ID }}

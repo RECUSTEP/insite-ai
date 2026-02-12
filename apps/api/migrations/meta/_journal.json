@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1724683354567,
+      "tag": "0000_flashy_sumo",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1750840827517,
+      "tag": "0001_quick_thunderball",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1750911383704,
+      "tag": "0002_superb_grim_reaper",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1750915586418,
+      "tag": "0003_cheerful_spot",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1751002268508,
+      "tag": "0004_silly_sunspot",
+      "breakpoints": true
+    }
+  ]
+}

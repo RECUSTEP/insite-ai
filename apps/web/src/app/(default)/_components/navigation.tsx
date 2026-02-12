@@ -1,0 +1,115 @@
+"use client";
+
+import { Tooltip } from "@/components/ui/tooltip";
+import {
+  HistoryIcon,
+  NotebookPenIcon,
+  SettingsIcon,
+  TrendingUpIcon,
+  UserRoundSearchIcon,
+  MapPinIcon,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { css } from "styled-system/css";
+
+const navigation = [
+  {
+    icon: <SettingsIcon size="20" />,
+    label: "プロジェクト設定",
+    path: "/",
+  },
+  {
+    icon: <UserRoundSearchIcon size="20" />,
+    label: "分析AI",
+    path: "/competitor-analysis",
+  },
+  {
+    icon: <TrendingUpIcon size="20" />,
+    label: "AI店舗運営",
+    path: "/improvement-proposal",
+  },
+  {
+    icon: <NotebookPenIcon size="20" />,
+    label: "ライティングAI（Instagram）",
+    path: "/writing",
+  },
+  {
+    icon: <MapPinIcon size="20" />,
+    label: "ライティングAI（Google Map）",
+    path: "/google-map",
+  },
+  {
+    icon: <HistoryIcon size="20" />,
+    label: "履歴",
+    path: "/history",
+  },
+] as const;
+
+export function Navigation() {
+  const pathname = usePathname();
+
+  return (
+    <nav
+      className={css({
+        flex: 1,
+        overflowY: "auto",
+      })}
+    >
+      <ul>
+        {navigation.map((item) => (
+          <li key={item.path}>
+            <Link
+              href={item.path}
+              className={css({
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                p: 4,
+                color: "white",
+                _currentPage: {
+                  color: "subfont",
+                  bg: "white",
+                },
+                _hover: {
+                  bg: "gray.a4",
+                  _currentPage: {
+                    bg: "bg.default",
+                  },
+                },
+              })}
+              aria-current={pathname === item.path ? "page" : undefined}
+            >
+              <Tooltip.Root positioning={{ placement: "left", strategy: "fixed" }} openDelay={200}>
+                <Tooltip.Trigger asChild>
+                  <span
+                    className={css({
+                      m: -4,
+                      p: 4,
+                      color: "accent",
+                    })}
+                  >
+                    {item.icon}
+                  </span>
+                </Tooltip.Trigger>
+                <Tooltip.Positioner
+                  css={{
+                    ".group[data-expanded=true] &": {
+                      display: "none",
+                    },
+                  }}
+                >
+                  <Tooltip.Arrow>
+                    <Tooltip.ArrowTip />
+                  </Tooltip.Arrow>
+                  <Tooltip.Content>{item.label}</Tooltip.Content>
+                </Tooltip.Positioner>
+              </Tooltip.Root>
+              {item.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}

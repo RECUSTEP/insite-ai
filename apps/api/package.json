@@ -1,0 +1,42 @@
+{
+  "name": "api",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema.ts"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint . --write",
+    "check": "biome check .",
+    "check:fix": "biome check . --write",
+    "format": "biome format . --write",
+    "migration": "drizzle-kit generate",
+    "migrate": "wrangler d1 migrations apply database --local",
+    "migrate:remote": "wrangler d1 migrations apply database --remote",
+    "studio": "drizzle-kit studio",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.2.2",
+    "@repo/db": "workspace:*",
+    "@repo/module": "workspace:*",
+    "@repo/configuration": "workspace:*",
+    "drizzle-orm": "catalog:",
+    "es-toolkit": "^1.16.0",
+    "hono": "catalog:",
+    "openai": "^4.56.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@cloudflare/workers-types": "catalog:",
+    "@libsql/client": "^0.7.0",
+    "drizzle-kit": "catalog:",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^2.0.4",
+    "wrangler": "catalog:"
+  }
+}
