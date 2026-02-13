@@ -13,7 +13,7 @@ export function replacePlaceholders(template: string, values: Record<string, str
   });
 }
 
-export async function chatgpt(applicationSettings: ApplicationSettingUseCase<"d1">) {
+async function getOpenAIClient(applicationSettings: ApplicationSettingUseCase<"d1">) {
   const settings = await applicationSettings.getApplicationSetting();
   if (!settings.ok) {
     throw new Error("Application settings not found");
@@ -23,9 +23,29 @@ export async function chatgpt(applicationSettings: ApplicationSettingUseCase<"d1
   if (!apiKey || !model || !apiKey.trim() || !model.trim()) {
     throw new Error("OpenAI API key or model not found");
   }
-  const client = new openAi({
-    apiKey,
+  return { client: new openAi({ apiKey }), model };
+}
+
+/** 非ストリーミングで1回だけ ChatGPT を呼び出す（api_usage 加算なしの用途向け） */
+export async function chatgptOnce(
+  applicationSettings: ApplicationSettingUseCase<"d1">,
+  system: string,
+  user: string,
+): Promise<string> {
+  const { client, model } = await getOpenAIClient(applicationSettings);
+  const response = await client.chat.completions.create({
+    model,
+    messages: [
+      { role: "system", content: system },
+      { role: "user", content: user },
+    ],
+    stream: false,
   });
+  return response.choices[0]?.message?.content ?? "";
+}
+
+export async function chatgpt(applicationSettings: ApplicationSettingUseCase<"d1">) {
+  const { client, model } = await getOpenAIClient(applicationSettings);
   return async function* (system: string, user: string, images?: File[]) {
     const systemMessage = {
       role: "system",
@@ -81,4 +101,32 @@ function filterObject<T extends Record<string, unknown>, U>(
     string,
     U
   >;
+}
+
+/** コード内デフォルト（DB に seo-article プロンプトが無い場合に使用） */
+export function getSeoArticleDefaultPrompt() {
+  const system = `あなたはSEO・AIO向けの記事ライターです。以下のルールに従って記事を執筆してください。
+
+【基本方針】
+- 結論ファーストで、読者がすぐに要点を把握できる構成にする
+- 体験談や独自の意見を盛り込み、説得力を高める
+- 指定キーワードを自然な形で適切な回数配置する（不自然な詰め込みは避ける）
+
+【文字数・構成】
+- 文字数: 800〜1200字（instruction で指定があればそれに従う）
+- 構成: 導入（1〜2文）→ 本論（H2見出しを3〜4個）→ まとめ
+
+【禁止・注意】
+- 「〜することができます」「様々な」の多用を避ける
+- AIらしい紋切り型の表現を避け、人間らしい自然な文体にする
+- トレンドや最新の動向を意識した内容にする
+
+【プロジェクト情報】
+業種・コンセプト・強み・ターゲット等の情報が \${businessType}、\${concept}、\${strength}、\${targetAge}、\${targetGender} などに含まれる場合は、それを踏まえて記事を執筆してください。`;
+
+  const user = `以下のキーワード・指示に基づいて、SEO・AIO向けの記事を執筆してください。
+
+\${instruction}`;
+
+  return { system, user };
 }

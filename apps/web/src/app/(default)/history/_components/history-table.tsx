@@ -49,6 +49,7 @@ const aiTypeToValueMap = {
   profile: "writing",
   "google-map": "google-map",
   "google-map-no-image": "google-map",
+  "seo-article": "seo-article",
 } as const;
 
 const aiTypeMap = {
@@ -56,6 +57,7 @@ const aiTypeMap = {
   improvement: "AI店舗運営",
   writing: "ライティングAI（Instagram）",
   "google-map": "ライティングAI（Google Map）",
+  "seo-article": "SEO・AIO記事",
 } as const;
 
 type RawHistory = z.infer<typeof analysisHistorySchema>;
@@ -267,6 +269,7 @@ function AiTypeSelect({ column }: { column: Column<History> }) {
       { label: "AI店舗運営", value: "improvement" },
       { label: "ライティングAI（Instagram）", value: "writing" },
       { label: "ライティングAI（Google Map）", value: "google-map" },
+      { label: "SEO・AIO記事", value: "seo-article" },
     ],
     [],
   );

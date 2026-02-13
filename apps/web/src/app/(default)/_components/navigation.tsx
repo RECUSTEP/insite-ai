@@ -2,6 +2,7 @@
 
 import { Tooltip } from "@/components/ui/tooltip";
 import {
+  FileTextIcon,
   HistoryIcon,
   NotebookPenIcon,
   SettingsIcon,
@@ -38,6 +39,11 @@ const navigation = [
     icon: <MapPinIcon size="20" />,
     label: "ライティングAI（Google Map）",
     path: "/google-map",
+  },
+  {
+    icon: <FileTextIcon size="20" />,
+    label: "SEO・AIO記事",
+    path: "/seo-articles",
   },
   {
     icon: <HistoryIcon size="20" />,

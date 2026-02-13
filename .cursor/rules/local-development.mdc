@@ -1,0 +1,11 @@
+---
+description: InsiteAI のローカル開発・確認と Cloudflare 非接触のルール
+globs: 
+alwaysApply: true
+---
+
+# InsiteAI ローカル開発ルール
+
+- InsiteAI の変更・デバッグ・確認を行うときは、**まず `docs/LOCAL_DEVELOPMENT.md` を読む**。構成・ポート・認証・DB の前提を把握してから作業する。**このサイトでできること（システムの全機能）**は同ドキュメントの「システムの全機能」にまとまっている。機能追加・仕様変更時はそこを参照して影響範囲を把握する。**バックエンド（API）の仕様変更・確認**時は `docs/BACKEND_SPEC.md` を参照する。
+- ローカルで動作確認が必要な場合は、`docs/LOCAL_DEVELOPMENT.md` のセットアップ手順と確認手順に従う（`pnpm dev`、AdminPage ログイン → プロジェクト作成 → UserPage ログイン、必要に応じて API エンドポイント確認）。
+- **Cloudflare をいじらない**: Cloudflare ダッシュボード、リモート D1/R2、本番・ステージングの環境変数・バインド、GitHub の Cloudflare 用 Secrets は変更・提案しない。ローカル用の `wrangler.toml` の `[vars]` や `apps/api/.dev.vars` の説明・編集は可。

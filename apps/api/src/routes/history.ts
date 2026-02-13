@@ -20,6 +20,7 @@ export const analysisHistorySchema = z.object({
     z.literal("profile"),
     z.literal("google-map"),
     z.literal("google-map-no-image"),
+    z.literal("seo-article"),
   ]),
   input: z.object({
     image: z.string().optional(),

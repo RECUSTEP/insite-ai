@@ -12,4 +12,5 @@ export const aiTypeMap = {
   profile: "ライティングAI（Instagram）",
   "google-map": "ライティングAI（Google Map）",
   "google-map-no-image": "ライティングAI（Google Map）",
+  "seo-article": "SEO・AIO記事",
 } as const;

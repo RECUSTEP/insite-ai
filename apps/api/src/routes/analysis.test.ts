@@ -75,7 +75,10 @@ describe("analysis", () => {
 
   describe("[GET] /", () => {
     it("ログインしていないとアクセスできない", async () => {
-      const res = await testClient(app).index.$post({ query: { type: "market" }, form: {} });
+      const res = await testClient(app).index.$post({
+        query: { type: "market" },
+        form: { instruction: "", images: [] },
+      });
       expect(res.status).toBe(401);
     });
   });
@@ -98,7 +101,8 @@ describe("analysis", () => {
       {
         query: { type: "market" },
         form: {
-          image: new File(["test"], "test.png", { type: "image/png" }),
+          instruction: "",
+          images: [new File(["test"], "test.png", { type: "image/png" })],
         },
       },
       {
@@ -129,7 +133,8 @@ describe("analysis", () => {
       {
         query: { type: "market" },
         form: {
-          image: new File(["test"], "test.png", { type: "image/png" }),
+          instruction: "",
+          images: [new File(["test"], "test.png", { type: "image/png" })],
         },
       },
       {
@@ -141,7 +146,7 @@ describe("analysis", () => {
     expect(res.status).toBe(200);
     await wait;
     const usage = await apiUsageUseCase.getMonthlyApiUsageCount({
-      projectId: session.projectId,
+      projectId: session.projectId ?? "test",
     });
     expect(usage.val).toBe(1);
   });
@@ -149,7 +154,7 @@ describe("analysis", () => {
   it("API使用数が上限を超えるとエラー", async () => {
     await createProject();
     const session = await createSession();
-    await apiUsageUseCase.createApiUsage({ projectId: session.projectId });
+    await apiUsageUseCase.createApiUsage({ projectId: session.projectId ?? "test" });
     const res = await testClient(
       app,
       {
@@ -165,7 +170,8 @@ describe("analysis", () => {
       {
         query: { type: "market" },
         form: {
-          image: new File(["test"], "test.png", { type: "image/png" }),
+          instruction: "",
+          images: [new File(["test"], "test.png", { type: "image/png" })],
         },
       },
       {
@@ -196,7 +202,8 @@ describe("analysis", () => {
       {
         query: { type: "market" },
         form: {
-          image: new File(["test"], "test.png", { type: "image/png" }),
+          instruction: "",
+          images: [new File(["test"], "test.png", { type: "image/png" })],
         },
       },
       {
@@ -209,7 +216,7 @@ describe("analysis", () => {
     await wait;
     await waitReadableStream(res.body as ReadableStream);
     const history = await analysisHistoryUseCase.getAnalysisHistories({
-      projectId: session.projectId,
+      projectId: session.projectId ?? "test",
     });
     expect(history.ok).toBe(true);
     expect(history.val).toHaveLength(1);

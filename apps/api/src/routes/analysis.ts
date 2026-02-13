@@ -3,7 +3,9 @@ import { fileUpload } from "@repo/configuration";
 import { streamText } from "hono/streaming";
 import { z } from "zod";
 import { upload } from "../libs/bucket";
-import { chatgpt, getPrompt } from "../libs/chatgpt";
+import { chatgpt, getPrompt, getSeoArticleDefaultPrompt, replacePlaceholders } from "../libs/chatgpt";
+import { CommonUseCaseError } from "@repo/module/error";
+import { omit } from "es-toolkit";
 import { projectGuard } from "./_factory";
 import { validator } from "hono/validator";
 
@@ -59,6 +61,9 @@ export const analysisSchemaByType = {
   "google-map-no-image": z.object({
     instruction: z.string({ message: "指示を入力してください" }),
   }),
+  "seo-article": z.object({
+    instruction: z.string({ message: "キーワードを入力してください" }).min(1, "キーワードを入力してください"),
+  }),
 } as const;
 
 export const analysisQuerySchema = z.object({
@@ -75,6 +80,7 @@ export const analysisQuerySchema = z.object({
       z.literal("profile"),
       z.literal("google-map"),
       z.literal("google-map-no-image"),
+      z.literal("seo-article"),
     ],
     { message: "Invalid type" },
   ),
@@ -88,10 +94,12 @@ const formValidator = validator("form", async (value, c) => {
   }
   const instruction = parsed.data;
 
-  // validate images
+  // validate images (skip instruction - for instruction-only types like seo-article)
   const form = await c.req.formData();
   const images: File[] = [];
-  form.forEach((v) => {
+  form.forEach((v: unknown, key: string) => {
+    if (key === "instruction") return;
+    if (!(v instanceof File)) return;
     const parsed = imageSchema.safeParse(v);
     if (!parsed.success) {
       return c.json({ error: parsed.error }, 400);
@@ -131,11 +139,43 @@ const analysisHandler = projectGuard.createHandlers(
       return c.json({ error: "Monthly API usage limit exceeded" }, 403);
     }
 
-    const { system, user } = await getPrompt(c.var.promptUseCase, c.var.projectInfoUseCase)(
-      c.var.session.projectId,
-      type,
-      "instruction" in form ? form.instruction : undefined,
-    );
+    let system: string;
+    let user: string;
+    if (type === "seo-article") {
+      const prompt = await c.var.promptUseCase.getPromptByAiType("seo-article");
+      if (!prompt.ok && prompt.val === CommonUseCaseError.NotFound) {
+        const projectInfo = await c.var.projectInfoUseCase.getProjectInfo({
+          projectId: c.var.session.projectId,
+        });
+        const values = {
+          ...(projectInfo.ok ? omit(projectInfo.val, ["id"]) : {}),
+          instruction: "instruction" in form ? form.instruction ?? "" : "",
+        };
+        const isString = (v: unknown): v is string => typeof v === "string";
+        const filtered = Object.fromEntries(
+          Object.entries(values).filter(([, v]) => isString(v)),
+        ) as Record<string, string>;
+        const defaultPrompt = getSeoArticleDefaultPrompt();
+        system = replacePlaceholders(defaultPrompt.system, filtered);
+        user = replacePlaceholders(defaultPrompt.user, filtered);
+      } else {
+        const got = await getPrompt(c.var.promptUseCase, c.var.projectInfoUseCase)(
+          c.var.session.projectId,
+          type,
+          "instruction" in form ? form.instruction : undefined,
+        );
+        system = got.system;
+        user = got.user;
+      }
+    } else {
+      const got = await getPrompt(c.var.promptUseCase, c.var.projectInfoUseCase)(
+        c.var.session.projectId,
+        type,
+        "instruction" in form ? form.instruction : undefined,
+      );
+      system = got.system;
+      user = got.user;
+    }
     const chat = (await chatgpt(c.var.applicationSettingUseCase))(
       system,
       user,

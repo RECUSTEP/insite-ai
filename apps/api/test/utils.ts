@@ -1,6 +1,12 @@
 import { createClient } from "@libsql/client";
+import { eq } from "drizzle-orm";
 import * as schema from "@repo/db/schema";
-import type { AdminSessionInsert, ProjectInsert, SessionInsert } from "@repo/module/schema";
+import type {
+  AdminSessionInsert,
+  AuthInsert,
+  ProjectInsert,
+  SessionInsert,
+} from "@repo/module/schema";
 import {
   AdminSessionUseCase,
   AnalysisHistoryUseCase,
@@ -68,8 +74,34 @@ export function createAdminSessionFactory(db: Awaited<ReturnType<typeof initDb>>
   };
 }
 
+export function createAuthFactory(db: Awaited<ReturnType<typeof initDb>>[1]) {
+  return async (value: Partial<AuthInsert> = {}) => {
+    const [auth] = await db
+      .insert(schema.auth)
+      .values({
+        id: "test",
+        password: "test",
+        ...value,
+      })
+      .returning();
+    if (!auth) {
+      throw new Error("Failed to create auth");
+    }
+    return auth;
+  };
+}
+
 export function createProjectFactory(db: Awaited<ReturnType<typeof initDb>>[1]) {
   return async (value: Partial<ProjectInsert> = {}) => {
+    const authId = "authId" in value && value.authId ? value.authId : "test";
+    const [authExists] = await db
+      .select()
+      .from(schema.auth)
+      .where(eq(schema.auth.id, authId))
+      .limit(1);
+    if (authExists === undefined) {
+      await db.insert(schema.auth).values({ id: authId, password: "test" });
+    }
     const [project] = await db
       .insert(schema.projects)
       .values({
@@ -79,6 +111,7 @@ export function createProjectFactory(db: Awaited<ReturnType<typeof initDb>>[1]) 
         projectId: "test",
         projectPass: "test",
         apiUsageLimit: 1,
+        authId,
         ...value,
       })
       .returning();
@@ -91,10 +124,20 @@ export function createProjectFactory(db: Awaited<ReturnType<typeof initDb>>[1]) 
 
 export function createSessionFactory(db: Awaited<ReturnType<typeof initDb>>[1]) {
   return async (value: Partial<SessionInsert> = {}) => {
+    const authId = "authId" in value && value.authId ? value.authId : "test";
+    const [authExists] = await db
+      .select()
+      .from(schema.auth)
+      .where(eq(schema.auth.id, authId))
+      .limit(1);
+    if (authExists === undefined) {
+      await db.insert(schema.auth).values({ id: authId, password: "test" });
+    }
     const [session] = await db
       .insert(schema.sessions)
       .values({
         id: "test",
+        authId,
         projectId: "test",
         expiresAt: Date.now() + 1000,
         ...value,
