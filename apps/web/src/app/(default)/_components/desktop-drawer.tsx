@@ -1,6 +1,5 @@
 "use client";
 
-import logoImage from "@/assets/logo.png";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ChevronsLeftIcon, ChevronsRightIcon } from "lucide-react";
 import { useState } from "react";
@@ -37,20 +36,10 @@ export default function DesktopDrawer({ children }: Props) {
       )}
     >
       <Box h="full" w={80} display="flex" flexDir="column" gap={4}>
-        <Box display="flex" flexDir="column" alignItems="center" gap={2} mb={-4} py={6}>
-          <img
-            alt="SAIのロゴ"
-            src={logoImage.src}
-            width={logoImage.width}
-            height={logoImage.height}
-            className={css({
-              height: 24,
-              width: "auto",
-            })}
-          />
+        <Box display="flex" alignItems="center" justifyContent="center" mb={-4} py={6}>
           <span
             className={css({
-              fontSize: "lg",
+              fontSize: "xl",
               fontWeight: "700",
               color: "text.primary",
               letterSpacing: "0.5px",
