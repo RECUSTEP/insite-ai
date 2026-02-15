@@ -5,6 +5,7 @@ import Link from "next/link";
 import { HStack } from "styled-system/jsx";
 import type { z } from "zod";
 import { DeleteProject } from "./delete-project";
+import { SeoAddonToggle } from "./seo-addon-toggle";
 
 export type ProjectTableProps = {
   projects: z.infer<typeof projectSchema>[];
@@ -23,6 +24,12 @@ export function ProjectTable({ projects }: ProjectTableProps) {
             <Table.Cell textAlign="center">{project.projectId}</Table.Cell>
             <Table.Cell textAlign="center">{project.authId}</Table.Cell>
             <Table.Cell textAlign="center">{project.apiUsageLimit}</Table.Cell>
+            <Table.Cell textAlign="center">
+              <SeoAddonToggle 
+                projectId={project.projectId} 
+                initialEnabled={project.seoAddonEnabled ?? false}
+              />
+            </Table.Cell>
             <Table.Cell maxW="min-content">
               <HStack gap={2} w="fit-content" mx="auto">
                 <Link href={`/projects/${encodeURIComponent(project.projectId)}`}>
@@ -50,6 +57,7 @@ function Header() {
         <Table.Header textAlign="center">プロジェクトID</Table.Header>
         <Table.Header textAlign="center">認証ID</Table.Header>
         <Table.Header textAlign="center">API使用可能回数/月</Table.Header>
+        <Table.Header textAlign="center">SEO/AIO</Table.Header>
         <Table.Header textAlign="center" maxW="min-content" />
       </Table.Row>
     </Table.Head>
