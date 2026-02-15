@@ -190,7 +190,7 @@ export function ProjectInfoForm({ defaultValue }: ProjectInfoFormProps) {
             display: "none",
             "&[data-type=success]": {
               display: "block",
-              color: "accent.default",
+              color: "brand.DEFAULT",
             },
           })}
         />

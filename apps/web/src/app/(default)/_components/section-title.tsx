@@ -10,7 +10,7 @@ const sectionTitleStyle = cva({
     px: 1.5,
     borderLeft: "2px solid",
     borderBottom: "2px solid",
-    borderColor: "accent",
+    borderColor: "brand.DEFAULT",
   },
 });
 

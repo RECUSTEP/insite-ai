@@ -6,10 +6,10 @@ const accent = {
   name: "accent",
   tokens: defineTokens.colors({
     light: {
-      "1": { value: "#c0b385" },
+      "1": { value: "#2F80ED" },
     },
     dark: {
-      "1": { value: "#c0b385" },
+      "1": { value: "#2F80ED" },
     },
   }),
   semanticTokens: defineSemanticTokens.colors({
@@ -107,7 +107,7 @@ export default defineConfig({
             value: "#6e6863",
           },
           accent: {
-            value: "#c0b385",
+            value: "#2F80ED",
           },
         },
         shadows: {

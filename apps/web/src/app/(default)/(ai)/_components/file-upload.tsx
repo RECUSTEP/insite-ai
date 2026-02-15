@@ -21,10 +21,10 @@ export function FileUpload(props: StyledFileUpload.RootProps) {
           flexDir="column"
           alignItems="center"
           gap="1.5"
-          color="accent.default"
+          color="brand.DEFAULT"
         >
           <ImageIcon size={40} />
-          <Text as="span" color="accent">
+          <Text as="span" color="brand.DEFAULT">
             <Text as="span" display="none" md={{ display: "inline" }}>
               ドロップして
             </Text>
