@@ -15,7 +15,7 @@ export function GlobalHeader() {
       className={css({
         position: "fixed",
         top: { base: 12, md: 0 },
-        left: { base: 0, md: 80 },
+        left: 0,
         right: 0,
         zIndex: 40,
         bg: "bg.card",

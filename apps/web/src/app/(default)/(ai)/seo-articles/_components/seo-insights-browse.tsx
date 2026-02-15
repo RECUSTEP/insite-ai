@@ -119,7 +119,7 @@ export function SeoInsightsBrowse({ mode = "browse" }: SeoInsightsBrowseProps) {
                 bg: "bg.card",
                 borderRadius: "card",
                 boxShadow: "card",
-                p: mode === "browse" ? 4 : 5,
+                p: mode === "browse" ? 4 : 6,
                 display: "flex",
                 flexDirection: "column",
                 gap: mode === "browse" ? 2 : 3,
@@ -173,7 +173,7 @@ export function SeoInsightsBrowse({ mode = "browse" }: SeoInsightsBrowseProps) {
                     key={index}
                     className={css({
                       py: mode === "browse" ? 1.5 : 2,
-                      px: mode === "browse" ? 2 : 3,
+                      px: mode === "browse" ? 2 : 1,
                       borderRadius: "md",
                       bg: "gray.50",
                       transition: "background 0.2s ease",
@@ -187,6 +187,7 @@ export function SeoInsightsBrowse({ mode = "browse" }: SeoInsightsBrowseProps) {
                         fontSize: mode === "browse" ? "xs" : "sm",
                         color: "text.secondary",
                         lineHeight: 1.5,
+                        width: "100%",
                       })}
                     >
                       {item}

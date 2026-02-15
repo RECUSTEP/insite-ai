@@ -24,7 +24,7 @@ export function SeoArticlesWrapper({ children }: SeoArticlesWrapperProps) {
           })}
         >
           <SeoInsightsBrowse mode="focus" />
-          <Box maxW="1600px" w="full" px={4}>
+          <Box maxW="800px" w="full">
             {children}
           </Box>
         </Flex>

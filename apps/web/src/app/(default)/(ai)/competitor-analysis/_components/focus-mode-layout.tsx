@@ -48,7 +48,7 @@ export function FocusModeLayout({ children }: FocusModeLayoutProps) {
       })}
     >
       {/* 分析結果カード（PC向け、横並び3枚） */}
-      <Flex gap={6} w="full" maxW="1600px" justify="center">
+      <Flex gap={4} w="full" maxW="1400px" justify="center">
         {analysisCards.map((card) => (
           <AnalysisStats
             key={card.id}
@@ -63,7 +63,7 @@ export function FocusModeLayout({ children }: FocusModeLayoutProps) {
       </Flex>
 
       <Box
-        maxW="1600px"
+        maxW="800px"
         w="full"
         className={css({
           bg: "bg.card",

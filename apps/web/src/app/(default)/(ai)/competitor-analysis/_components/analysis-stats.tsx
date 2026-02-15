@@ -130,8 +130,8 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
       }
     : {
         flex: 1,
-        minW: "380px",
-        h: "380px",
+        minW: "320px",
+        h: "320px",
       };
 
   if (loading) {
@@ -167,7 +167,7 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
         bg: "bg.card",
         borderRadius: "card",
         boxShadow: "card",
-        p: 6,
+        p: mode === "browse" ? 6 : 8,
         display: "flex",
         flexDirection: "column",
         gap: 4,
@@ -220,12 +220,12 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
       {hasData ? (
         <VStack
           flex={1}
-          gap={mode === "browse" ? 1.5 : 3}
+          gap={mode === "browse" ? 1.5 : 2}
           alignItems="stretch"
           className={css({
             borderRadius: "md",
             bg: "gray.50",
-            p: mode === "browse" ? 3 : 6,
+            p: mode === "browse" ? 3 : 2,
             overflowY: mode === "browse" ? "auto" : "hidden",
           })}
         >
@@ -233,8 +233,8 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
             <Box
               key={index}
               className={css({
-                py: mode === "browse" ? 1.5 : 3,
-                px: mode === "browse" ? 2 : 5,
+                py: mode === "browse" ? 1.5 : 2,
+                px: mode === "browse" ? 2 : 1,
                 borderRadius: "md",
                 bg: "white",
                 transition: "background 0.2s ease",
@@ -245,9 +245,10 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
             >
               <Text
                 className={css({
-                  fontSize: mode === "browse" ? "xs" : "md",
+                  fontSize: mode === "browse" ? "xs" : "sm",
                   color: "text.secondary",
                   lineHeight: 1.6,
+                  width: "100%",
                 })}
               >
                 {point}
