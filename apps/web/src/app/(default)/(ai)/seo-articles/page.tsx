@@ -6,6 +6,7 @@ import { css } from "styled-system/css";
 import { Flex } from "styled-system/jsx";
 import { ProjectSelector } from "../../_components/project-selector";
 import { SeoArticleForm } from "./_components/seo-article-form";
+import { SeoArticlesWrapper } from "./_components/seo-articles-wrapper";
 
 export const metadata: Metadata = {
   title: "SEO・AIO記事",
@@ -47,25 +48,27 @@ export default async function Page() {
   }
 
   return (
-    <Flex
-      gap={8}
-      direction="column"
-      className={css({
-        animation: "fadeIn 0.4s ease",
-      })}
-    >
-      <Text
-        as="h1"
-        size="xl"
+    <SeoArticlesWrapper>
+      <Flex
+        gap={8}
+        direction="column"
         className={css({
-          fontWeight: 600,
-          color: "text.primary",
+          animation: "fadeIn 0.4s ease",
         })}
       >
-        SEO・AIO記事
-      </Text>
-      <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
-      <SeoArticleForm />
-    </Flex>
+        <Text
+          as="h1"
+          size="xl"
+          className={css({
+            fontWeight: 600,
+            color: "text.primary",
+          })}
+        >
+          SEO・AIO記事
+        </Text>
+        <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
+        <SeoArticleForm />
+      </Flex>
+    </SeoArticlesWrapper>
   );
 }
