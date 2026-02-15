@@ -72,7 +72,7 @@ export default defineConfig({
           // 背景色
           bg: {
             base: {
-              value: "#FAFBFC",
+              value: "#F0F4F8", // わずかに青みのある明るいグレー
             },
             card: {
               value: "#FFFFFF",
@@ -138,6 +138,7 @@ export default defineConfig({
   globalCss: {
     body: {
       minHeight: "100dvh",
+      backgroundColor: "#F0F4F8", // わずかに青みのある明るいグレー
     },
     // ページ遷移アニメーション
     "@keyframes fadeIn": {

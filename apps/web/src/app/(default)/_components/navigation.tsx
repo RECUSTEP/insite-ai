@@ -2,14 +2,8 @@
 
 import { Tooltip } from "@/components/ui/tooltip";
 import {
-  FileTextIcon,
   HistoryIcon,
-  HomeIcon,
-  MapPinIcon,
-  NotebookPenIcon,
   SettingsIcon,
-  TrendingUpIcon,
-  UserRoundSearchIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -17,44 +11,14 @@ import { css } from "styled-system/css";
 
 const navigation = [
   {
-    icon: <HomeIcon size="20" />,
-    label: "ホーム",
-    path: "/home",
-  },
-  {
-    icon: <SettingsIcon size="20" />,
-    label: "プロジェクト設定",
-    path: "/",
-  },
-  {
-    icon: <UserRoundSearchIcon size="20" />,
-    label: "分析AI",
-    path: "/competitor-analysis",
-  },
-  {
-    icon: <TrendingUpIcon size="20" />,
-    label: "AI店舗運営",
-    path: "/improvement-proposal",
-  },
-  {
-    icon: <NotebookPenIcon size="20" />,
-    label: "ライティングAI（Instagram）",
-    path: "/writing",
-  },
-  {
-    icon: <MapPinIcon size="20" />,
-    label: "ライティングAI（Google Map）",
-    path: "/google-map",
-  },
-  {
-    icon: <FileTextIcon size="20" />,
-    label: "SEO・AIO記事",
-    path: "/seo-articles",
-  },
-  {
     icon: <HistoryIcon size="20" />,
     label: "履歴",
     path: "/history",
+  },
+  {
+    icon: <SettingsIcon size="20" />,
+    label: "設定",
+    path: "/",
   },
 ] as const;
 

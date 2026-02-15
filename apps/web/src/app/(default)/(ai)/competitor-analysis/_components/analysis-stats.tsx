@@ -130,8 +130,8 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
       }
     : {
         flex: 1,
-        minW: "320px",
-        h: "280px",
+        minW: "380px",
+        h: "380px",
       };
 
   if (loading) {
@@ -220,12 +220,12 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
       {hasData ? (
         <VStack
           flex={1}
-          gap={mode === "browse" ? 1.5 : 2}
+          gap={mode === "browse" ? 1.5 : 3}
           alignItems="stretch"
           className={css({
             borderRadius: "md",
             bg: "gray.50",
-            p: mode === "browse" ? 3 : 4,
+            p: mode === "browse" ? 3 : 6,
             overflowY: mode === "browse" ? "auto" : "hidden",
           })}
         >
@@ -233,8 +233,8 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
             <Box
               key={index}
               className={css({
-                py: mode === "browse" ? 1.5 : 2,
-                px: mode === "browse" ? 2 : 3,
+                py: mode === "browse" ? 1.5 : 3,
+                px: mode === "browse" ? 2 : 5,
                 borderRadius: "md",
                 bg: "white",
                 transition: "background 0.2s ease",
@@ -245,9 +245,9 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
             >
               <Text
                 className={css({
-                  fontSize: mode === "browse" ? "xs" : "sm",
+                  fontSize: mode === "browse" ? "xs" : "md",
                   color: "text.secondary",
-                  lineHeight: 1.5,
+                  lineHeight: 1.6,
                 })}
               >
                 {point}

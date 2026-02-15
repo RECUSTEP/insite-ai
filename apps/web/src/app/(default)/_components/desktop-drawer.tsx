@@ -29,7 +29,6 @@ export default function DesktopDrawer({ children }: Props) {
           boxShadow: "float",
           transition: "width 0.3s ease",
           overflowX: "hidden",
-          pt: 16, // グローバルヘッダーの高さ分
           "&[data-expanded=false]": {
             w: "3.25rem",
           },
@@ -37,6 +36,21 @@ export default function DesktopDrawer({ children }: Props) {
       )}
     >
       <Box h="full" w={80} display="flex" flexDir="column" gap={4}>
+        <Box display="flex" alignItems="center" justifyContent="center" mb={-4} py={6}>
+          <span
+            className={css({
+              fontSize: "xl",
+              fontWeight: "700",
+              color: "text.primary",
+              letterSpacing: "0.5px",
+              ".group[data-expanded=false] &": {
+                display: "none",
+              },
+            })}
+          >
+            INSITE AI
+          </span>
+        </Box>
         <button
           type="button"
           onClick={() => setIsExpanded((prev) => !prev)}
