@@ -16,10 +16,9 @@ const insights = [
     icon: TrendingUpIcon,
     color: "#2F80ED",
     items: [
-      "AI生成コンテンツの品質評価が厳格化",
+      "AI生成コンテンツ品質評価厳格化",
       "UXシグナルの重要性増加",
       "E-E-A-Tが必須要素に",
-      "モバイルファースト完全移行",
     ],
   },
   {
@@ -28,10 +27,9 @@ const insights = [
     icon: CheckCircleIcon,
     color: "#27AE60",
     items: [
-      "3000文字以上の充実したコンテンツ",
-      "明確な見出し構造（H2, H3）",
+      "3000文字以上の充実コンテンツ",
+      "明確な見出し構造",
       "FAQ形式での質問回答",
-      "独自の視点や実体験",
     ],
   },
   {
@@ -42,8 +40,7 @@ const insights = [
     items: [
       "キーワードを自然に配置",
       "最初の段落で結論を提示",
-      "具体的な数値やデータを含める",
-      "定期的な更新で鮮度を保つ",
+      "数値やデータを含める",
     ],
   },
 ];
@@ -58,9 +55,7 @@ export function SeoInsightsBrowse({ mode = "browse" }: SeoInsightsBrowseProps) {
     : {
         flex: 1,
         minW: "320px",
-        h: "auto",
-        minH: "220px",
-        maxH: "280px",
+        h: "260px",
       };
 
   const containerGap = mode === "browse" ? 3 : 4;
@@ -75,29 +70,28 @@ export function SeoInsightsBrowse({ mode = "browse" }: SeoInsightsBrowseProps) {
         animation: "slideIn 0.3s ease",
       })}
     >
-      {mode === "browse" && (
-        <VStack gap={6} px={4}>
-          <Text
-            size="2xl"
-            className={css({
-              fontWeight: 700,
-              color: "text.primary",
-              textAlign: "center",
-            })}
-          >
-            SEO/AIO記事の最新トレンド
-          </Text>
-          <Text
-            className={css({
-              color: "text.secondary",
-              textAlign: "center",
-              maxW: "2xl",
-            })}
-          >
-            検索エンジンで高評価を得るための最新情報とベストプラクティスをまとめました
-          </Text>
-        </VStack>
-      )}
+      <VStack gap={mode === "focus" ? 2 : 6} px={4} w={mode === "focus" ? "full" : "auto"} maxW={mode === "focus" ? "1400px" : "auto"}>
+        <Text
+          size={mode === "focus" ? "xl" : "2xl"}
+          className={css({
+            fontWeight: 700,
+            color: "text.primary",
+            textAlign: "center",
+          })}
+        >
+          SEO/AIO記事の最新トレンド
+        </Text>
+        <Text
+          className={css({
+            color: "text.secondary",
+            textAlign: "center",
+            maxW: "2xl",
+            fontSize: mode === "focus" ? "sm" : "md",
+          })}
+        >
+          検索エンジンで高評価を得るための最新情報とベストプラクティスをまとめました
+        </Text>
+      </VStack>
 
       <Box
         w="full"

@@ -21,7 +21,7 @@ interface HistoryItem {
   output: { output: string };
 }
 
-function extractSummaryPoints(markdownText: string, maxPoints: number = 4): string[] {
+function extractSummaryPoints(markdownText: string, maxPoints: number = 3): string[] {
   const points: string[] = [];
   
   // **太字マーカー**を削除
@@ -31,9 +31,9 @@ function extractSummaryPoints(markdownText: string, maxPoints: number = 4): stri
   const bulletRegex = /^[\s]*[-*]\s+(.+)$/gm;
   let match;
   while ((match = bulletRegex.exec(cleanedText)) !== null && points.length < maxPoints) {
-    const point = match[1]?.trim();
-    if (point && point.length > 10 && point.length < 80) {
-      points.push(point);
+    const point = match[1]?.trim().slice(0, 60);
+    if (point && point.length > 10) {
+      points.push(point + (point.length >= 60 ? "..." : ""));
     }
   }
   
@@ -43,7 +43,7 @@ function extractSummaryPoints(markdownText: string, maxPoints: number = 4): stri
     while ((match = headingRegex.exec(cleanedText)) !== null && points.length < maxPoints) {
       const content = match[2]?.trim();
       if (content && content.length > 15) {
-        const firstSentence = content.split(/[。\n]/)[0]?.trim().slice(0, 80);
+        const firstSentence = content.split(/[。\n]/)[0]?.trim().slice(0, 60);
         if (firstSentence && firstSentence.length > 10) {
           points.push(firstSentence + (firstSentence.endsWith("。") ? "" : "..."));
         }
@@ -58,7 +58,7 @@ function extractSummaryPoints(markdownText: string, maxPoints: number = 4): stri
       if (points.length >= maxPoints) break;
       const cleaned = para.replace(/^#{1,6}\s+/, "").trim();
       if (cleaned.length > 15 && !cleaned.startsWith("-") && !cleaned.startsWith("*")) {
-        const firstSentence = cleaned.split(/[。\n]/)[0]?.trim().slice(0, 80);
+        const firstSentence = cleaned.split(/[。\n]/)[0]?.trim().slice(0, 60);
         if (firstSentence && firstSentence.length > 10) {
           points.push(firstSentence + (firstSentence.endsWith("。") ? "" : "..."));
         }
@@ -131,9 +131,7 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
     : {
         flex: 1,
         minW: "320px",
-        h: "auto",
-        minH: "220px",
-        maxH: "280px",
+        h: "260px",
       };
 
   if (loading) {
