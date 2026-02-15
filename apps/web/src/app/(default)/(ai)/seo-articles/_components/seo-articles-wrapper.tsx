@@ -14,26 +14,8 @@ export function SeoArticlesWrapper({ children }: SeoArticlesWrapperProps) {
 
   return (
     <>
-      {mode === "focus" ? (
-        <Flex
-          direction="column"
-          align="center"
-          gap={6}
-          className={css({
-            animation: "slideIn 0.3s ease",
-          })}
-        >
-          <SeoInsightsBrowse mode="focus" />
-          <Box maxW="800px" w="full">
-            {children}
-          </Box>
-        </Flex>
-      ) : (
-        <>
-          <SeoInsightsBrowse mode="browse" />
-          {children}
-        </>
-      )}
+      <SeoInsightsBrowse mode="browse" />
+      {children}
     </>
   );
 }

@@ -37,43 +37,38 @@ export function FocusModeLayout({ children }: FocusModeLayoutProps) {
   return (
     <Flex
       direction="column"
-      align="center"
-      justify="flex-start"
-      minH="calc(100vh - 200px)"
-      px={4}
-      py={8}
       gap={6}
+      py={8}
       className={css({
         animation: "slideIn 0.3s ease",
       })}
     >
-      {/* 分析結果カード（PC向け、横並び3枚） */}
-      <Flex gap={4} w="full" maxW="1400px" justify="center">
-        {analysisCards.map((card) => (
-          <AnalysisStats
-            key={card.id}
-            type={card.id}
-            title={card.title}
-            icon={card.icon}
-            color={card.color}
-            description={card.description}
-            mode="focus"
-          />
-        ))}
-      </Flex>
-
       <Box
-        maxW="800px"
-        w="full"
         className={css({
-          bg: "bg.card",
-          borderRadius: "card",
-          boxShadow: "card",
-          p: { base: 4, md: 8 },
+          overflowX: "auto",
+          WebkitOverflowScrolling: "touch",
+          scrollbarWidth: "none",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
         })}
       >
-        {children}
+        <Flex gap={3} px={4} minW="max-content">
+          {analysisCards.map((card) => (
+            <AnalysisStats
+              key={card.id}
+              type={card.id}
+              title={card.title}
+              icon={card.icon}
+              color={card.color}
+              description={card.description}
+              mode="browse"
+            />
+          ))}
+        </Flex>
       </Box>
+
+      <Box px={4}>{children}</Box>
     </Flex>
   );
 }
