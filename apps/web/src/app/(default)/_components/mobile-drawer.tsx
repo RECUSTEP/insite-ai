@@ -28,10 +28,10 @@ export function MobileDrawer({ children }: Props) {
       </Drawer.Trigger>
       <Drawer.Backdrop />
       <Drawer.Positioner>
-        <Drawer.Content bg="#374b66">
+        <Drawer.Content bg="bg.card" css={{ transition: "transform 0.3s ease" }}>
           <Drawer.Header alignItems="flex-end" py={2}>
             <Drawer.CloseTrigger asChild>
-              <IconButton variant="ghost" color="accent.fg">
+              <IconButton variant="ghost" color="text.primary">
                 <XIcon />
               </IconButton>
             </Drawer.CloseTrigger>

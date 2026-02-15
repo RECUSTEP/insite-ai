@@ -11,6 +11,7 @@ import { route as projectsRoute } from "./projects";
 import { route as projectInfoRoute } from "./project-info";
 import { route as sessionRoute } from "./session";
 import { route as instructionGuideRoute } from "./instruction-guide";
+import { route as seoArticleReviseRoute } from "./seo-article-revise";
 import { route as seoSuggestKeywordsRoute } from "./seo-suggest-keywords";
 
 export const route = new Hono()
@@ -26,4 +27,5 @@ export const route = new Hono()
   .route("/project_info", projectInfoRoute)
   .route("/session", sessionRoute)
   .route("/instruction-guide", instructionGuideRoute)
+  .route("/seo-article-revise", seoArticleReviseRoute)
   .route("/seo-suggest-keywords", seoSuggestKeywordsRoute);

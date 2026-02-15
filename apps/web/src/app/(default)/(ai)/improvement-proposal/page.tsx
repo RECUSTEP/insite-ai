@@ -1,14 +1,15 @@
 import { Text } from "@/components/ui/text";
+import { createClient } from "@/lib/api";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
+import { cookies } from "next/headers";
+import { css } from "styled-system/css";
 import { Flex, HStack } from "styled-system/jsx";
+import { ProjectSelector } from "../../_components/project-selector";
 import { HelpPopover } from "../_components/help-popover";
 import type { TabPanelProps } from "../_components/tab-panel";
 import { ImageForm } from "./_components/image-form";
 import { NoImageForm } from "./_components/no-image-form";
-import { createClient } from "@/lib/api";
-import { cookies } from "next/headers";
-import { ProjectSelector } from "../../_components/project-selector";
 
 export const metadata: Metadata = {
   title: "AI店舗運営",
@@ -92,9 +93,22 @@ export default async function Page() {
   ] satisfies TabPanelProps["panels"];
 
   return (
-    <Flex gap={8} direction="column">
+    <Flex
+      gap={8}
+      direction="column"
+      className={css({
+        animation: "fadeIn 0.4s ease",
+      })}
+    >
       <HStack>
-        <Text as="h1" size="xl">
+        <Text
+          as="h1"
+          size="xl"
+          className={css({
+            fontWeight: 600,
+            color: "text.primary",
+          })}
+        >
           AI店舗運営
         </Text>
         <HelpPopover

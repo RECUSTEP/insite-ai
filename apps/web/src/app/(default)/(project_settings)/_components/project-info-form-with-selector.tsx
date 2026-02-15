@@ -1,13 +1,13 @@
 "use client";
 
-import { Center } from "styled-system/jsx";
-import { ProjectSelector } from "../../_components/project-selector";
-import { Flex } from "styled-system/jsx";
-import { ProjectInfoForm } from "./project-info-form";
-import { projectInfoSchema } from "api/schema";
-import { z } from "zod";
-import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import type { projectInfoSchema } from "api/schema";
+import { useState } from "react";
+import { Center } from "styled-system/jsx";
+import { Flex } from "styled-system/jsx";
+import type { z } from "zod";
+import { ProjectSelector } from "../../_components/project-selector";
+import { ProjectInfoForm } from "./project-info-form";
 
 type Schema = z.infer<typeof projectInfoSchema>;
 type ProjectInfoFormProps = {

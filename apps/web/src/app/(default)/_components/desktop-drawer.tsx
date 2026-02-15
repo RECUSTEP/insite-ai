@@ -26,8 +26,9 @@ export default function DesktopDrawer({ children }: Props) {
           height: "100dvh",
           top: 0,
           position: "sticky",
-          bgColor: "sidebarBg",
-          transition: "width 0.2s",
+          bgColor: "bg.card",
+          boxShadow: "float",
+          transition: "width 0.3s ease",
           overflowX: "hidden",
           "&[data-expanded=false]": {
             w: "3.25rem",
@@ -36,7 +37,7 @@ export default function DesktopDrawer({ children }: Props) {
       )}
     >
       <Box h="full" w={80} display="flex" flexDir="column" gap={4}>
-        <Box display="grid" placeItems="center" mb={-4}>
+        <Box display="grid" placeItems="center" mb={-4} py={6}>
           <img
             alt="SAIのロゴ"
             src={logoImage.src}
@@ -56,9 +57,12 @@ export default function DesktopDrawer({ children }: Props) {
             alignItems: "center",
             gap: 4,
             p: 4,
-            color: "white",
+            mx: 2,
+            borderRadius: "md",
+            color: "text.secondary",
+            transition: "all 0.2s ease",
             _hover: {
-              bg: "gray.a4",
+              bg: "gray.100",
             },
             cursor: "pointer",
             fontSize: "sm",

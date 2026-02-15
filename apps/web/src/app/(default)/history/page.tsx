@@ -1,9 +1,10 @@
 import { Text } from "@/components/ui/text";
 import { createClient } from "@/lib/api";
 import { cookies } from "next/headers";
-import { HistoryTable } from "./_components/history-table";
-import { ProjectSelector } from "../_components/project-selector";
+import { css } from "styled-system/css";
 import { Flex } from "styled-system/jsx";
+import { ProjectSelector } from "../_components/project-selector";
+import { HistoryTable } from "./_components/history-table";
 
 export default async function Page() {
   const client = createClient();
@@ -55,11 +56,24 @@ export default async function Page() {
   const history = await response.json();
 
   return (
-    <Flex gap={8} direction="column">
-      <Text as="h1" size="xl">
+    <Flex
+      gap={8}
+      direction="column"
+      className={css({
+        animation: "fadeIn 0.4s ease",
+      })}
+    >
+      <Text
+        as="h1"
+        size="xl"
+        className={css({
+          fontWeight: 600,
+          color: "text.primary",
+        })}
+      >
         利用履歴
       </Text>
-      <Text mb={2} size="sm" color="fg.muted" md={{ display: "none" }}>
+      <Text mb={2} size="sm" color="text.muted" md={{ display: "none" }}>
         横にスクロールできます。
       </Text>
       <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />

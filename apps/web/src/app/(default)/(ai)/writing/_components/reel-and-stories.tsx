@@ -1,6 +1,7 @@
 "use client";
 
 import { SectionTitle } from "@/app/(default)/_components/section-title";
+import { useState } from "react";
 import { Stack } from "styled-system/jsx";
 import {
   FileUpload,
@@ -10,7 +11,6 @@ import {
   Output,
   Root,
 } from "../../_components/form-fields";
-import { useState } from "react";
 
 export function ReelAndStoriesForm(props: { placeholder?: string }) {
   const [files, setFiles] = useState<File[]>([]);

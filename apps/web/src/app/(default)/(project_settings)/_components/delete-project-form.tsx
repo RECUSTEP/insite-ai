@@ -1,16 +1,16 @@
 "use client";
 
-import { Text } from "@/components/ui/text";
 import { SubmitButton } from "@/components/submit-button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { deleteProjectSchema_, type projectSchema } from "api/schema";
-import { stack } from "styled-system/patterns";
-import { type z } from "zod";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { stack } from "styled-system/patterns";
+import type { z } from "zod";
 
 type Project = z.infer<typeof projectSchema>;
 

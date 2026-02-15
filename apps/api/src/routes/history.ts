@@ -22,6 +22,8 @@ export const analysisHistorySchema = z.object({
     z.literal("google-map-no-image"),
     z.literal("seo-article"),
   ]),
+  revisionParentId: z.string().nullable(),
+  version: z.number().int(),
   input: z.object({
     image: z.string().optional(),
     instruction: z.string().optional(),

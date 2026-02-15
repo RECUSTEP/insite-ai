@@ -1,14 +1,15 @@
+import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { createClient } from "@/lib/api";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import type { ComponentProps } from "react";
-import { ProjectInfoForm } from "./_components/project-info-form";
-import { Flex, HStack } from "styled-system/jsx";
-import { ProjectInfoFormWithSelector } from "./_components/project-info-form-with-selector";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import type { ComponentProps } from "react";
+import { css } from "styled-system/css";
+import { Flex, HStack } from "styled-system/jsx";
 import { ProjectDeleteModalButton } from "./_components/project-delete-modal-button";
+import type { ProjectInfoForm } from "./_components/project-info-form";
+import { ProjectInfoFormWithSelector } from "./_components/project-info-form-with-selector";
 
 export const metadata: Metadata = {
   title: "プロジェクト設定",
@@ -69,13 +70,38 @@ export default async function Page() {
   const projects = await projectsRes.json();
 
   return (
-    <Flex gap={8} direction={"column"}>
+    <Flex
+      gap={8}
+      direction={"column"}
+      className={css({
+        animation: "fadeIn 0.4s ease",
+      })}
+    >
       <Flex justify="space-between">
-        <Text as="h1" size="xl">
+        <Text
+          as="h1"
+          size="xl"
+          className={css({
+            fontWeight: 600,
+            color: "text.primary",
+          })}
+        >
           プロジェクト設定
         </Text>
         <Link href="/new" scroll={false}>
-          <Button>プロジェクト新規作成</Button>
+          <Button
+            className={css({
+              background: "brand.gradient",
+              color: "white",
+              transition: "all 0.2s ease",
+              _hover: {
+                transform: "scale(1.05)",
+                boxShadow: "cardHover",
+              },
+            })}
+          >
+            プロジェクト新規作成
+          </Button>
         </Link>
       </Flex>
       <ProjectInfoFormWithSelector

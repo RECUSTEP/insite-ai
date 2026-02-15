@@ -1,9 +1,9 @@
 "use client";
 
 import { SectionTitle } from "@/app/(default)/_components/section-title";
+import { useState } from "react";
 import { Stack } from "styled-system/jsx";
 import { FileUpload, Form, GenerateButton, Output, Root } from "../../_components/form-fields";
-import { useState } from "react";
 
 export function InsightAnalysisForm() {
   const [files, setFiles] = useState<File[]>([]);

@@ -7,6 +7,7 @@ import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { projectInfoSchema } from "api/schema";
 import { CheckCircleIcon } from "lucide-react";
+import { useEffect } from "react";
 import { useFormState } from "react-dom";
 import { css } from "styled-system/css";
 import { Box, HStack } from "styled-system/jsx";
@@ -14,7 +15,6 @@ import { stack } from "styled-system/patterns";
 import type { z } from "zod";
 import { SectionTitle } from "../../_components/section-title";
 import { saveProjectInfoAction } from "../_actions/project-info";
-import { useEffect } from "react";
 
 const formFields = {
   business: [

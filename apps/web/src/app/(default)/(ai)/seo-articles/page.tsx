@@ -1,8 +1,9 @@
 import { Text } from "@/components/ui/text";
-import type { Metadata } from "next";
-import { Flex } from "styled-system/jsx";
 import { createClient } from "@/lib/api";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { css } from "styled-system/css";
+import { Flex } from "styled-system/jsx";
 import { ProjectSelector } from "../../_components/project-selector";
 import { SeoArticleForm } from "./_components/seo-article-form";
 
@@ -29,7 +30,12 @@ export default async function Page() {
     },
   );
 
-  if (!projectRes.ok && projectRes.status !== 404 && !projectsRes.ok && projectsRes.status !== 404) {
+  if (
+    !projectRes.ok &&
+    projectRes.status !== 404 &&
+    !projectsRes.ok &&
+    projectsRes.status !== 404
+  ) {
     throw new Error("Failed to fetch project info");
   }
 
@@ -41,8 +47,21 @@ export default async function Page() {
   }
 
   return (
-    <Flex gap={8} direction="column">
-      <Text as="h1" size="xl">
+    <Flex
+      gap={8}
+      direction="column"
+      className={css({
+        animation: "fadeIn 0.4s ease",
+      })}
+    >
+      <Text
+        as="h1"
+        size="xl"
+        className={css({
+          fontWeight: 600,
+          color: "text.primary",
+        })}
+      >
         SEO・AIO記事
       </Text>
       <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />

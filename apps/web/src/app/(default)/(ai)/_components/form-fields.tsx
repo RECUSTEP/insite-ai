@@ -4,9 +4,11 @@ import { Button, type ButtonProps } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea, type TextareaProps } from "@/components/ui/textarea";
+import { Tooltip } from "@/components/ui/tooltip";
 import { PROJECT_TAG } from "@/lib/tags";
 import { fileUpload } from "@repo/configuration";
 import type { analysisQuerySchema } from "api/schema";
+import { Copy } from "lucide-react";
 import {
   type ComponentProps,
   type Dispatch,
@@ -20,8 +22,6 @@ import { Stack } from "styled-system/jsx";
 import type { z } from "zod";
 import { revalidateTagAction } from "../../_action/revalidate";
 import { FileUpload as BaseFileUpload } from "./file-upload";
-import { Copy } from "lucide-react";
-import { Tooltip } from "@/components/ui/tooltip";
 
 const { acceptExtensions, maxFileSizeMb } = fileUpload;
 
@@ -84,6 +84,28 @@ class AnalysisKnownError extends Error {
   }
 }
 
+const parseErrorMessage = async (response: Response) => {
+  try {
+    const data = (await response.json()) as {
+      error?: unknown;
+      message?: unknown;
+      details?: unknown;
+    };
+    if (typeof data.error === "string" && data.error.length > 0) {
+      return data.error;
+    }
+    if (typeof data.message === "string" && data.message.length > 0) {
+      return data.message;
+    }
+    if (data.details) {
+      return "文字数基準未達です。再生成をお試しください。";
+    }
+  } catch {
+    return "エラーが発生しました。";
+  }
+  return "エラーが発生しました。";
+};
+
 export type FormProps = Omit<React.ComponentProps<"form">, "onSubmit"> & {
   files?: File[];
 };
@@ -98,9 +120,9 @@ export function Form({ children, ...props }: FormProps) {
     try {
       const query = new URLSearchParams({ type: option.type });
       const form = new FormData(e.currentTarget);
-      props.files?.forEach((file) => {
+      for (const file of props.files ?? []) {
         form.append("images", file);
-      });
+      }
       const response = await fetch(`/api/analysis?${query.toString()}`, {
         method: "POST",
         body: form,
@@ -109,7 +131,7 @@ export function Form({ children, ...props }: FormProps) {
         if (response.status === 403) {
           throw new AnalysisKnownError("利用制限を超えています。");
         }
-        throw new Error("エラーが発生しました。");
+        throw new AnalysisKnownError(await parseErrorMessage(response));
       }
       revalidateTagAction(PROJECT_TAG);
       for await (const chunk of readStream(response.body)) {

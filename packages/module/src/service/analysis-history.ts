@@ -62,6 +62,8 @@ export class AnalysisHistoryUseCase<T extends "d1" | "libsql"> extends UseCase<T
         .values({
           projectId: analysisHistory.projectId,
           aiType: analysisHistory.aiType,
+          revisionParentId: analysisHistory.revisionParentId ?? null,
+          version: analysisHistory.version ?? 1,
           input: inputParseResult.data,
           output: outputParseResult.data,
           createdAt: analysisHistory.createdAt ?? Date.now(),

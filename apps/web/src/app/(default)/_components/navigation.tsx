@@ -4,17 +4,23 @@ import { Tooltip } from "@/components/ui/tooltip";
 import {
   FileTextIcon,
   HistoryIcon,
+  HomeIcon,
+  MapPinIcon,
   NotebookPenIcon,
   SettingsIcon,
   TrendingUpIcon,
   UserRoundSearchIcon,
-  MapPinIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { css } from "styled-system/css";
 
 const navigation = [
+  {
+    icon: <HomeIcon size="20" />,
+    label: "ホーム",
+    path: "/home",
+  },
   {
     icon: <SettingsIcon size="20" />,
     label: "プロジェクト設定",
@@ -72,15 +78,19 @@ export function Navigation() {
                 alignItems: "center",
                 gap: 4,
                 p: 4,
-                color: "white",
+                color: "text.primary",
+                borderRadius: "md",
+                transition: "all 0.2s ease",
                 _currentPage: {
-                  color: "subfont",
-                  bg: "white",
+                  color: "brand.DEFAULT",
+                  bg: "#EBF8FF",
+                  fontWeight: 600,
                 },
                 _hover: {
-                  bg: "gray.a4",
+                  bg: "gray.100",
+                  transform: "scale(1.02)",
                   _currentPage: {
-                    bg: "bg.default",
+                    bg: "#EBF8FF",
                   },
                 },
               })}
@@ -92,7 +102,7 @@ export function Navigation() {
                     className={css({
                       m: -4,
                       p: 4,
-                      color: "accent",
+                      color: "brand.DEFAULT",
                     })}
                   >
                     {item.icon}

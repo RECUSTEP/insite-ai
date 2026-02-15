@@ -52,12 +52,15 @@ const analysisHistory = sqliteTable(
       .notNull()
       .references(() => projects.projectId, { onDelete: "cascade" }),
     aiType: text("ai_type").notNull(),
+    revisionParentId: text("revision_parent_id"),
+    version: integer("version").notNull().default(1),
     input: text("input", { mode: "json" }).notNull(),
     output: text("output", { mode: "json" }).notNull(),
     createdAt: integer("created_at").notNull(),
   },
   (table) => ({
     projectIdIdx: index("analysis_history_project_id_idx").on(table.projectId),
+    revisionParentIdIdx: index("analysis_history_revision_parent_id_idx").on(table.revisionParentId),
   }),
 );
 
