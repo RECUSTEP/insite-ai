@@ -76,25 +76,25 @@ const aiFeatures = [
   {
     icon: SparklesIcon,
     title: "AI自動生成",
-    description: "最新のAI技術で、高品質なコンテンツを数秒で生成",
+    description: "高度な自然言語処理AIが、あなたのビジネスに最適化されたコンテンツを瞬時に生成。Instagram投稿、Google Mapの口コミ返信、SEO記事まで、プロフェッショナルな品質を数秒で実現します。",
     color: "#2F80ED",
   },
   {
     icon: ZapIcon,
     title: "業務効率化",
-    description: "手作業の時間を90%削減し、本質的な業務に集中",
+    description: "SNS運用、口コミ対応、コンテンツ作成など、日々の煩雑な業務を自動化。手作業の時間を最大90%削減し、戦略立案やお客様との対話など、本質的な業務に集中できる環境を実現します。",
     color: "#27AE60",
   },
   {
     icon: BrainCircuitIcon,
-    title: "データ分析",
-    description: "市場・競合・自社データを総合的に分析して戦略立案",
+    title: "データ駆動の戦略立案",
+    description: "市場トレンド、競合店舗の動向、自社アカウントのパフォーマンスを統合的に分析。AIが膨大なデータから意味のある洞察を抽出し、次の一手を的確に提案します。",
     color: "#9B51E0",
   },
   {
     icon: RocketIcon,
-    title: "売上向上",
-    description: "最適化されたマーケティング施策で集客・売上アップ",
+    title: "持続的な成長支援",
+    description: "AIが24時間365日、あなたのビジネスの成長をサポート。最適化されたマーケティング施策、効果的なコンテンツ戦略、データに基づく改善提案により、集客力と売上の向上を実現します。",
     color: "#F2994A",
   },
 ];
@@ -260,101 +260,114 @@ export default async function HomePage() {
       </Box>
 
       {/* INSITE AIの特徴セクション */}
-      <VStack gap={12} w="full" maxW="1200px">
-        <VStack gap={3} textAlign="center">
+      <VStack gap={16} w="full" maxW="1100px" mb={12}>
+        <VStack gap={4} textAlign="center">
           <Text
-            size="3xl"
+            size="4xl"
             className={css({
               fontWeight: 700,
-              color: "text.primary",
+              background: "brand.gradient",
+              backgroundClip: "text",
+              color: "transparent",
             })}
+            style={{
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
           >
             INSITE AIの特徴
           </Text>
           <Text
-            size="md"
+            size="lg"
             className={css({
               color: "text.secondary",
-              maxW: "2xl",
+              maxW: "3xl",
+              lineHeight: 1.8,
             })}
           >
-            最先端のAI技術で、あなたのビジネスを次のステージへ
+            最先端のAI技術とデータサイエンスを駆使し、
+            <br />
+            あなたのビジネスを次のステージへ導きます
           </Text>
         </VStack>
 
-        <Box
-          className={css({
-            display: "grid",
-            gridTemplateColumns: {
-              base: "1fr",
-              md: "repeat(2, 1fr)",
-            },
-            gap: 6,
-            w: "full",
-          })}
-        >
+        <VStack gap={12} w="full">
           {aiFeatures.map((feature, index) => (
-            <Box
+            <Flex
               key={index}
+              gap={8}
+              alignItems="flex-start"
+              p={10}
+              bg="white"
+              borderRadius="2xl"
+              boxShadow="0 8px 24px rgba(0, 0, 0, 0.06)"
+              border="1px solid"
+              borderColor="gray.100"
+              transition="all 0.4s ease"
+              w="full"
               className={css({
-                bg: "white",
-                borderRadius: "xl",
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                p: 8,
-                transition: "all 0.3s ease",
-                border: "1px solid",
-                borderColor: "gray.100",
                 _hover: {
-                  transform: "translateY(-4px)",
-                  boxShadow: "0 12px 24px rgba(0, 0, 0, 0.12)",
+                  transform: "translateY(-8px)",
+                  boxShadow: "0 16px 48px rgba(0, 0, 0, 0.12)",
                   borderColor: feature.color,
                 },
               })}
             >
-              <HStack gap={4} alignItems="flex-start">
-                <Box
+              <Box
+                className={css({
+                  w: 20,
+                  h: 20,
+                  borderRadius: "2xl",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  bg: `${feature.color}15`,
+                  flexShrink: 0,
+                  position: "relative",
+                  _before: {
+                    content: '""',
+                    position: "absolute",
+                    inset: 0,
+                    borderRadius: "2xl",
+                    padding: "2px",
+                    background: `linear-gradient(135deg, ${feature.color}40, ${feature.color}10)`,
+                    WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                    WebkitMaskComposite: "xor",
+                    maskComposite: "exclude",
+                  },
+                })}
+              >
+                <feature.icon
+                  size={40}
                   className={css({
-                    w: 14,
-                    h: 14,
-                    borderRadius: "xl",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    bg: `${feature.color}15`,
-                    flexShrink: 0,
+                    color: feature.color,
+                  })}
+                />
+              </Box>
+              <VStack gap={3} alignItems="flex-start" flex={1}>
+                <Text
+                  size="2xl"
+                  className={css({
+                    fontWeight: 700,
+                    color: "text.primary",
                   })}
                 >
-                  <feature.icon
-                    size={28}
-                    className={css({
-                      color: feature.color,
-                    })}
-                  />
-                </Box>
-                <VStack gap={2} alignItems="flex-start" flex={1}>
-                  <Text
-                    size="lg"
-                    className={css({
-                      fontWeight: 600,
-                      color: "text.primary",
-                    })}
-                  >
-                    {feature.title}
-                  </Text>
-                  <Text
-                    className={css({
-                      color: "text.secondary",
-                      fontSize: "sm",
-                      lineHeight: 1.6,
-                    })}
-                  >
-                    {feature.description}
-                  </Text>
-                </VStack>
-              </HStack>
-            </Box>
+                  {feature.title}
+                </Text>
+                <Text
+                  className={css({
+                    color: "text.secondary",
+                    fontSize: "md",
+                    lineHeight: 1.9,
+                    letterSpacing: "0.3px",
+                  })}
+                >
+                  {feature.description}
+                </Text>
+              </VStack>
+            </Flex>
           ))}
-        </Box>
+        </VStack>
       </VStack>
     </Flex>
   );
