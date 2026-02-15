@@ -12,6 +12,7 @@ interface AnalysisStatsProps {
   icon: LucideIcon;
   color: string;
   description: string;
+  mode?: "focus" | "browse";
 }
 
 interface HistoryItem {
@@ -23,10 +24,13 @@ interface HistoryItem {
 function extractSummaryPoints(markdownText: string, maxPoints: number = 7): string[] {
   const points: string[] = [];
   
+  // **太字マーカー**を削除
+  const cleanedText = markdownText.replace(/\*\*(.+?)\*\*/g, "$1");
+  
   // 箇条書きを優先的に抽出
   const bulletRegex = /^[\s]*[-*]\s+(.+)$/gm;
   let match;
-  while ((match = bulletRegex.exec(markdownText)) !== null && points.length < maxPoints) {
+  while ((match = bulletRegex.exec(cleanedText)) !== null && points.length < maxPoints) {
     const point = match[1]?.trim();
     if (point && point.length > 10 && point.length < 150) {
       points.push(point);
@@ -36,7 +40,7 @@ function extractSummaryPoints(markdownText: string, maxPoints: number = 7): stri
   // 箇条書きが少ない場合、見出し直後のテキストを抽出
   if (points.length < 3) {
     const headingRegex = /^#{2,3}\s+(.+?)[\r\n]+(.+?)(?=\n\n|#{2,3}|$)/gms;
-    while ((match = headingRegex.exec(markdownText)) !== null && points.length < maxPoints) {
+    while ((match = headingRegex.exec(cleanedText)) !== null && points.length < maxPoints) {
       const content = match[2]?.trim();
       if (content && content.length > 20) {
         const firstSentence = content.split(/[。\n]/)[0]?.trim();
@@ -49,7 +53,7 @@ function extractSummaryPoints(markdownText: string, maxPoints: number = 7): stri
   
   // それでも足りない場合、段落の最初の文を抽出
   if (points.length < 3) {
-    const paragraphs = markdownText.split(/\n\n+/);
+    const paragraphs = cleanedText.split(/\n\n+/);
     for (const para of paragraphs) {
       if (points.length >= maxPoints) break;
       const cleaned = para.replace(/^#{1,6}\s+/, "").trim();
@@ -65,7 +69,7 @@ function extractSummaryPoints(markdownText: string, maxPoints: number = 7): stri
   return points.slice(0, maxPoints);
 }
 
-export function AnalysisStats({ type, title, icon: Icon, color, description }: AnalysisStatsProps) {
+export function AnalysisStats({ type, title, icon: Icon, color, description, mode = "browse" }: AnalysisStatsProps) {
   const [summaryPoints, setSummaryPoints] = useState<string[]>([]);
   const [hasData, setHasData] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -118,12 +122,24 @@ export function AnalysisStats({ type, title, icon: Icon, color, description }: A
     fetchStats();
   }, [type]);
 
+  const cardStyles = mode === "browse" 
+    ? {
+        minW: "280px",
+        maxW: "280px",
+        h: "350px",
+      }
+    : {
+        w: "full",
+        maxW: "600px",
+        h: "auto",
+        minH: "300px",
+      };
+
   if (loading) {
     return (
       <Box
         className={css({
-          minW: "320px",
-          h: "400px",
+          ...cardStyles,
           bg: "bg.card",
           borderRadius: "card",
           boxShadow: "card",
@@ -148,8 +164,7 @@ export function AnalysisStats({ type, title, icon: Icon, color, description }: A
   return (
     <Box
       className={css({
-        minW: "320px",
-        h: "400px",
+        ...cardStyles,
         bg: "bg.card",
         borderRadius: "card",
         boxShadow: "card",
@@ -160,7 +175,7 @@ export function AnalysisStats({ type, title, icon: Icon, color, description }: A
         transition: "all 0.3s ease",
         _hover: {
           boxShadow: "cardHover",
-          transform: "translateY(-4px)",
+          transform: mode === "browse" ? "translateY(-4px)" : "none",
         },
       })}
     >

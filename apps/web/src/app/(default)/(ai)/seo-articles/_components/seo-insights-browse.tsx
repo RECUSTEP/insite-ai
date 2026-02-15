@@ -89,19 +89,21 @@ export function SeoInsightsBrowse() {
           },
         })}
       >
-        <Flex gap={4} px={4} minW="max-content">
+        <Flex gap={3} px={4} minW="max-content">
           {insights.map((insight) => (
             <Box
               key={insight.id}
               className={css({
-                minW: "360px",
+                minW: "280px",
+                maxW: "280px",
+                h: "350px",
                 bg: "bg.card",
                 borderRadius: "card",
                 boxShadow: "card",
-                p: 6,
+                p: 5,
                 display: "flex",
                 flexDirection: "column",
-                gap: 4,
+                gap: 3,
                 transition: "all 0.3s ease",
                 _hover: {
                   boxShadow: "cardHover",
@@ -109,11 +111,11 @@ export function SeoInsightsBrowse() {
                 },
               })}
             >
-              <Flex align="center" gap={3}>
+              <Flex align="center" gap={2}>
                 <Box
                   className={css({
-                    w: 12,
-                    h: 12,
+                    w: 10,
+                    h: 10,
                     borderRadius: "full",
                     display: "flex",
                     alignItems: "center",
@@ -122,14 +124,14 @@ export function SeoInsightsBrowse() {
                   })}
                 >
                   <insight.icon
-                    size={24}
+                    size={20}
                     className={css({
                       color: insight.color,
                     })}
                   />
                 </Box>
                 <Text
-                  size="lg"
+                  size="md"
                   className={css({
                     fontWeight: 600,
                     color: "text.primary",
@@ -139,14 +141,21 @@ export function SeoInsightsBrowse() {
                 </Text>
               </Flex>
 
-              <VStack gap={2} alignItems="stretch">
+              <VStack 
+                gap={2} 
+                alignItems="stretch"
+                className={css({
+                  flex: 1,
+                  overflowY: "auto",
+                })}
+              >
                 {insight.items.map((item, index) => (
                   <Flex
                     key={index}
                     gap={2}
                     className={css({
-                      py: 2,
-                      px: 3,
+                      py: 1.5,
+                      px: 2,
                       borderRadius: "md",
                       bg: "gray.50",
                       transition: "background 0.2s ease",
@@ -157,8 +166,8 @@ export function SeoInsightsBrowse() {
                   >
                     <Box
                       className={css({
-                        w: 5,
-                        h: 5,
+                        w: 4,
+                        h: 4,
                         borderRadius: "full",
                         bg: insight.color,
                         flexShrink: 0,
@@ -167,9 +176,9 @@ export function SeoInsightsBrowse() {
                     />
                     <Text
                       className={css({
-                        fontSize: "sm",
+                        fontSize: "xs",
                         color: "text.secondary",
-                        lineHeight: 1.6,
+                        lineHeight: 1.5,
                       })}
                     >
                       {item}

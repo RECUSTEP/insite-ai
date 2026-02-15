@@ -53,7 +53,7 @@ export function BrowseModeLayout({ children }: BrowseModeLayoutProps) {
           },
         })}
       >
-        <Flex gap={4} px={4} minW="max-content">
+        <Flex gap={3} px={4} minW="max-content">
           {analysisCards.map((card) => (
             <AnalysisStats
               key={card.id}
@@ -62,6 +62,7 @@ export function BrowseModeLayout({ children }: BrowseModeLayoutProps) {
               icon={card.icon}
               color={card.color}
               description={card.description}
+              mode="browse"
             />
           ))}
         </Flex>
