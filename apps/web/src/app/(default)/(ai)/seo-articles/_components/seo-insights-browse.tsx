@@ -17,10 +17,9 @@ const insights = [
     color: "#2F80ED",
     items: [
       "AI生成コンテンツの品質評価が厳格化",
-      "ユーザー体験（UX）シグナルの重要性増加",
-      "E-E-A-T（経験・専門性・権威性・信頼性）が必須",
-      "モバイルファーストインデックスの完全移行",
-      "音声検索最適化の重要性が上昇",
+      "UXシグナルの重要性増加",
+      "E-E-A-Tが必須要素に",
+      "モバイルファースト完全移行",
     ],
   },
   {
@@ -29,12 +28,10 @@ const insights = [
     icon: CheckCircleIcon,
     color: "#27AE60",
     items: [
-      "3000文字以上の充実したコンテンツ量",
-      "明確な見出し構造（H2, H3の適切な使用）",
-      "FAQ形式での質問回答（各200文字以上）",
-      "独自の視点や実体験の盛り込み",
-      "読みやすい段落構成と適切な改行",
-      "内部リンクと外部リンクのバランス",
+      "3000文字以上の充実したコンテンツ",
+      "明確な見出し構造（H2, H3）",
+      "FAQ形式での質問回答",
+      "独自の視点や実体験",
     ],
   },
   {
@@ -43,12 +40,10 @@ const insights = [
     icon: LightbulbIcon,
     color: "#9B51E0",
     items: [
-      "ターゲットキーワードを自然に配置",
-      "最初の段落で記事の結論を提示",
+      "キーワードを自然に配置",
+      "最初の段落で結論を提示",
       "具体的な数値やデータを含める",
-      "ユーザーの検索意図を満たす内容",
       "定期的な更新で鮮度を保つ",
-      "画像のalt属性を適切に設定",
     ],
   },
 ];
@@ -58,13 +53,14 @@ export function SeoInsightsBrowse({ mode = "browse" }: SeoInsightsBrowseProps) {
     ? {
         minW: "280px",
         maxW: "280px",
-        h: "350px",
+        h: "300px",
       }
     : {
         flex: 1,
         minW: "320px",
         h: "auto",
-        minH: "320px",
+        minH: "220px",
+        maxH: "280px",
       };
 
   const containerGap = mode === "browse" ? 3 : 4;
@@ -129,10 +125,10 @@ export function SeoInsightsBrowse({ mode = "browse" }: SeoInsightsBrowseProps) {
                 bg: "bg.card",
                 borderRadius: "card",
                 boxShadow: "card",
-                p: mode === "browse" ? 5 : 6,
+                p: mode === "browse" ? 4 : 5,
                 display: "flex",
                 flexDirection: "column",
-                gap: mode === "browse" ? 3 : 4,
+                gap: mode === "browse" ? 2 : 3,
                 transition: "all 0.3s ease",
                 _hover: {
                   boxShadow: "cardHover",
@@ -171,7 +167,7 @@ export function SeoInsightsBrowse({ mode = "browse" }: SeoInsightsBrowseProps) {
               </Flex>
 
               <VStack 
-                gap={mode === "browse" ? 2 : 2.5}
+                gap={mode === "browse" ? 1.5 : 2}
                 alignItems="stretch"
                 className={css({
                   flex: 1,
@@ -182,8 +178,8 @@ export function SeoInsightsBrowse({ mode = "browse" }: SeoInsightsBrowseProps) {
                   <Box
                     key={index}
                     className={css({
-                      py: mode === "browse" ? 1.5 : 2.5,
-                      px: mode === "browse" ? 2 : 4,
+                      py: mode === "browse" ? 1.5 : 2,
+                      px: mode === "browse" ? 2 : 3,
                       borderRadius: "md",
                       bg: "gray.50",
                       transition: "background 0.2s ease",
@@ -194,9 +190,9 @@ export function SeoInsightsBrowse({ mode = "browse" }: SeoInsightsBrowseProps) {
                   >
                     <Text
                       className={css({
-                        fontSize: mode === "browse" ? "xs" : "md",
+                        fontSize: mode === "browse" ? "xs" : "sm",
                         color: "text.secondary",
-                        lineHeight: 1.6,
+                        lineHeight: 1.5,
                       })}
                     >
                       {item}

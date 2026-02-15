@@ -21,7 +21,7 @@ interface HistoryItem {
   output: { output: string };
 }
 
-function extractSummaryPoints(markdownText: string, maxPoints: number = 7): string[] {
+function extractSummaryPoints(markdownText: string, maxPoints: number = 4): string[] {
   const points: string[] = [];
   
   // **太字マーカー**を削除
@@ -32,7 +32,7 @@ function extractSummaryPoints(markdownText: string, maxPoints: number = 7): stri
   let match;
   while ((match = bulletRegex.exec(cleanedText)) !== null && points.length < maxPoints) {
     const point = match[1]?.trim();
-    if (point && point.length > 10 && point.length < 150) {
+    if (point && point.length > 10 && point.length < 80) {
       points.push(point);
     }
   }
@@ -42,25 +42,25 @@ function extractSummaryPoints(markdownText: string, maxPoints: number = 7): stri
     const headingRegex = /^#{2,3}\s+(.+?)[\r\n]+(.+?)(?=\n\n|#{2,3}|$)/gms;
     while ((match = headingRegex.exec(cleanedText)) !== null && points.length < maxPoints) {
       const content = match[2]?.trim();
-      if (content && content.length > 20) {
-        const firstSentence = content.split(/[。\n]/)[0]?.trim();
-        if (firstSentence && firstSentence.length > 10 && firstSentence.length < 150) {
-          points.push(firstSentence + (firstSentence.endsWith("。") ? "" : ""));
+      if (content && content.length > 15) {
+        const firstSentence = content.split(/[。\n]/)[0]?.trim().slice(0, 80);
+        if (firstSentence && firstSentence.length > 10) {
+          points.push(firstSentence + (firstSentence.endsWith("。") ? "" : "..."));
         }
       }
     }
   }
   
   // それでも足りない場合、段落の最初の文を抽出
-  if (points.length < 3) {
+  if (points.length < 2) {
     const paragraphs = cleanedText.split(/\n\n+/);
     for (const para of paragraphs) {
       if (points.length >= maxPoints) break;
       const cleaned = para.replace(/^#{1,6}\s+/, "").trim();
-      if (cleaned.length > 20 && !cleaned.startsWith("-") && !cleaned.startsWith("*")) {
-        const firstSentence = cleaned.split(/[。\n]/)[0]?.trim();
-        if (firstSentence && firstSentence.length > 10 && firstSentence.length < 150) {
-          points.push(firstSentence + (firstSentence.endsWith("。") ? "" : ""));
+      if (cleaned.length > 15 && !cleaned.startsWith("-") && !cleaned.startsWith("*")) {
+        const firstSentence = cleaned.split(/[。\n]/)[0]?.trim().slice(0, 80);
+        if (firstSentence && firstSentence.length > 10) {
+          points.push(firstSentence + (firstSentence.endsWith("。") ? "" : "..."));
         }
       }
     }
@@ -126,13 +126,14 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
     ? {
         minW: "280px",
         maxW: "280px",
-        h: "350px",
+        h: "300px",
       }
     : {
         flex: 1,
         minW: "320px",
         h: "auto",
-        minH: "320px",
+        minH: "220px",
+        maxH: "280px",
       };
 
   if (loading) {
@@ -221,12 +222,12 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
       {hasData ? (
         <VStack
           flex={1}
-          gap={mode === "browse" ? 2 : 2.5}
+          gap={mode === "browse" ? 1.5 : 2}
           alignItems="stretch"
           className={css({
             borderRadius: "md",
             bg: "gray.50",
-            p: mode === "browse" ? 4 : 5,
+            p: mode === "browse" ? 3 : 4,
             overflowY: "auto",
           })}
         >
@@ -234,8 +235,8 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
             <Box
               key={index}
               className={css({
-                py: mode === "browse" ? 2 : 2.5,
-                px: mode === "browse" ? 3 : 4,
+                py: mode === "browse" ? 1.5 : 2,
+                px: mode === "browse" ? 2 : 3,
                 borderRadius: "md",
                 bg: "white",
                 transition: "background 0.2s ease",
@@ -246,9 +247,9 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
             >
               <Text
                 className={css({
-                  fontSize: mode === "browse" ? "sm" : "md",
+                  fontSize: mode === "browse" ? "xs" : "sm",
                   color: "text.secondary",
-                  lineHeight: 1.6,
+                  lineHeight: 1.5,
                 })}
               >
                 {point}
