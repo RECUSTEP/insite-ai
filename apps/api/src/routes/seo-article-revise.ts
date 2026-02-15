@@ -45,6 +45,16 @@ const handler = projectGuard.createHandlers(
       return c.json({ error: "SEO記事の履歴のみ修正できます" }, 400);
     }
 
+    // プロジェクトのSEOアドオンフラグをチェック
+    if (!project.val.seoAddonEnabled) {
+      return c.json(
+        { 
+          error: "SEO/AIO記事生成機能は有効化されていません。管理者にお問い合わせください。" 
+        }, 
+        403
+      );
+    }
+
     const previousOutput = (history.output as { output?: unknown })?.output;
     if (typeof previousOutput !== "string" || previousOutput.trim().length === 0) {
       return c.json({ error: "修正対象の記事本文が見つかりません" }, 422);

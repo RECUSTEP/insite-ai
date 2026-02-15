@@ -4,10 +4,14 @@ import { Logout } from "./logout";
 import { Navigation } from "./navigation";
 import { ProjectOverview } from "./project-overview";
 
-export default function Sidebar() {
+interface SidebarProps {
+  seoAddonEnabled: boolean;
+}
+
+export default function Sidebar({ seoAddonEnabled }: SidebarProps) {
   return (
     <DesktopDrawer>
-      <Navigation />
+      <Navigation seoAddonEnabled={seoAddonEnabled} />
       <VStack
         px={4}
         alignItems="stretch"

@@ -36,6 +36,13 @@
       "when": 1751002268508,
       "tag": "0004_silly_sunspot",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1771180284401,
+      "tag": "0005_modern_lady_mastermind",
+      "breakpoints": true
     }
   ]
 }

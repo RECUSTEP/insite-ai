@@ -238,6 +238,16 @@ const analysisHandler = projectGuard.createHandlers(
     let system: string;
     let user: string;
     if (type === "seo-article") {
+      // プロジェクトのSEOアドオンフラグをチェック
+      if (!project.val.seoAddonEnabled) {
+        return c.json(
+          { 
+            error: "SEO/AIO記事生成機能は有効化されていません。管理者にお問い合わせください。" 
+          }, 
+          403
+        );
+      }
+      
       const prompt = await c.var.promptUseCase.getPromptByAiType("seo-article");
       if (!prompt.ok && prompt.val === CommonUseCaseError.NotFound) {
         const projectInfo = await c.var.projectInfoUseCase.getProjectInfo({

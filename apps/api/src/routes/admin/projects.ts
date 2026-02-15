@@ -42,6 +42,7 @@ export const projectSchema = z.object({
       required_error: ErrorMessages.AuthIdRequired,
     })
     .min(1, ErrorMessages.AuthIdRequired),
+  seoAddonEnabled: z.boolean().optional(),
 });
 
 const createProjectHandler = adminGuard.createHandlers(

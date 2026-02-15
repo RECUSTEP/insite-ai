@@ -5,7 +5,11 @@ import { MobileDrawer } from "./mobile-drawer";
 import { Navigation } from "./navigation";
 import { ProjectOverview } from "./project-overview";
 
-export function Header() {
+interface HeaderProps {
+  seoAddonEnabled: boolean;
+}
+
+export function Header({ seoAddonEnabled }: HeaderProps) {
   return (
     <header
       className={css({
@@ -25,7 +29,7 @@ export function Header() {
       })}
     >
       <MobileDrawer>
-        <Navigation />
+        <Navigation seoAddonEnabled={seoAddonEnabled} />
         <VStack px={4} alignItems="stretch">
           <ProjectOverview />
           <Logout />

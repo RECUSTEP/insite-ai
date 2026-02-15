@@ -58,8 +58,17 @@ const navigation = [
   },
 ] as const;
 
-export function Navigation() {
+interface NavigationProps {
+  seoAddonEnabled: boolean;
+}
+
+export function Navigation({ seoAddonEnabled }: NavigationProps) {
   const pathname = usePathname();
+
+  // SEOアドオンが有効な場合のみSEO機能を表示
+  const visibleNavigation = navigation.filter(item => 
+    item.path !== '/seo-articles' || seoAddonEnabled
+  );
 
   return (
     <nav
@@ -69,7 +78,7 @@ export function Navigation() {
       })}
     >
       <ul>
-        {navigation.map((item) => (
+        {visibleNavigation.map((item) => (
           <li key={item.path}>
             <Link
               href={item.path}

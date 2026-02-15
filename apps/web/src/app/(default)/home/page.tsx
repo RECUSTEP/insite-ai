@@ -1,4 +1,5 @@
 import { Text } from "@/components/ui/text";
+import { createClient } from "@/lib/api";
 import type { LucideIcon } from "lucide-react";
 import {
   BrainCircuitIcon,
@@ -12,6 +13,7 @@ import {
   ZapIcon,
 } from "lucide-react";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { css } from "styled-system/css";
 import { Box, Flex, HStack, VStack } from "styled-system/jsx";
@@ -97,7 +99,29 @@ const aiFeatures = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  // プロジェクト情報を取得してSEOアドオンの有効状態を確認
+  const client = createClient();
+  const projectRes = await client.project.$get(
+    {},
+    {
+      headers: {
+        cookie: cookies().toString(),
+      },
+    },
+  );
+
+  let seoAddonEnabled = false;
+  if (projectRes.ok) {
+    const project = await projectRes.json();
+    seoAddonEnabled = project.seoAddonEnabled ?? false;
+  }
+
+  // SEOアドオンが有効な場合のみSEO機能を表示
+  const visibleFeatures = features.filter(f => 
+    f.id !== 'seo-articles' || seoAddonEnabled
+  );
+
   return (
     <Flex
       direction="column"
@@ -174,7 +198,7 @@ export default function HomePage() {
           },
         })}
       >
-        {features.map((feature) => (
+        {visibleFeatures.map((feature) => (
           <Link key={feature.id} href={feature.path}>
             <Box
               className={css({

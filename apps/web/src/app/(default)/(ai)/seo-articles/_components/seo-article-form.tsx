@@ -63,6 +63,14 @@ export function SeoArticleForm() {
     try {
       const res = await fetch("/api/seo-suggest-keywords", { method: "POST" });
       if (!res.ok) {
+        if (res.status === 403) {
+          const data = (await res.json()) as { error?: string };
+          toaster.error({
+            title: "エラー",
+            description: data.error ?? "SEO/AIO記事生成機能は有効化されていません。",
+          });
+          return;
+        }
         throw new Error("Failed to fetch");
       }
       const data = (await res.json()) as { keywords?: string[]; suggestions?: string };
@@ -71,10 +79,10 @@ export function SeoArticleForm() {
       } else if (typeof data.suggestions === "string") {
         setSuggestions([data.suggestions]);
       }
-    } catch {
+    } catch (error) {
       toaster.error({
         title: "エラー",
-        description: "キーワードの取得に失敗しました",
+        description: error instanceof Error ? error.message : "キーワードの取得に失敗しました",
       });
     } finally {
       setSuggestLoading(false);
@@ -112,6 +120,9 @@ export function SeoArticleForm() {
       });
       const data = (await res.json()) as { output?: string; error?: string };
       if (!res.ok) {
+        if (res.status === 403) {
+          throw new Error(data.error ?? "SEO/AIO記事生成機能は有効化されていません。");
+        }
         throw new Error(data.error ?? "修正に失敗しました");
       }
       setRevisedOutput(data.output ?? "");

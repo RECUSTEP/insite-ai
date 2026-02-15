@@ -22,6 +22,23 @@ JSON配列のみで返してください。例: ["キーワード1", "キーワ�
 最寄り駅: \${nearestStation}`;
 
 const handler = projectGuard.createHandlers(async (c) => {
+  const project = await c.var.projectUseCase.getProject({
+    projectId: c.var.session.projectId,
+  });
+  if (!project.ok) {
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
+
+  // プロジェクトのSEOアドオンフラグをチェック
+  if (!project.val.seoAddonEnabled) {
+    return c.json(
+      { 
+        error: "SEO/AIO記事生成機能は有効化されていません。管理者にお問い合わせください。" 
+      }, 
+      403
+    );
+  }
+
   const projectInfo = await c.var.projectInfoUseCase.getProjectInfo({
     projectId: c.var.session.projectId,
   });

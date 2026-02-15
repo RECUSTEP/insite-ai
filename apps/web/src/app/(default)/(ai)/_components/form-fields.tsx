@@ -129,7 +129,8 @@ export function Form({ children, ...props }: FormProps) {
       });
       if (!response.ok || response.body === null) {
         if (response.status === 403) {
-          throw new AnalysisKnownError("利用制限を超えています。");
+          const errorMsg = await parseErrorMessage(response);
+          throw new AnalysisKnownError(errorMsg);
         }
         throw new AnalysisKnownError(await parseErrorMessage(response));
       }

@@ -18,6 +18,7 @@ const getProjectHandler = projectGuard.createHandlers(async (c) => {
     name: projectResult.val.name,
     apiUsageLimit: projectResult.val.apiUsageLimit,
     apiUsageCount: apiUsageResult.val,
+    seoAddonEnabled: projectResult.val.seoAddonEnabled ?? false,
   });
 });
 
