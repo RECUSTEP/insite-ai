@@ -4,7 +4,7 @@ import { Text } from "@/components/ui/text";
 import type { LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { css } from "styled-system/css";
-import { Box, Flex } from "styled-system/jsx";
+import { Box, Flex, VStack } from "styled-system/jsx";
 
 interface AnalysisStatsProps {
   type: "market" | "competitor" | "account";
@@ -14,18 +14,60 @@ interface AnalysisStatsProps {
   description: string;
 }
 
-interface Stats {
-  totalCount: number;
-  thisMonthCount: number;
-  lastUsed: string | null;
+interface HistoryItem {
+  aiType: string;
+  createdAt: string;
+  output: { output: string };
+}
+
+function extractSummaryPoints(markdownText: string, maxPoints: number = 7): string[] {
+  const points: string[] = [];
+  
+  // 箇条書きを優先的に抽出
+  const bulletRegex = /^[\s]*[-*]\s+(.+)$/gm;
+  let match;
+  while ((match = bulletRegex.exec(markdownText)) !== null && points.length < maxPoints) {
+    const point = match[1]?.trim();
+    if (point && point.length > 10 && point.length < 150) {
+      points.push(point);
+    }
+  }
+  
+  // 箇条書きが少ない場合、見出し直後のテキストを抽出
+  if (points.length < 3) {
+    const headingRegex = /^#{2,3}\s+(.+?)[\r\n]+(.+?)(?=\n\n|#{2,3}|$)/gms;
+    while ((match = headingRegex.exec(markdownText)) !== null && points.length < maxPoints) {
+      const content = match[2]?.trim();
+      if (content && content.length > 20) {
+        const firstSentence = content.split(/[。\n]/)[0]?.trim();
+        if (firstSentence && firstSentence.length > 10 && firstSentence.length < 150) {
+          points.push(firstSentence + (firstSentence.endsWith("。") ? "" : ""));
+        }
+      }
+    }
+  }
+  
+  // それでも足りない場合、段落の最初の文を抽出
+  if (points.length < 3) {
+    const paragraphs = markdownText.split(/\n\n+/);
+    for (const para of paragraphs) {
+      if (points.length >= maxPoints) break;
+      const cleaned = para.replace(/^#{1,6}\s+/, "").trim();
+      if (cleaned.length > 20 && !cleaned.startsWith("-") && !cleaned.startsWith("*")) {
+        const firstSentence = cleaned.split(/[。\n]/)[0]?.trim();
+        if (firstSentence && firstSentence.length > 10 && firstSentence.length < 150) {
+          points.push(firstSentence + (firstSentence.endsWith("。") ? "" : ""));
+        }
+      }
+    }
+  }
+  
+  return points.slice(0, maxPoints);
 }
 
 export function AnalysisStats({ type, title, icon: Icon, color, description }: AnalysisStatsProps) {
-  const [stats, setStats] = useState<Stats>({
-    totalCount: 0,
-    thisMonthCount: 0,
-    lastUsed: null,
-  });
+  const [summaryPoints, setSummaryPoints] = useState<string[]>([]);
+  const [hasData, setHasData] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,31 +77,36 @@ export function AnalysisStats({ type, title, icon: Icon, color, description }: A
 
         if (response.ok) {
           const data = await response.json();
-          const histories = data as Array<{ aiType: string; createdAt: string }>;
-          const now = new Date();
-          const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+          const histories = data as Array<HistoryItem>;
 
           const filteredHistories = histories.filter((h) => h.aiType === type);
 
-          const totalCount = filteredHistories.length;
-          const thisMonthCount = filteredHistories.filter(
-            (h) => new Date(h.createdAt) >= thisMonthStart,
-          ).length;
-
-          let lastUsed: string | null = null;
           if (filteredHistories.length > 0) {
-            const lastHistory = filteredHistories.sort(
+            // 最新の分析結果を取得
+            const latestHistory = filteredHistories.sort(
               (a, b) =>
                 new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
             )[0];
-            if (lastHistory) {
-              const lastDate = new Date(lastHistory.createdAt);
-              const diffDays = Math.floor((now.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
-              lastUsed = diffDays === 0 ? "今日" : diffDays === 1 ? "昨日" : `${diffDays}日前`;
+
+            if (latestHistory?.output?.output) {
+              const points = extractSummaryPoints(latestHistory.output.output);
+              if (points.length > 0) {
+                setSummaryPoints(points);
+                setHasData(true);
+              } else {
+                // 要約抽出失敗時は最初の200文字を使用
+                const fallback = latestHistory.output.output
+                  .replace(/^#{1,6}\s+/gm, "")
+                  .replace(/[-*]\s+/g, "")
+                  .trim()
+                  .slice(0, 200);
+                if (fallback) {
+                  setSummaryPoints([fallback + "..."]);
+                  setHasData(true);
+                }
+              }
             }
           }
-
-          setStats({ totalCount, thisMonthCount, lastUsed });
         }
       } catch (error) {
         console.error("Failed to fetch analysis stats:", error);
@@ -155,96 +202,101 @@ export function AnalysisStats({ type, title, icon: Icon, color, description }: A
         {description}
       </Text>
 
-      {/* 統計情報 */}
-      <Flex
-        flex={1}
-        direction="column"
-        gap={3}
-        className={css({
-          borderRadius: "md",
-          bg: "gray.50",
-          p: 4,
-        })}
-      >
-        <Box>
-          <Text
+      {/* 分析結果の要約 */}
+      {hasData ? (
+        <VStack
+          flex={1}
+          gap={2}
+          alignItems="stretch"
+          className={css({
+            borderRadius: "md",
+            bg: "gray.50",
+            p: 4,
+            overflowY: "auto",
+          })}
+        >
+          {summaryPoints.map((point, index) => (
+            <Flex
+              key={index}
+              gap={2}
+              className={css({
+                py: 2,
+                px: 3,
+                borderRadius: "md",
+                bg: "white",
+                transition: "background 0.2s ease",
+                _hover: {
+                  bg: "gray.100",
+                },
+              })}
+            >
+              <Box
+                className={css({
+                  w: 5,
+                  h: 5,
+                  borderRadius: "full",
+                  bg: color,
+                  flexShrink: 0,
+                  mt: 0.5,
+                })}
+              />
+              <Text
+                className={css({
+                  fontSize: "sm",
+                  color: "text.secondary",
+                  lineHeight: 1.6,
+                })}
+              >
+                {point}
+              </Text>
+            </Flex>
+          ))}
+        </VStack>
+      ) : (
+        <Box
+          flex={1}
+          className={css({
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "md",
+            bg: "gray.50",
+            p: 6,
+            textAlign: "center",
+          })}
+        >
+          <Icon
+            size={48}
             className={css({
-              fontSize: "xs",
-              color: "text.muted",
-              mb: 1,
-            })}
-          >
-            総実行回数
-          </Text>
-          <Text
-            className={css({
-              fontSize: "2xl",
-              fontWeight: 700,
               color: color,
+              opacity: 0.3,
+              mb: 3,
             })}
-          >
-            {stats.totalCount}回
-          </Text>
-        </Box>
-
-        <Box>
+          />
           <Text
             className={css({
-              fontSize: "xs",
-              color: "text.muted",
-              mb: 1,
-            })}
-          >
-            今月の実行回数
-          </Text>
-          <Text
-            className={css({
-              fontSize: "xl",
+              fontSize: "md",
               fontWeight: 600,
               color: "text.primary",
+              mb: 2,
             })}
           >
-            {stats.thisMonthCount}回
+            まだ実行されていません
+          </Text>
+          <Text
+            className={css({
+              fontSize: "sm",
+              color: "text.muted",
+              lineHeight: 1.6,
+            })}
+          >
+            この分析を実行すると、
+            <br />
+            ここに最新の結果が表示されます
           </Text>
         </Box>
-
-        {stats.lastUsed && (
-          <Box>
-            <Text
-              className={css({
-                fontSize: "xs",
-                color: "text.muted",
-                mb: 1,
-              })}
-            >
-              最終実行
-            </Text>
-            <Text
-              className={css({
-                fontSize: "md",
-                fontWeight: 500,
-                color: "text.secondary",
-              })}
-            >
-              {stats.lastUsed}
-            </Text>
-          </Box>
-        )}
-
-        {stats.totalCount === 0 && (
-          <Box pt={4}>
-            <Text
-              className={css({
-                fontSize: "sm",
-                color: "text.muted",
-                textAlign: "center",
-              })}
-            >
-              まだ実行されていません
-            </Text>
-          </Box>
-        )}
-      </Flex>
+      )}
     </Box>
   );
 }
