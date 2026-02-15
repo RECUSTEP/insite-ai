@@ -1,10 +1,20 @@
 import { Text } from "@/components/ui/text";
 import type { LucideIcon } from "lucide-react";
-import { FileTextIcon, ImagePlusIcon, MessageCircleReplyIcon, StoreIcon, TrendingUpIcon } from "lucide-react";
+import {
+  BrainCircuitIcon,
+  FileTextIcon,
+  ImagePlusIcon,
+  MessageCircleReplyIcon,
+  RocketIcon,
+  SparklesIcon,
+  StoreIcon,
+  TrendingUpIcon,
+  ZapIcon,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { css } from "styled-system/css";
-import { Box, Flex, VStack } from "styled-system/jsx";
+import { Box, Flex, HStack, VStack } from "styled-system/jsx";
 
 export const metadata: Metadata = {
   title: "ホーム - SAI",
@@ -60,25 +70,53 @@ const features: Array<{
   },
 ];
 
+const aiFeatures = [
+  {
+    icon: SparklesIcon,
+    title: "AI自動生成",
+    description: "最新のAI技術で、高品質なコンテンツを数秒で生成",
+    color: "#2F80ED",
+  },
+  {
+    icon: ZapIcon,
+    title: "業務効率化",
+    description: "手作業の時間を90%削減し、本質的な業務に集中",
+    color: "#27AE60",
+  },
+  {
+    icon: BrainCircuitIcon,
+    title: "データ分析",
+    description: "市場・競合・自社データを総合的に分析して戦略立案",
+    color: "#9B51E0",
+  },
+  {
+    icon: RocketIcon,
+    title: "売上向上",
+    description: "最適化されたマーケティング施策で集客・売上アップ",
+    color: "#F2994A",
+  },
+];
+
 export default function HomePage() {
   return (
     <Flex
       direction="column"
       align="center"
-      justify="center"
+      justify="flex-start"
       minH="calc(100vh - 200px)"
-      gap={12}
+      gap={20}
       px={4}
+      py={12}
       bg="bg.base"
       className={css({
         animation: "fadeIn 0.4s ease",
       })}
     >
-      <VStack gap={4} textAlign="center">
+      <VStack gap={3} textAlign="center" maxW="3xl">
         <Text
-          size="3xl"
+          size="4xl"
           className={css({
-            fontWeight: 600,
+            fontWeight: 700,
             background: "brand.gradient",
             backgroundClip: "text",
             color: "transparent",
@@ -92,15 +130,27 @@ export default function HomePage() {
             WebkitTextFillColor: "transparent",
           }}
         >
-          どの機能を使いますか？
+          INSITE AI
         </Text>
         <Text
-          size="lg"
+          size="xl"
           className={css({
-            color: "text.secondary",
+            fontWeight: 600,
+            color: "text.primary",
           })}
         >
-          AIがあなたの業務をサポートします
+          店舗・ビジネスを成長させるAIアシスタント
+        </Text>
+        <Text
+          size="md"
+          className={css({
+            color: "text.secondary",
+            lineHeight: 1.8,
+          })}
+        >
+          SNS投稿、口コミ返信、市場分析、SEO記事作成まで。
+          <br />
+          AIが24時間365日、あなたのビジネスをサポートします。
         </Text>
       </VStack>
 
@@ -128,7 +178,9 @@ export default function HomePage() {
           <Link key={feature.id} href={feature.path}>
             <Box
               className={css({
-                bg: "bg.card",
+                bg: "white",
+                borderRadius: "xl",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
                 p: 8,
                 cursor: "pointer",
                 transition: "all 0.3s ease",
@@ -139,8 +191,12 @@ export default function HomePage() {
                 justifyContent: "center",
                 gap: 4,
                 textAlign: "center",
+                border: "1px solid",
+                borderColor: "gray.100",
                 _hover: {
                   transform: "translateY(-8px)",
+                  boxShadow: "0 12px 24px rgba(0, 0, 0, 0.12)",
+                  borderColor: feature.color,
                 },
               })}
             >
@@ -186,6 +242,104 @@ export default function HomePage() {
           </Link>
         ))}
       </Box>
+
+      {/* INSITE AIの特徴セクション */}
+      <VStack gap={12} w="full" maxW="1200px">
+        <VStack gap={3} textAlign="center">
+          <Text
+            size="3xl"
+            className={css({
+              fontWeight: 700,
+              color: "text.primary",
+            })}
+          >
+            INSITE AIの特徴
+          </Text>
+          <Text
+            size="md"
+            className={css({
+              color: "text.secondary",
+              maxW: "2xl",
+            })}
+          >
+            最先端のAI技術で、あなたのビジネスを次のステージへ
+          </Text>
+        </VStack>
+
+        <Box
+          className={css({
+            display: "grid",
+            gridTemplateColumns: {
+              base: "1fr",
+              md: "repeat(2, 1fr)",
+            },
+            gap: 6,
+            w: "full",
+          })}
+        >
+          {aiFeatures.map((feature, index) => (
+            <Box
+              key={index}
+              className={css({
+                bg: "white",
+                borderRadius: "xl",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                p: 8,
+                transition: "all 0.3s ease",
+                border: "1px solid",
+                borderColor: "gray.100",
+                _hover: {
+                  transform: "translateY(-4px)",
+                  boxShadow: "0 12px 24px rgba(0, 0, 0, 0.12)",
+                  borderColor: feature.color,
+                },
+              })}
+            >
+              <HStack gap={4} alignItems="flex-start">
+                <Box
+                  className={css({
+                    w: 14,
+                    h: 14,
+                    borderRadius: "xl",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    bg: `${feature.color}15`,
+                    flexShrink: 0,
+                  })}
+                >
+                  <feature.icon
+                    size={28}
+                    className={css({
+                      color: feature.color,
+                    })}
+                  />
+                </Box>
+                <VStack gap={2} alignItems="flex-start" flex={1}>
+                  <Text
+                    size="lg"
+                    className={css({
+                      fontWeight: 600,
+                      color: "text.primary",
+                    })}
+                  >
+                    {feature.title}
+                  </Text>
+                  <Text
+                    className={css({
+                      color: "text.secondary",
+                      fontSize: "sm",
+                      lineHeight: 1.6,
+                    })}
+                  >
+                    {feature.description}
+                  </Text>
+                </VStack>
+              </HStack>
+            </Box>
+          ))}
+        </Box>
+      </VStack>
     </Flex>
   );
 }
