@@ -46,18 +46,20 @@ jobs:
           CLOUDFLARE_API_TOKEN:   ${{ env.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID:  ${{ env.CLOUDFLARE_ACCOUNT_ID }}
       
-      # 5.5) 最新マイグレーション（0005）を個別に適用（冪等性保証）
-      - name: Apply Latest Migration (0005) - Add Revision Columns
+      # 5.5) 最新マイグレーションを個別に適用（冪等性保証）
+      - name: Apply Latest Migration - Add Revision Columns & SEO Addon
         run: |
           cd apps/api
           if [ "${{ github.ref_name }}" = "prd" ]; then
             npx wrangler@4 d1 execute database --remote --command "ALTER TABLE analysis_history ADD COLUMN revision_parent_id TEXT;" || echo "Column may already exist"
             npx wrangler@4 d1 execute database --remote --command "ALTER TABLE analysis_history ADD COLUMN version INTEGER DEFAULT 1 NOT NULL;" || echo "Column may already exist"
             npx wrangler@4 d1 execute database --remote --command "CREATE INDEX IF NOT EXISTS analysis_history_revision_parent_id_idx ON analysis_history (revision_parent_id);" || echo "Index may already exist"
+            npx wrangler@4 d1 execute database --remote --command "ALTER TABLE project ADD COLUMN seo_addon_enabled INTEGER DEFAULT 0 NOT NULL;" || echo "Column may already exist"
           else
             npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE analysis_history ADD COLUMN revision_parent_id TEXT;" || echo "Column may already exist"
             npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE analysis_history ADD COLUMN version INTEGER DEFAULT 1 NOT NULL;" || echo "Column may already exist"
             npx wrangler@4 d1 execute database --remote --env preview --command "CREATE INDEX IF NOT EXISTS analysis_history_revision_parent_id_idx ON analysis_history (revision_parent_id);" || echo "Index may already exist"
+            npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE project ADD COLUMN seo_addon_enabled INTEGER DEFAULT 0 NOT NULL;" || echo "Column may already exist"
           fi
         env:
           CLOUDFLARE_API_TOKEN:   ${{ env.CLOUDFLARE_API_TOKEN }}
