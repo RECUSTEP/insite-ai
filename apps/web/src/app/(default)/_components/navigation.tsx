@@ -17,7 +17,7 @@ import { usePathname } from "next/navigation";
 import { css } from "styled-system/css";
 import { Box, VStack } from "styled-system/jsx";
 
-const navigation = [
+const navigationBefore = [
   {
     icon: <HomeIcon size="20" />,
     label: "ホーム",
@@ -43,6 +43,9 @@ const navigation = [
     label: "ライティングAI（Google Map）",
     path: "/google-map",
   },
+] as const;
+
+const navigationAfter = [
   {
     icon: <HistoryIcon size="20" />,
     label: "履歴",
@@ -70,7 +73,8 @@ export function Navigation({ seoAddonEnabled }: NavigationProps) {
       })}
     >
       <ul>
-        {navigation.map((item) => (
+        {/* ライティングまでのナビゲーション */}
+        {navigationBefore.map((item) => (
           <li key={item.path}>
             <Link
               href={item.path}
@@ -127,7 +131,7 @@ export function Navigation({ seoAddonEnabled }: NavigationProps) {
           </li>
         ))}
         
-        {/* SEO/AIO機能 */}
+        {/* SEO/AIO機能（ライティングと履歴の間） */}
         <li>
           {seoAddonEnabled ? (
             <Link
@@ -177,10 +181,10 @@ export function Navigation({ seoAddonEnabled }: NavigationProps) {
                   <Tooltip.Arrow>
                     <Tooltip.ArrowTip />
                   </Tooltip.Arrow>
-                  <Tooltip.Content>SEO・AIO記事</Tooltip.Content>
+                  <Tooltip.Content>SEO/AIO記事生成</Tooltip.Content>
                 </Tooltip.Positioner>
               </Tooltip.Root>
-              SEO・AIO記事
+              SEO/AIO記事生成
             </Link>
           ) : (
             <Box
@@ -205,7 +209,7 @@ export function Navigation({ seoAddonEnabled }: NavigationProps) {
                       },
                     })}
                   >
-                    SEO・AIO記事（有料）
+                    SEO/AIO記事生成
                   </span>
                 </Box>
                 <p
@@ -218,12 +222,70 @@ export function Navigation({ seoAddonEnabled }: NavigationProps) {
                     },
                   })}
                 >
-                  検索最適化された長文記事を自動生成。管理者にお問い合わせください。
+                  高品質なSEO記事を自動作成。有料プランで利用できます。
                 </p>
               </VStack>
             </Box>
           )}
         </li>
+
+        {/* 履歴・設定 */}
+        {navigationAfter.map((item) => (
+          <li key={item.path}>
+            <Link
+              href={item.path}
+              className={css({
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                p: 4,
+                color: "text.primary",
+                borderRadius: "md",
+                transition: "all 0.2s ease",
+                _currentPage: {
+                  color: "brand.DEFAULT",
+                  bg: "#EBF8FF",
+                  fontWeight: 600,
+                },
+                _hover: {
+                  bg: "gray.100",
+                  transform: "scale(1.02)",
+                  _currentPage: {
+                    bg: "#EBF8FF",
+                  },
+                },
+              })}
+              aria-current={pathname === item.path ? "page" : undefined}
+            >
+              <Tooltip.Root positioning={{ placement: "left", strategy: "fixed" }} openDelay={200}>
+                <Tooltip.Trigger asChild>
+                  <span
+                    className={css({
+                      m: -4,
+                      p: 4,
+                      color: "brand.DEFAULT",
+                    })}
+                  >
+                    {item.icon}
+                  </span>
+                </Tooltip.Trigger>
+                <Tooltip.Positioner
+                  css={{
+                    ".group[data-expanded=true] &": {
+                      display: "none",
+                    },
+                  }}
+                >
+                  <Tooltip.Arrow>
+                    <Tooltip.ArrowTip />
+                  </Tooltip.Arrow>
+                  <Tooltip.Content>{item.label}</Tooltip.Content>
+                </Tooltip.Positioner>
+              </Tooltip.Root>
+              {item.label}
+            </Link>
+          </li>
+        ))}
       </ul>
     </nav>
   );
