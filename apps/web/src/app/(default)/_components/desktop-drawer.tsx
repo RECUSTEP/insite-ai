@@ -37,7 +37,7 @@ export default function DesktopDrawer({ children }: Props) {
       )}
     >
       <Box h="full" w={80} display="flex" flexDir="column" gap={4}>
-        <Box display="flex" alignItems="center" justifyContent="center" mb={-2} py={3}>
+        <Box display="flex" alignItems="center" justifyContent="center" py={2}>
           <span
             className={css({
               fontSize: "lg",

@@ -291,65 +291,19 @@ export default async function HomePage() {
           </Text>
         </VStack>
 
-        <VStack gap={12} w="full">
+        <VStack gap={8} w="full">
           {aiFeatures.map((feature, index) => (
-            <Flex
+            <Box
               key={index}
-              gap={8}
-              alignItems="flex-start"
-              p={10}
-              bg="white"
-              borderRadius="2xl"
-              boxShadow="0 8px 24px rgba(0, 0, 0, 0.06)"
-              border="1px solid"
-              borderColor="gray.100"
-              transition="all 0.4s ease"
+              py={8}
               w="full"
-              className={css({
-                _hover: {
-                  transform: "translateY(-8px)",
-                  boxShadow: "0 16px 48px rgba(0, 0, 0, 0.12)",
-                  borderColor: feature.color,
-                },
-              })}
             >
-              <Box
-                className={css({
-                  w: 20,
-                  h: 20,
-                  borderRadius: "2xl",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  bg: `${feature.color}15`,
-                  flexShrink: 0,
-                  position: "relative",
-                  _before: {
-                    content: '""',
-                    position: "absolute",
-                    inset: 0,
-                    borderRadius: "2xl",
-                    padding: "2px",
-                    background: `linear-gradient(135deg, ${feature.color}40, ${feature.color}10)`,
-                    WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                    WebkitMaskComposite: "xor",
-                    maskComposite: "exclude",
-                  },
-                })}
-              >
-                <feature.icon
-                  size={40}
-                  className={css({
-                    color: feature.color,
-                  })}
-                />
-              </Box>
-              <VStack gap={3} alignItems="flex-start" flex={1}>
+              <VStack gap={3} alignItems="flex-start">
                 <Text
                   size="2xl"
                   className={css({
                     fontWeight: 700,
-                    color: "text.primary",
+                    color: feature.color,
                   })}
                 >
                   {feature.title}
@@ -365,7 +319,7 @@ export default async function HomePage() {
                   {feature.description}
                 </Text>
               </VStack>
-            </Flex>
+            </Box>
           ))}
         </VStack>
       </VStack>
