@@ -183,19 +183,11 @@ export default async function HomePage() {
           display: "grid",
           gridTemplateColumns: {
             base: "1fr", // モバイル: 1列
-            md: "repeat(2, 1fr)", // タブレット: 2列
-            lg: "repeat(3, 1fr)", // デスクトップ: 3列
+            md: "repeat(2, 1fr)", // タブレット以上: 2列
           },
           gap: { base: 4, md: 6 },
-          maxW: { base: "800px", lg: "1200px" },
+          maxW: "900px",
           w: "full",
-          // 下段2枚を中央配置（5枚目と6枚目）
-          "& > a:nth-of-type(4)": {
-            gridColumn: { lg: "2 / 3" },
-          },
-          "& > a:nth-of-type(5)": {
-            gridColumn: { lg: "auto" },
-          },
         })}
       >
         {visibleFeatures.map((feature) => (

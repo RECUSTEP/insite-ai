@@ -12,7 +12,6 @@ interface AnalysisStatsProps {
   icon: LucideIcon;
   color: string;
   description: string;
-  mode?: "focus" | "browse";
 }
 
 interface HistoryItem {
@@ -69,7 +68,7 @@ function extractSummaryPoints(markdownText: string, maxPoints: number = 3): stri
   return points.slice(0, maxPoints);
 }
 
-export function AnalysisStats({ type, title, icon: Icon, color, description, mode = "browse" }: AnalysisStatsProps) {
+export function AnalysisStats({ type, title, icon: Icon, color, description }: AnalysisStatsProps) {
   const [summaryPoints, setSummaryPoints] = useState<string[]>([]);
   const [hasData, setHasData] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -122,17 +121,12 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
     fetchStats();
   }, [type]);
 
-  const cardStyles = mode === "browse" 
-    ? {
-        minW: "280px",
-        maxW: "280px",
-        h: "300px",
-      }
-    : {
-        flex: 1,
-        minW: "320px",
-        h: "320px",
-      };
+  const cardStyles = {
+    flex: 1,
+    minW: "350px",
+    maxW: "450px",
+    minH: "500px",
+  };
 
   if (loading) {
     return (
@@ -167,14 +161,14 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
         bg: "bg.card",
         borderRadius: "card",
         boxShadow: "card",
-        p: mode === "browse" ? 6 : 8,
+        p: 8,
         display: "flex",
         flexDirection: "column",
         gap: 4,
         transition: "all 0.3s ease",
         _hover: {
           boxShadow: "cardHover",
-          transform: mode === "browse" ? "translateY(-4px)" : "none",
+          transform: "translateY(-4px)",
         },
       })}
     >
@@ -220,23 +214,17 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
       {hasData ? (
         <VStack
           flex={1}
-          gap={mode === "browse" ? 1.5 : 2}
+          gap={3}
           alignItems="stretch"
-          className={css({
-            borderRadius: "md",
-            bg: "gray.50",
-            p: mode === "browse" ? 3 : 2,
-            overflowY: mode === "browse" ? "auto" : "hidden",
-          })}
         >
           {summaryPoints.map((point, index) => (
             <Box
               key={index}
               className={css({
-                py: mode === "browse" ? 1.5 : 2,
-                px: mode === "browse" ? 2 : 1,
+                py: 3,
+                px: 3,
                 borderRadius: "md",
-                bg: "white",
+                bg: "gray.50",
                 transition: "background 0.2s ease",
                 _hover: {
                   bg: "gray.100",
@@ -245,9 +233,9 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
             >
               <Text
                 className={css({
-                  fontSize: mode === "browse" ? "xs" : "sm",
+                  fontSize: "md",
                   color: "text.secondary",
-                  lineHeight: 1.6,
+                  lineHeight: 1.7,
                   width: "100%",
                 })}
               >

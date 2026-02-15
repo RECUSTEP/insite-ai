@@ -5,10 +5,6 @@ import { CheckCircleIcon, LightbulbIcon, TrendingUpIcon } from "lucide-react";
 import { css } from "styled-system/css";
 import { Box, Flex, VStack } from "styled-system/jsx";
 
-interface SeoInsightsBrowseProps {
-  mode?: "focus" | "browse";
-}
-
 const insights = [
   {
     id: "trends",
@@ -45,34 +41,26 @@ const insights = [
   },
 ];
 
-export function SeoInsightsBrowse({ mode = "browse" }: SeoInsightsBrowseProps) {
-  const cardStyles = mode === "browse" 
-    ? {
-        minW: "280px",
-        maxW: "280px",
-        h: "300px",
-      }
-    : {
-        flex: 1,
-        minW: "320px",
-        h: "280px",
-      };
-
-  const containerGap = mode === "browse" ? 3 : 4;
+export function SeoInsightsBrowse() {
+  const cardStyles = {
+    flex: 1,
+    minW: "350px",
+    maxW: "450px",
+    minH: "500px",
+  };
 
   return (
     <Flex
       direction="column"
       gap={6}
       py={8}
-      align={mode === "focus" ? "center" : "flex-start"}
       className={css({
         animation: "slideIn 0.3s ease",
       })}
     >
-      <VStack gap={mode === "focus" ? 2 : 6} px={4} w={mode === "focus" ? "full" : "auto"} maxW={mode === "focus" ? "1400px" : "auto"}>
+      <VStack gap={4} px={4} w="full" maxW="1400px" mx="auto">
         <Text
-          size={mode === "focus" ? "xl" : "2xl"}
+          size="2xl"
           className={css({
             fontWeight: 700,
             color: "text.primary",
@@ -86,119 +74,106 @@ export function SeoInsightsBrowse({ mode = "browse" }: SeoInsightsBrowseProps) {
             color: "text.secondary",
             textAlign: "center",
             maxW: "2xl",
-            fontSize: mode === "focus" ? "sm" : "md",
+            fontSize: "md",
           })}
         >
           検索エンジンで高評価を得るための最新情報とベストプラクティスをまとめました
         </Text>
       </VStack>
 
-      <Box
+      <Flex
+        gap={4}
+        px={4}
         w="full"
-        maxW={mode === "focus" ? "1400px" : "full"}
-        className={css({
-          overflowX: mode === "browse" ? "auto" : "visible",
-          WebkitOverflowScrolling: "touch",
-          scrollbarWidth: "none",
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-        })}
+        justify="center"
+        flexWrap="wrap"
+        maxW="1400px"
+        mx="auto"
       >
-        <Flex 
-          gap={containerGap} 
-          px={4} 
-          minW={mode === "browse" ? "max-content" : "auto"}
-          justify={mode === "focus" ? "center" : "flex-start"}
-        >
-          {insights.map((insight) => (
-            <Box
-              key={insight.id}
-              className={css({
-                ...cardStyles,
-                bg: "bg.card",
-                borderRadius: "card",
-                boxShadow: "card",
-                p: mode === "browse" ? 4 : 6,
-                display: "flex",
-                flexDirection: "column",
-                gap: mode === "browse" ? 2 : 3,
-                transition: "all 0.3s ease",
-                _hover: {
-                  boxShadow: "cardHover",
-                  transform: mode === "browse" ? "translateY(-4px)" : "none",
-                },
-              })}
-            >
-              <Flex align="center" gap={2}>
-                <Box
-                  className={css({
-                    w: 10,
-                    h: 10,
-                    borderRadius: "full",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    bg: `${insight.color}20`,
-                  })}
-                >
-                  <insight.icon
-                    size={20}
-                    className={css({
-                      color: insight.color,
-                    })}
-                  />
-                </Box>
-                <Text
-                  size="md"
-                  className={css({
-                    fontWeight: 600,
-                    color: "text.primary",
-                  })}
-                >
-                  {insight.title}
-                </Text>
-              </Flex>
-
-              <VStack 
-                gap={mode === "browse" ? 1.5 : 2}
-                alignItems="stretch"
+        {insights.map((insight) => (
+          <Box
+            key={insight.id}
+            className={css({
+              ...cardStyles,
+              bg: "bg.card",
+              borderRadius: "card",
+              boxShadow: "card",
+              p: 8,
+              display: "flex",
+              flexDirection: "column",
+              gap: 4,
+              transition: "all 0.3s ease",
+              _hover: {
+                boxShadow: "cardHover",
+                transform: "translateY(-4px)",
+              },
+            })}
+          >
+            <Flex align="center" gap={3}>
+              <Box
                 className={css({
-                  flex: 1,
-                  overflowY: mode === "browse" ? "auto" : "hidden",
+                  w: 12,
+                  h: 12,
+                  borderRadius: "full",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  bg: `${insight.color}20`,
                 })}
               >
-                {insight.items.map((item, index) => (
-                  <Box
-                    key={index}
+                <insight.icon
+                  size={24}
+                  className={css({
+                    color: insight.color,
+                  })}
+                />
+              </Box>
+              <Text
+                size="lg"
+                className={css({
+                  fontWeight: 600,
+                  color: "text.primary",
+                })}
+              >
+                {insight.title}
+              </Text>
+            </Flex>
+
+            <VStack
+              gap={3}
+              alignItems="stretch"
+              flex={1}
+            >
+              {insight.items.map((item, index) => (
+                <Box
+                  key={index}
+                  className={css({
+                    py: 3,
+                    px: 3,
+                    borderRadius: "md",
+                    bg: "gray.50",
+                    transition: "background 0.2s ease",
+                    _hover: {
+                      bg: "gray.100",
+                    },
+                  })}
+                >
+                  <Text
                     className={css({
-                      py: mode === "browse" ? 1.5 : 2,
-                      px: mode === "browse" ? 2 : 1,
-                      borderRadius: "md",
-                      bg: "gray.50",
-                      transition: "background 0.2s ease",
-                      _hover: {
-                        bg: "gray.100",
-                      },
+                      fontSize: "md",
+                      color: "text.secondary",
+                      lineHeight: 1.7,
+                      width: "100%",
                     })}
                   >
-                    <Text
-                      className={css({
-                        fontSize: mode === "browse" ? "xs" : "sm",
-                        color: "text.secondary",
-                        lineHeight: 1.5,
-                        width: "100%",
-                      })}
-                    >
-                      {item}
-                    </Text>
-                  </Box>
-                ))}
-              </VStack>
-            </Box>
-          ))}
-        </Flex>
-      </Box>
+                    {item}
+                  </Text>
+                </Box>
+              ))}
+            </VStack>
+          </Box>
+        ))}
+      </Flex>
     </Flex>
   );
 }

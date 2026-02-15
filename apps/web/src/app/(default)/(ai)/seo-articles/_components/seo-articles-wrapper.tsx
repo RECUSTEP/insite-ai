@@ -1,8 +1,5 @@
 "use client";
 
-import { useUiMode } from "@/contexts/ui-mode-context";
-import { css } from "styled-system/css";
-import { Box, Flex } from "styled-system/jsx";
 import { SeoInsightsBrowse } from "./seo-insights-browse";
 
 interface SeoArticlesWrapperProps {
@@ -10,11 +7,9 @@ interface SeoArticlesWrapperProps {
 }
 
 export function SeoArticlesWrapper({ children }: SeoArticlesWrapperProps) {
-  const { mode } = useUiMode();
-
   return (
     <>
-      <SeoInsightsBrowse mode="browse" />
+      <SeoInsightsBrowse />
       {children}
     </>
   );
