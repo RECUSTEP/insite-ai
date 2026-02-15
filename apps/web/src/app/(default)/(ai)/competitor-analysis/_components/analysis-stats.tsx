@@ -131,7 +131,7 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
     : {
         flex: 1,
         minW: "320px",
-        h: "260px",
+        h: "280px",
       };
 
   if (loading) {
@@ -226,7 +226,7 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
             borderRadius: "md",
             bg: "gray.50",
             p: mode === "browse" ? 3 : 4,
-            overflowY: "auto",
+            overflowY: mode === "browse" ? "auto" : "hidden",
           })}
         >
           {summaryPoints.map((point, index) => (

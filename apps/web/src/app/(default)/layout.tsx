@@ -13,6 +13,7 @@ export default function Layout({
 }>) {
   return (
     <UiModeProvider>
+      <Header />
       <GlobalHeader />
       <div
         className={css({
@@ -20,10 +21,9 @@ export default function Layout({
           px: { base: 2, md: 0 },
           display: "flex",
           flexDirection: { base: "column", md: "row" },
-          pt: { base: 0, md: 16 }, // グローバルヘッダーの高さ分のpadding
+          pt: { base: 28, md: 16 }, // モバイル: header + global-header分、PC: global-headerのみ
         })}
       >
-        <Header />
         <Box flexGrow="1" flexShrink="0">
           <Sidebar />
         </Box>

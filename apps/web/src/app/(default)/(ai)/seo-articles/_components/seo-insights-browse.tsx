@@ -55,7 +55,7 @@ export function SeoInsightsBrowse({ mode = "browse" }: SeoInsightsBrowseProps) {
     : {
         flex: 1,
         minW: "320px",
-        h: "260px",
+        h: "280px",
       };
 
   const containerGap = mode === "browse" ? 3 : 4;
@@ -165,7 +165,7 @@ export function SeoInsightsBrowse({ mode = "browse" }: SeoInsightsBrowseProps) {
                 alignItems="stretch"
                 className={css({
                   flex: 1,
-                  overflowY: "auto",
+                  overflowY: mode === "browse" ? "auto" : "hidden",
                 })}
               >
                 {insight.items.map((item, index) => (

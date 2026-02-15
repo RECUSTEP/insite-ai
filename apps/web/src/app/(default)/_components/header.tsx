@@ -10,7 +10,18 @@ export function Header() {
     <header
       className={css({
         display: { base: "flex", md: "none" },
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        bg: "bg.card",
+        borderBottom: "1px solid",
+        borderColor: "gray.200",
         py: 2,
+        px: 4,
+        justifyContent: "space-between",
+        alignItems: "center",
       })}
     >
       <MobileDrawer>
