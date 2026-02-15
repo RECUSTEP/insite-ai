@@ -28,19 +28,19 @@ export async function ProjectOverview() {
 
   return (
     <Stack>
-      <Text as="span" color="white">
+      <Text as="span" color="text.primary" fontWeight="600">
         {project.name}
       </Text>
       <Stack>
-        <Stack direction="row" justify="space-between" fontSize="sm" color="gray.3">
+        <Stack direction="row" justify="space-between" fontSize="sm" color="text.primary" fontWeight="500">
           <span>API使用上限</span>
           <span>
             {project.apiUsageCount} / {project.apiUsageLimit}
           </span>
         </Stack>
         <Progress.Root value={project.apiUsageCount} min={0} max={project.apiUsageLimit}>
-          <Progress.Track bg="#181e27">
-            <Progress.Range bg="bg.default" />
+          <Progress.Track bg="gray.200">
+            <Progress.Range bg="brand.DEFAULT" />
           </Progress.Track>
         </Progress.Root>
       </Stack>

@@ -78,6 +78,7 @@ export default function HomePage() {
       minH="calc(100vh - 200px)"
       gap={12}
       px={4}
+      bg="bg.base"
       className={css({
         animation: "fadeIn 0.4s ease",
       })}

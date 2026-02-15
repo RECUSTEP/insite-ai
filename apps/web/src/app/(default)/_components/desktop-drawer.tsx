@@ -37,7 +37,7 @@ export default function DesktopDrawer({ children }: Props) {
       )}
     >
       <Box h="full" w={80} display="flex" flexDir="column" gap={4}>
-        <Box display="grid" placeItems="center" mb={-4} py={6}>
+        <Box display="flex" flexDir="column" alignItems="center" gap={2} mb={-4} py={6}>
           <img
             alt="SAIのロゴ"
             src={logoImage.src}
@@ -48,6 +48,19 @@ export default function DesktopDrawer({ children }: Props) {
               width: "auto",
             })}
           />
+          <span
+            className={css({
+              fontSize: "lg",
+              fontWeight: "700",
+              color: "text.primary",
+              letterSpacing: "0.5px",
+              ".group[data-expanded=false] &": {
+                display: "none",
+              },
+            })}
+          >
+            INSITE AI
+          </span>
         </Box>
         <button
           type="button"
