@@ -129,8 +129,6 @@ export default function HomePage() {
             <Box
               className={css({
                 bg: "bg.card",
-                borderRadius: "card",
-                boxShadow: "card",
                 p: 8,
                 cursor: "pointer",
                 transition: "all 0.3s ease",
@@ -143,7 +141,6 @@ export default function HomePage() {
                 textAlign: "center",
                 _hover: {
                   transform: "translateY(-8px)",
-                  boxShadow: "cardHover",
                 },
               })}
             >

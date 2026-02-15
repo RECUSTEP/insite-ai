@@ -1,6 +1,8 @@
+import { UiModeProvider } from "@/contexts/ui-mode-context";
 import { css } from "styled-system/css";
 import { Box } from "styled-system/jsx";
 import { BottomNavigation } from "./_components/bottom-navigation";
+import { GlobalHeader } from "./_components/global-header";
 import { Header } from "./_components/header";
 import Sidebar from "./_components/sidebar";
 
@@ -10,13 +12,15 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
+    <UiModeProvider>
+      <GlobalHeader />
       <div
         className={css({
           mx: "auto",
           px: { base: 2, md: 0 },
           display: "flex",
           flexDirection: { base: "column", md: "row" },
+          pt: { base: 0, md: 16 }, // グローバルヘッダーの高さ分のpadding
         })}
       >
         <Header />
@@ -36,6 +40,6 @@ export default function Layout({
         </main>
       </div>
       <BottomNavigation />
-    </>
+    </UiModeProvider>
   );
 }
