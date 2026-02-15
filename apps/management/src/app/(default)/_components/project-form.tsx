@@ -1,11 +1,13 @@
 "use client";
 
 import { SubmitButton } from "@/components/submit-button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { type SubmissionResult, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { projectSchema } from "api/schema";
+import { useState } from "react";
 import { useFormState } from "react-dom";
 import { stack } from "styled-system/patterns";
 import type { z } from "zod";
@@ -18,6 +20,9 @@ type Props = {
 
 export function ProjectForm({ defaultValue, action }: Props) {
   const [lastResult, formAction] = useFormState(action, {});
+  const [seoAddonEnabled, setSeoAddonEnabled] = useState(
+    defaultValue?.seoAddonEnabled ?? false
+  );
   const [form, fields] = useForm({
     defaultValue,
     lastResult,
@@ -37,6 +42,7 @@ export function ProjectForm({ defaultValue, action }: Props) {
       noValidate
     >
       <input type="hidden" name="id" defaultValue={fields.id.initialValue} />
+      <input type="hidden" name="seoAddonEnabled" value={seoAddonEnabled ? "true" : "false"} />
       <div className={stack({ gap: 4 })}>
         <Field.Root className={stack({ gap: 1.5 })} invalid={!!fields.name.errors?.length}>
           <Field.Label>プロジェクト名</Field.Label>
@@ -119,6 +125,17 @@ export function ProjectForm({ defaultValue, action }: Props) {
           {fields.apiUsageLimit.errors?.map((error) => (
             <Field.ErrorText key={error}>{error}</Field.ErrorText>
           ))}
+        </Field.Root>
+        <Field.Root className={stack({ gap: 1.5 })}>
+          <Checkbox
+            checked={seoAddonEnabled}
+            onCheckedChange={(details) => setSeoAddonEnabled(details.checked === true)}
+          >
+            SEO/AIO記事生成機能を有効化（有料アドオン）
+          </Checkbox>
+          <Field.HelperText>
+            このオプションを有効にすると、プロジェクトでSEO/AIO記事生成機能が利用可能になります
+          </Field.HelperText>
         </Field.Root>
       </div>
       <SubmitButton>登録</SubmitButton>

@@ -12,6 +12,12 @@ export async function updateProjectAction(
   _: SubmissionResult,
   formData: FormData,
 ): Promise<SubmissionResult> {
+  // Convert "true"/"false" string to boolean
+  const seoAddonEnabledValue = formData.get("seoAddonEnabled");
+  if (seoAddonEnabledValue === "true" || seoAddonEnabledValue === "false") {
+    formData.set("seoAddonEnabled", seoAddonEnabledValue === "true" ? "1" : "0");
+  }
+
   const submission = parseWithZod(formData, {
     schema: projectSchema,
   });
