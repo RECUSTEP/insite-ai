@@ -55,11 +55,11 @@ export function AnimatedIcon({ variant, icon: Icon, color, size = 64 }: Animated
       />
 
       {/* バリアント別のアニメーション要素 */}
-      {variant === "orbit" && <OrbitAnimation />}
-      {variant === "relay" && <RelayAnimation />}
-      {variant === "wave" && <WaveAnimation />}
-      {variant === "spark" && <SparkAnimation />}
-      {variant === "loop" && <LoopAnimation />}
+      {variant === "orbit" && <OrbitAnimation color={color} />}
+      {variant === "relay" && <RelayAnimation color={color} />}
+      {variant === "wave" && <WaveAnimation color={color} />}
+      {variant === "spark" && <SparkAnimation color={color} />}
+      {variant === "loop" && <LoopAnimation color={color} />}
     </Box>
   );
 }
@@ -67,9 +67,10 @@ export function AnimatedIcon({ variant, icon: Icon, color, size = 64 }: Animated
 /**
  * Orbit: 回転する光のライン
  */
-function OrbitAnimation() {
+function OrbitAnimation({ color }: { color: string }) {
   return (
     <Box
+      style={{ color }}
       className={css({
         position: "absolute",
         height: "140%",
@@ -87,9 +88,10 @@ function OrbitAnimation() {
 /**
  * Relay: 水平に流れるダッシュライン
  */
-function RelayAnimation() {
+function RelayAnimation({ color }: { color: string }) {
   return (
     <Box
+      style={{ color }}
       className={css({
         position: "absolute",
         inset: "18px",
@@ -133,7 +135,7 @@ function RelayAnimation() {
 /**
  * Wave: 波のように動くグラデーション
  */
-function WaveAnimation() {
+function WaveAnimation({ color }: { color: string }) {
   return (
     <Box
       className={css({
@@ -146,6 +148,7 @@ function WaveAnimation() {
       })}
     >
       <Box
+        style={{ color }}
         className={css({
           position: "absolute",
           inset: 0,
@@ -160,9 +163,10 @@ function WaveAnimation() {
 /**
  * Spark: パルス状に広がるリング
  */
-function SparkAnimation() {
+function SparkAnimation({ color }: { color: string }) {
   return (
     <Box
+      style={{ color }}
       className={css({
         position: "absolute",
         inset: 0,
@@ -199,7 +203,7 @@ function SparkAnimation() {
 /**
  * Loop: 十字に交差するライン
  */
-function LoopAnimation() {
+function LoopAnimation({ color }: { color: string }) {
   return (
     <Box
       className={css({
@@ -210,6 +214,7 @@ function LoopAnimation() {
     >
       {/* 水平ライン */}
       <Box
+        style={{ color }}
         className={css({
           position: "absolute",
           height: "1px",
@@ -222,6 +227,7 @@ function LoopAnimation() {
       />
       {/* 垂直ライン */}
       <Box
+        style={{ color }}
         className={css({
           position: "absolute",
           height: "1px",
