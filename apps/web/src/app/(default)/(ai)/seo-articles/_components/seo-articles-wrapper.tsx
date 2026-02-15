@@ -1,6 +1,8 @@
 "use client";
 
 import { useUiMode } from "@/contexts/ui-mode-context";
+import { css } from "styled-system/css";
+import { Box, Flex } from "styled-system/jsx";
 import { SeoInsightsBrowse } from "./seo-insights-browse";
 
 interface SeoArticlesWrapperProps {
@@ -13,10 +15,22 @@ export function SeoArticlesWrapper({ children }: SeoArticlesWrapperProps) {
   return (
     <>
       {mode === "focus" ? (
-        <>{children}</>
+        <Flex
+          direction="column"
+          align="center"
+          gap={6}
+          className={css({
+            animation: "slideIn 0.3s ease",
+          })}
+        >
+          <SeoInsightsBrowse mode="focus" />
+          <Box maxW="800px" w="full">
+            {children}
+          </Box>
+        </Flex>
       ) : (
         <>
-          <SeoInsightsBrowse />
+          <SeoInsightsBrowse mode="browse" />
           {children}
         </>
       )}

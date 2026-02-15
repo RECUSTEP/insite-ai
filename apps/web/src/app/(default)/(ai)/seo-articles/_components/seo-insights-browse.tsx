@@ -1,7 +1,13 @@
+"use client";
+
 import { Text } from "@/components/ui/text";
 import { CheckCircleIcon, LightbulbIcon, TrendingUpIcon } from "lucide-react";
 import { css } from "styled-system/css";
 import { Box, Flex, VStack } from "styled-system/jsx";
+
+interface SeoInsightsBrowseProps {
+  mode?: "focus" | "browse";
+}
 
 const insights = [
   {
@@ -47,41 +53,61 @@ const insights = [
   },
 ];
 
-export function SeoInsightsBrowse() {
+export function SeoInsightsBrowse({ mode = "browse" }: SeoInsightsBrowseProps) {
+  const cardStyles = mode === "browse" 
+    ? {
+        minW: "280px",
+        maxW: "280px",
+        h: "350px",
+      }
+    : {
+        flex: 1,
+        minW: "320px",
+        h: "auto",
+        minH: "320px",
+      };
+
+  const containerGap = mode === "browse" ? 3 : 4;
+
   return (
     <Flex
       direction="column"
       gap={6}
       py={8}
+      align={mode === "focus" ? "center" : "flex-start"}
       className={css({
         animation: "slideIn 0.3s ease",
       })}
     >
-      <VStack gap={6} px={4}>
-        <Text
-          size="2xl"
-          className={css({
-            fontWeight: 700,
-            color: "text.primary",
-            textAlign: "center",
-          })}
-        >
-          SEO/AIO記事の最新トレンド
-        </Text>
-        <Text
-          className={css({
-            color: "text.secondary",
-            textAlign: "center",
-            maxW: "2xl",
-          })}
-        >
-          検索エンジンで高評価を得るための最新情報とベストプラクティスをまとめました
-        </Text>
-      </VStack>
+      {mode === "browse" && (
+        <VStack gap={6} px={4}>
+          <Text
+            size="2xl"
+            className={css({
+              fontWeight: 700,
+              color: "text.primary",
+              textAlign: "center",
+            })}
+          >
+            SEO/AIO記事の最新トレンド
+          </Text>
+          <Text
+            className={css({
+              color: "text.secondary",
+              textAlign: "center",
+              maxW: "2xl",
+            })}
+          >
+            検索エンジンで高評価を得るための最新情報とベストプラクティスをまとめました
+          </Text>
+        </VStack>
+      )}
 
       <Box
+        w="full"
+        maxW={mode === "focus" ? "1400px" : "full"}
         className={css({
-          overflowX: "auto",
+          overflowX: mode === "browse" ? "auto" : "visible",
           WebkitOverflowScrolling: "touch",
           scrollbarWidth: "none",
           "&::-webkit-scrollbar": {
@@ -89,25 +115,28 @@ export function SeoInsightsBrowse() {
           },
         })}
       >
-        <Flex gap={3} px={4} minW="max-content">
+        <Flex 
+          gap={containerGap} 
+          px={4} 
+          minW={mode === "browse" ? "max-content" : "auto"}
+          justify={mode === "focus" ? "center" : "flex-start"}
+        >
           {insights.map((insight) => (
             <Box
               key={insight.id}
               className={css({
-                minW: "280px",
-                maxW: "280px",
-                h: "350px",
+                ...cardStyles,
                 bg: "bg.card",
                 borderRadius: "card",
                 boxShadow: "card",
-                p: 5,
+                p: mode === "browse" ? 5 : 6,
                 display: "flex",
                 flexDirection: "column",
-                gap: 3,
+                gap: mode === "browse" ? 3 : 4,
                 transition: "all 0.3s ease",
                 _hover: {
                   boxShadow: "cardHover",
-                  transform: "translateY(-4px)",
+                  transform: mode === "browse" ? "translateY(-4px)" : "none",
                 },
               })}
             >
@@ -142,7 +171,7 @@ export function SeoInsightsBrowse() {
               </Flex>
 
               <VStack 
-                gap={2} 
+                gap={mode === "browse" ? 2 : 2.5}
                 alignItems="stretch"
                 className={css({
                   flex: 1,
@@ -150,12 +179,11 @@ export function SeoInsightsBrowse() {
                 })}
               >
                 {insight.items.map((item, index) => (
-                  <Flex
+                  <Box
                     key={index}
-                    gap={2}
                     className={css({
-                      py: 1.5,
-                      px: 2,
+                      py: mode === "browse" ? 1.5 : 2.5,
+                      px: mode === "browse" ? 2 : 4,
                       borderRadius: "md",
                       bg: "gray.50",
                       transition: "background 0.2s ease",
@@ -164,26 +192,16 @@ export function SeoInsightsBrowse() {
                       },
                     })}
                   >
-                    <Box
-                      className={css({
-                        w: 4,
-                        h: 4,
-                        borderRadius: "full",
-                        bg: insight.color,
-                        flexShrink: 0,
-                        mt: 0.5,
-                      })}
-                    />
                     <Text
                       className={css({
-                        fontSize: "xs",
+                        fontSize: mode === "browse" ? "xs" : "md",
                         color: "text.secondary",
-                        lineHeight: 1.5,
+                        lineHeight: 1.6,
                       })}
                     >
                       {item}
                     </Text>
-                  </Flex>
+                  </Box>
                 ))}
               </VStack>
             </Box>

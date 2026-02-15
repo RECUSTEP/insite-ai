@@ -2,7 +2,7 @@
 
 import { BarChartIcon, TrendingUpIcon, UsersIcon } from "lucide-react";
 import { css } from "styled-system/css";
-import { Box, Flex, VStack } from "styled-system/jsx";
+import { Box, Flex } from "styled-system/jsx";
 import { AnalysisStats } from "./analysis-stats";
 
 interface FocusModeLayoutProps {
@@ -47,8 +47,8 @@ export function FocusModeLayout({ children }: FocusModeLayoutProps) {
         animation: "slideIn 0.3s ease",
       })}
     >
-      {/* 分析結果カード（PC向け、横スクロールなし） */}
-      <VStack gap={4} w="full" maxW="1200px">
+      {/* 分析結果カード（PC向け、横並び3枚） */}
+      <Flex gap={4} w="full" maxW="1400px" justify="center">
         {analysisCards.map((card) => (
           <AnalysisStats
             key={card.id}
@@ -60,7 +60,7 @@ export function FocusModeLayout({ children }: FocusModeLayoutProps) {
             mode="focus"
           />
         ))}
-      </VStack>
+      </Flex>
 
       <Box
         maxW="800px"

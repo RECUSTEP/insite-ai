@@ -129,10 +129,10 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
         h: "350px",
       }
     : {
-        w: "full",
-        maxW: "600px",
+        flex: 1,
+        minW: "320px",
         h: "auto",
-        minH: "300px",
+        minH: "320px",
       };
 
   if (loading) {
@@ -221,22 +221,21 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
       {hasData ? (
         <VStack
           flex={1}
-          gap={2}
+          gap={mode === "browse" ? 2 : 2.5}
           alignItems="stretch"
           className={css({
             borderRadius: "md",
             bg: "gray.50",
-            p: 4,
+            p: mode === "browse" ? 4 : 5,
             overflowY: "auto",
           })}
         >
           {summaryPoints.map((point, index) => (
-            <Flex
+            <Box
               key={index}
-              gap={2}
               className={css({
-                py: 2,
-                px: 3,
+                py: mode === "browse" ? 2 : 2.5,
+                px: mode === "browse" ? 3 : 4,
                 borderRadius: "md",
                 bg: "white",
                 transition: "background 0.2s ease",
@@ -245,26 +244,16 @@ export function AnalysisStats({ type, title, icon: Icon, color, description, mod
                 },
               })}
             >
-              <Box
-                className={css({
-                  w: 5,
-                  h: 5,
-                  borderRadius: "full",
-                  bg: color,
-                  flexShrink: 0,
-                  mt: 0.5,
-                })}
-              />
               <Text
                 className={css({
-                  fontSize: "sm",
+                  fontSize: mode === "browse" ? "sm" : "md",
                   color: "text.secondary",
                   lineHeight: 1.6,
                 })}
               >
                 {point}
               </Text>
-            </Flex>
+            </Box>
           ))}
         </VStack>
       ) : (
