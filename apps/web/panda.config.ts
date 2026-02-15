@@ -159,5 +159,38 @@ export default defineConfig({
       "0%, 80%, 100%": { transform: "scale(0)" },
       "40%": { transform: "scale(1)" },
     },
+    // Bentoスタイルアイコンアニメーション
+    "@keyframes iconOrbit": {
+      "0%": { transform: "rotate(0deg)" },
+      "100%": { transform: "rotate(360deg)" },
+    },
+    "@keyframes iconDash": {
+      "0%": { transform: "translateX(-25%)", opacity: 0 },
+      "30%": { opacity: 1 },
+      "70%": { opacity: 1 },
+      "100%": { transform: "translateX(25%)", opacity: 0 },
+    },
+    "@keyframes iconWave": {
+      "0%": { transform: "translateX(-45%)" },
+      "100%": { transform: "translateX(45%)" },
+    },
+    "@keyframes iconPulse": {
+      "0%": { transform: "scale(0.8)", opacity: 0.6 },
+      "70%": { opacity: 0.05 },
+      "100%": { transform: "scale(1.35)", opacity: 0 },
+    },
+    "@keyframes iconLoop": {
+      "0%": { opacity: 0.3 },
+      "50%": { opacity: 1 },
+      "100%": { opacity: 0.3 },
+    },
+    // アニメーション無効化（アクセシビリティ対応）
+    "@media (prefers-reduced-motion: reduce)": {
+      "*": {
+        animationDuration: "0.01ms !important",
+        animationIterationCount: "1 !important",
+        transitionDuration: "0.01ms !important",
+      },
+    },
   },
 });

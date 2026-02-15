@@ -1,15 +1,27 @@
 import { Text } from "@/components/ui/text";
-import { ImagePlusIcon, MessageCircleReplyIcon, StoreIcon, TrendingUpIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { FileTextIcon, ImagePlusIcon, MessageCircleReplyIcon, StoreIcon, TrendingUpIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { css } from "styled-system/css";
 import { Box, Flex, VStack } from "styled-system/jsx";
+import { AnimatedIcon } from "./_components/animated-icon";
 
 export const metadata: Metadata = {
   title: "ホーム - SAI",
 };
 
-const features = [
+type AnimationVariant = "orbit" | "relay" | "wave" | "spark" | "loop";
+
+const features: Array<{
+  id: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  color: string;
+  path: string;
+  animationVariant: AnimationVariant;
+}> = [
   {
     id: "writing",
     title: "インスタ投稿作成",
@@ -17,6 +29,7 @@ const features = [
     icon: ImagePlusIcon,
     color: "#2F80ED",
     path: "/writing",
+    animationVariant: "orbit",
   },
   {
     id: "google-map",
@@ -25,6 +38,7 @@ const features = [
     icon: MessageCircleReplyIcon,
     color: "#27AE60",
     path: "/google-map",
+    animationVariant: "relay",
   },
   {
     id: "analysis",
@@ -33,6 +47,7 @@ const features = [
     icon: TrendingUpIcon,
     color: "#9B51E0",
     path: "/competitor-analysis",
+    animationVariant: "wave",
   },
   {
     id: "operation",
@@ -41,6 +56,16 @@ const features = [
     icon: StoreIcon,
     color: "#F2994A",
     path: "/improvement-proposal",
+    animationVariant: "spark",
+  },
+  {
+    id: "seo-articles",
+    title: "SEO/AIO記事生成",
+    description: "検索最適化された長文記事を自動作成",
+    icon: FileTextIcon,
+    color: "#E74C3C",
+    path: "/seo-articles",
+    animationVariant: "loop",
   },
 ];
 
@@ -90,10 +115,21 @@ export default function HomePage() {
       <Box
         className={css({
           display: "grid",
-          gridTemplateColumns: { base: "1fr", md: "repeat(2, 1fr)" },
-          gap: 6,
-          maxW: "800px",
+          gridTemplateColumns: {
+            base: "1fr", // モバイル: 1列
+            md: "repeat(2, 1fr)", // タブレット: 2列
+            lg: "repeat(3, 1fr)", // デスクトップ: 3列
+          },
+          gap: { base: 4, md: 6 },
+          maxW: { base: "800px", lg: "1200px" },
           w: "full",
+          // 下段2枚を中央配置（5枚目と6枚目）
+          "& > a:nth-of-type(4)": {
+            gridColumn: { lg: "2 / 3" },
+          },
+          "& > a:nth-of-type(5)": {
+            gridColumn: { lg: "auto" },
+          },
         })}
       >
         {features.map((feature) => (
@@ -106,37 +142,42 @@ export default function HomePage() {
                 p: 8,
                 cursor: "pointer",
                 transition: "all 0.3s ease",
-                h: "240px",
+                h: { base: "220px", md: "240px" },
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 4,
                 textAlign: "center",
+                position: "relative",
+                overflow: "hidden",
                 _hover: {
                   transform: "translateY(-8px)",
                   boxShadow: "cardHover",
+                  "& [data-animated-icon]": {
+                    opacity: 1,
+                    transform: "scale(1.1)",
+                  },
                 },
               })}
             >
+              {/* Bentoスタイルアニメーションアイコン */}
               <Box
+                data-animated-icon
                 className={css({
-                  w: 16,
-                  h: 16,
-                  borderRadius: "full",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  bg: `${feature.color}20`,
+                  opacity: 0.85,
+                  transition: "all 0.4s ease",
+                  transform: "scale(1)",
                 })}
               >
-                <feature.icon
-                  size={32}
-                  className={css({
-                    color: feature.color,
-                  })}
+                <AnimatedIcon
+                  variant={feature.animationVariant}
+                  icon={feature.icon}
+                  color={feature.color}
+                  size={64}
                 />
               </Box>
+
               <Text
                 size="xl"
                 className={css({
@@ -150,6 +191,7 @@ export default function HomePage() {
                 className={css({
                   color: "text.secondary",
                   fontSize: "sm",
+                  lineHeight: 1.6,
                 })}
               >
                 {feature.description}
