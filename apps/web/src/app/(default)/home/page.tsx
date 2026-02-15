@@ -5,13 +5,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { css } from "styled-system/css";
 import { Box, Flex, VStack } from "styled-system/jsx";
-import { AnimatedIcon } from "./_components/animated-icon";
 
 export const metadata: Metadata = {
   title: "ホーム - SAI",
 };
-
-type AnimationVariant = "orbit" | "relay" | "wave" | "spark" | "loop";
 
 const features: Array<{
   id: string;
@@ -20,7 +17,6 @@ const features: Array<{
   icon: LucideIcon;
   color: string;
   path: string;
-  animationVariant: AnimationVariant;
 }> = [
   {
     id: "writing",
@@ -29,7 +25,6 @@ const features: Array<{
     icon: ImagePlusIcon,
     color: "#2F80ED",
     path: "/writing",
-    animationVariant: "orbit",
   },
   {
     id: "google-map",
@@ -38,7 +33,6 @@ const features: Array<{
     icon: MessageCircleReplyIcon,
     color: "#27AE60",
     path: "/google-map",
-    animationVariant: "relay",
   },
   {
     id: "analysis",
@@ -47,7 +41,6 @@ const features: Array<{
     icon: TrendingUpIcon,
     color: "#9B51E0",
     path: "/competitor-analysis",
-    animationVariant: "wave",
   },
   {
     id: "operation",
@@ -56,7 +49,6 @@ const features: Array<{
     icon: StoreIcon,
     color: "#F2994A",
     path: "/improvement-proposal",
-    animationVariant: "spark",
   },
   {
     id: "seo-articles",
@@ -65,7 +57,6 @@ const features: Array<{
     icon: FileTextIcon,
     color: "#E74C3C",
     path: "/seo-articles",
-    animationVariant: "loop",
   },
 ];
 
@@ -150,32 +141,29 @@ export default function HomePage() {
                 justifyContent: "center",
                 gap: 4,
                 textAlign: "center",
-                position: "relative",
-                overflow: "hidden",
                 _hover: {
                   transform: "translateY(-8px)",
                   boxShadow: "cardHover",
-                  "& [data-animated-icon]": {
-                    opacity: 1,
-                    transform: "scale(1.1)",
-                  },
                 },
               })}
             >
-              {/* Bentoスタイルアニメーションアイコン */}
+              {/* シンプルなアイコン */}
               <Box
-                data-animated-icon
                 className={css({
-                  opacity: 0.85,
-                  transition: "all 0.4s ease",
-                  transform: "scale(1)",
+                  w: 16,
+                  h: 16,
+                  borderRadius: "full",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  bg: `${feature.color}20`,
                 })}
               >
-                <AnimatedIcon
-                  variant={feature.animationVariant}
-                  icon={feature.icon}
-                  color={feature.color}
-                  size={64}
+                <feature.icon
+                  size={32}
+                  className={css({
+                    color: feature.color,
+                  })}
                 />
               </Box>
 
