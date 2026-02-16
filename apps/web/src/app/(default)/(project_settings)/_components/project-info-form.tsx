@@ -61,9 +61,36 @@ const formFields = {
       key: "targetConcern",
     },
   ],
+  instagram: [
+    {
+      label: "店舗名",
+      key: "storeName",
+      multiline: false,
+    },
+    {
+      label: "テンプレート文章",
+      key: "instagramTemplate",
+      multiline: true,
+    },
+    {
+      label: "キーワード1",
+      key: "instagramKeyword1",
+      multiline: false,
+    },
+    {
+      label: "キーワード2",
+      key: "instagramKeyword2",
+      multiline: false,
+    },
+    {
+      label: "キーワード3",
+      key: "instagramKeyword3",
+      multiline: false,
+    },
+  ],
 } as const satisfies Record<
   string,
-  { label: string; key: keyof z.infer<typeof projectInfoSchema> }[]
+  { label: string; key: keyof z.infer<typeof projectInfoSchema>; multiline?: boolean }[]
 >;
 
 type Schema = z.infer<typeof projectInfoSchema>;
@@ -135,6 +162,31 @@ export function ProjectInfoForm({ defaultValue }: ProjectInfoFormProps) {
                 name={fields[field.key].name}
                 defaultValue={fields[field.key].initialValue}
                 rows={1}
+                resize="none"
+                adjustHeight
+              />
+            </Field.Textarea>
+            {fields[field.key].errors?.map((error) => (
+              <Field.ErrorText key={error}>{error}</Field.ErrorText>
+            ))}
+          </Field.Root>
+        ))}
+      </section>
+      <section className={stack({ gap: 4 })}>
+        <SectionTitle>Instagram設定</SectionTitle>
+        {formFields.instagram.map((field) => (
+          <Field.Root
+            key={field.key}
+            className={stack({ gap: 1.5 })}
+            invalid={!!fields[field.key].errors?.length}
+          >
+            <Field.Label>{field.label}</Field.Label>
+            <Field.Textarea asChild>
+              <Textarea
+                key={fields[field.key].key}
+                name={fields[field.key].name}
+                defaultValue={fields[field.key].initialValue}
+                rows={field.multiline ? 3 : 1}
                 resize="none"
                 adjustHeight
               />

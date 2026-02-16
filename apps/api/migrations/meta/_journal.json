@@ -43,6 +43,13 @@
       "when": 1771180284401,
       "tag": "0005_modern_lady_mastermind",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1771253458385,
+      "tag": "0006_nasty_garia",
+      "breakpoints": true
     }
   ]
 }

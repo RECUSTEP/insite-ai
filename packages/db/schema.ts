@@ -85,6 +85,11 @@ const projectInfo = sqliteTable(
     targetAttribute: text("target_attribute"),
     targetConcern: text("target_concern"),
     existingCustomerAnalysis: text("existing_customer_analysis"),
+    storeName: text("store_name"),
+    instagramTemplate: text("instagram_template"),
+    instagramKeyword1: text("instagram_keyword1"),
+    instagramKeyword2: text("instagram_keyword2"),
+    instagramKeyword3: text("instagram_keyword3"),
   },
   (table) => ({
     projectIdIdx: uniqueIndex("project_info_project_id_idx").on(table.projectId),

@@ -27,6 +27,11 @@ export const projectInfoSchema = z.object({
   targetAttribute: z.string().optional(),
   targetConcern: z.string().optional(),
   existingCustomerAnalysis: z.string().optional(),
+  storeName: z.string().optional(),
+  instagramTemplate: z.string().optional(),
+  instagramKeyword1: z.string().optional(),
+  instagramKeyword2: z.string().optional(),
+  instagramKeyword3: z.string().optional(),
 });
 
 const saveProjectHandler = projectGuard.createHandlers(
