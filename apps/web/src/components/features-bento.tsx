@@ -192,7 +192,9 @@ export function FeaturesBento({ features }: FeaturesBentoProps) {
               lineHeight: 1.2,
             })}
           >
-            パフォーマンスのために構築。柔軟性のために設計。
+            パフォーマンスのために構築。
+            <br />
+            柔軟性のために設計。
           </Text>
           <Text
             className={css({
