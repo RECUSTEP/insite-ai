@@ -186,7 +186,7 @@ export function FeaturesBento({ features }: FeaturesBentoProps) {
         <VStack gap={4} alignItems="flex-end">
           <Text
             className={css({
-              fontSize: { base: "3xl", md: "5xl" },
+              fontSize: { base: "2xl", md: "4xl" },
               fontWeight: 700,
               color: "text.primary",
               lineHeight: 1.2,
