@@ -50,49 +50,16 @@ export default defineConfig({
       radius: "md",
     }),
   ],
+  conditions: {
+    extend: {
+      dark: '.dark &, [data-theme="dark"] &',
+      light: '.light &, [data-theme="light"] &',
+    },
+  },
   theme: {
     extend: {
       tokens: {
         colors: {
-          // 新しいブランドカラー（水色→青グラデーション）
-          brand: {
-            gradient: {
-              value: "linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%)",
-            },
-            light: {
-              value: "#56CCF2",
-            },
-            DEFAULT: {
-              value: "#2F80ED",
-            },
-            dark: {
-              value: "#1E5BB8",
-            },
-          },
-          // 背景色
-          bg: {
-            base: {
-              value: "#F0F4F8", // わずかに青みのある明るいグレー
-            },
-            card: {
-              value: "#FFFFFF",
-            },
-            overlay: {
-              value: "rgba(0, 0, 0, 0.4)",
-            },
-          },
-          // テキスト
-          text: {
-            primary: {
-              value: "#2D3748",
-            },
-            secondary: {
-              value: "#718096",
-            },
-            muted: {
-              value: "#A0AEC0",
-            },
-          },
           // 旧カラー（互換性のため残す）
           sidebarBg: {
             value: "#292f3b",
@@ -130,15 +97,96 @@ export default defineConfig({
           },
         },
       },
+      semanticTokens: {
+        colors: {
+          // ブランドカラー
+          brand: {
+            gradient: {
+              value: {
+                base: "linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%)",
+                _dark: "linear-gradient(135deg, #4299E1 0%, #3182CE 100%)",
+              },
+            },
+            light: {
+              value: {
+                base: "#56CCF2",
+                _dark: "#4299E1",
+              },
+            },
+            primary: {
+              value: {
+                base: "#2F80ED",
+                _dark: "#3182CE",
+              },
+            },
+            dark: {
+              value: {
+                base: "#1E5BB8",
+                _dark: "#2C5282",
+              },
+            },
+            DEFAULT: {
+              value: {
+                base: "#2F80ED",
+                _dark: "#3182CE",
+              },
+            },
+          },
+          // 背景色
+          bg: {
+            base: {
+              value: {
+                base: "#F0F4F8",
+                _dark: "#1A202C",
+              },
+            },
+            card: {
+              value: {
+                base: "#FFFFFF",
+                _dark: "#2D3748",
+              },
+            },
+            overlay: {
+              value: {
+                base: "rgba(0, 0, 0, 0.4)",
+                _dark: "rgba(0, 0, 0, 0.6)",
+              },
+            },
+          },
+          // テキスト
+          text: {
+            primary: {
+              value: {
+                base: "#2D3748",
+                _dark: "#E2E8F0",
+              },
+            },
+            secondary: {
+              value: {
+                base: "#718096",
+                _dark: "#A0AEC0",
+              },
+            },
+            muted: {
+              value: {
+                base: "#A0AEC0",
+                _dark: "#718096",
+              },
+            },
+          },
+        },
+      },
     },
   },
   include: ["./src/**/*.{js,jsx,ts,tsx,vue}"],
   jsxFramework: "react",
   outdir: "styled-system",
   globalCss: {
-    body: {
+    "html, body": {
       minHeight: "100dvh",
-      backgroundColor: "#F0F4F8", // わずかに青みのある明るいグレー
+      backgroundColor: "bg.base",
+      color: "text.primary",
+      transition: "background-color 0.3s ease, color 0.3s ease",
     },
     // ページ遷移アニメーション
     "@keyframes fadeIn": {

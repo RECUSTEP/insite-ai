@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { BellIcon } from "lucide-react";
 import Link from "next/link";
 import { css } from "styled-system/css";
@@ -17,13 +18,17 @@ export function GlobalHeader() {
         zIndex: 40,
         bg: "bg.card",
         borderBottom: "1px solid",
-        borderColor: "gray.200",
+        borderColor: {
+          base: "gray.200",
+          _dark: "gray.700",
+        },
         boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
       })}
     >
       <Flex
         justify="flex-end"
         align="center"
+        gap={3}
         px={4}
         py={3}
         className={css({
@@ -31,6 +36,9 @@ export function GlobalHeader() {
           mx: "auto",
         })}
       >
+        {/* テーマ切り替え */}
+        <ThemeToggle />
+        
         {/* お知らせボタン */}
         <Link href="/announce">
           <Button
@@ -39,7 +47,10 @@ export function GlobalHeader() {
             className={css({
               gap: 2,
               _hover: {
-                bg: "gray.100",
+                bg: {
+                  base: "gray.100",
+                  _dark: "gray.700",
+                },
               },
             })}
           >
