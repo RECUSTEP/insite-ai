@@ -165,10 +165,6 @@ export function FeaturesBento({ features }: FeaturesBentoProps) {
             gridColumn: { lg: "span 3" },
             gridRow: { lg: "span 1" },
           },
-          "& > :nth-child(8)": {
-            gridColumn: { lg: "span 2" },
-            gridRow: { lg: "span 1" },
-          },
         })}
       >
         {features.map((feature, index) => (
@@ -196,9 +192,7 @@ export function FeaturesBento({ features }: FeaturesBentoProps) {
               lineHeight: 1.2,
             })}
           >
-            パフォーマンスのために構築。
-            <br />
-            柔軟性のために設計。
+            パフォーマンスのために構築。柔軟性のために設計。
           </Text>
           <Text
             className={css({
