@@ -158,19 +158,19 @@ export default defineConfig({
             primary: {
               value: {
                 base: "#2D3748",
-                _dark: "#E2E8F0",
+                _dark: "#F7FAFC",
               },
             },
             secondary: {
               value: {
                 base: "#718096",
-                _dark: "#A0AEC0",
+                _dark: "#CBD5E0",
               },
             },
             muted: {
               value: {
                 base: "#A0AEC0",
-                _dark: "#718096",
+                _dark: "#A0AEC0",
               },
             },
           },

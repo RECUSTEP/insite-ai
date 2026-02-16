@@ -29,15 +29,20 @@ export default function DesktopDrawer({ children }: Props) {
           boxShadow: "float",
           transition: "width 0.3s ease",
           overflowX: "hidden",
-          pt: 16, // グローバルヘッダーの高さ分
+          pt: 14, // グローバルヘッダーの高さ分
+          borderRight: "1px solid",
+          borderColor: {
+            base: "gray.200",
+            _dark: "gray.700",
+          },
           "&[data-expanded=false]": {
             w: "3.25rem",
           },
         }),
       )}
     >
-      <Box h="full" w={80} display="flex" flexDir="column" gap={4}>
-        <Box display="flex" alignItems="center" justifyContent="center" pt={0} pb={3}>
+      <Box h="full" w={80} display="flex" flexDir="column" gap={2}>
+        <Box display="flex" alignItems="center" justifyContent="center" pt={0} pb={1}>
           <span
             className={css({
               fontSize: "3xl",
@@ -58,14 +63,18 @@ export default function DesktopDrawer({ children }: Props) {
           className={css({
             display: "flex",
             alignItems: "center",
-            gap: 4,
-            p: 4,
+            gap: 3,
+            px: 3,
+            py: 2,
             mx: 2,
             borderRadius: "md",
             color: "text.secondary",
             transition: "all 0.2s ease",
             _hover: {
-              bg: "gray.100",
+              bg: {
+                base: "gray.100",
+                _dark: "gray.700",
+              },
             },
             cursor: "pointer",
             fontSize: "sm",
@@ -75,8 +84,8 @@ export default function DesktopDrawer({ children }: Props) {
             <Tooltip.Trigger asChild>
               <span
                 className={css({
-                  m: -4,
-                  p: 4,
+                  m: -3,
+                  p: 3,
                 })}
               >
                 <ChevronsLeftIcon

@@ -81,21 +81,31 @@ export function Navigation({ seoAddonEnabled }: NavigationProps) {
               className={css({
                 display: "flex",
                 alignItems: "center",
-                gap: 4,
-                p: 4,
+                gap: 3,
+                px: 3,
+                py: 2.5,
                 color: "text.primary",
                 borderRadius: "md",
                 transition: "all 0.2s ease",
                 _currentPage: {
                   color: "brand.DEFAULT",
-                  bg: "#EBF8FF",
+                  bg: {
+                    base: "#EBF8FF",
+                    _dark: "rgba(66, 153, 225, 0.2)",
+                  },
                   fontWeight: 600,
                 },
                 _hover: {
-                  bg: "gray.100",
+                  bg: {
+                    base: "gray.100",
+                    _dark: "gray.700",
+                  },
                   transform: "scale(1.02)",
                   _currentPage: {
-                    bg: "#EBF8FF",
+                    bg: {
+                      base: "#EBF8FF",
+                      _dark: "rgba(66, 153, 225, 0.2)",
+                    },
                   },
                 },
               })}
@@ -105,8 +115,8 @@ export function Navigation({ seoAddonEnabled }: NavigationProps) {
                 <Tooltip.Trigger asChild>
                   <span
                     className={css({
-                      m: -4,
-                      p: 4,
+                      m: -3,
+                      p: 3,
                       color: "brand.DEFAULT",
                     })}
                   >
@@ -139,21 +149,31 @@ export function Navigation({ seoAddonEnabled }: NavigationProps) {
               className={css({
                 display: "flex",
                 alignItems: "center",
-                gap: 4,
-                p: 4,
+                gap: 3,
+                px: 3,
+                py: 2.5,
                 color: "text.primary",
                 borderRadius: "md",
                 transition: "all 0.2s ease",
                 _currentPage: {
                   color: "brand.DEFAULT",
-                  bg: "#EBF8FF",
+                  bg: {
+                    base: "#EBF8FF",
+                    _dark: "rgba(66, 153, 225, 0.2)",
+                  },
                   fontWeight: 600,
                 },
                 _hover: {
-                  bg: "gray.100",
+                  bg: {
+                    base: "gray.100",
+                    _dark: "gray.700",
+                  },
                   transform: "scale(1.02)",
                   _currentPage: {
-                    bg: "#EBF8FF",
+                    bg: {
+                      base: "#EBF8FF",
+                      _dark: "rgba(66, 153, 225, 0.2)",
+                    },
                   },
                 },
               })}
@@ -163,8 +183,8 @@ export function Navigation({ seoAddonEnabled }: NavigationProps) {
                 <Tooltip.Trigger asChild>
                   <span
                     className={css({
-                      m: -4,
-                      p: 4,
+                      m: -3,
+                      p: 3,
                       color: "brand.DEFAULT",
                     })}
                   >
@@ -237,21 +257,31 @@ export function Navigation({ seoAddonEnabled }: NavigationProps) {
               className={css({
                 display: "flex",
                 alignItems: "center",
-                gap: 4,
-                p: 4,
+                gap: 3,
+                px: 3,
+                py: 2.5,
                 color: "text.primary",
                 borderRadius: "md",
                 transition: "all 0.2s ease",
                 _currentPage: {
                   color: "brand.DEFAULT",
-                  bg: "#EBF8FF",
+                  bg: {
+                    base: "#EBF8FF",
+                    _dark: "rgba(66, 153, 225, 0.2)",
+                  },
                   fontWeight: 600,
                 },
                 _hover: {
-                  bg: "gray.100",
+                  bg: {
+                    base: "gray.100",
+                    _dark: "gray.700",
+                  },
                   transform: "scale(1.02)",
                   _currentPage: {
-                    bg: "#EBF8FF",
+                    bg: {
+                      base: "#EBF8FF",
+                      _dark: "rgba(66, 153, 225, 0.2)",
+                    },
                   },
                 },
               })}
@@ -261,8 +291,8 @@ export function Navigation({ seoAddonEnabled }: NavigationProps) {
                 <Tooltip.Trigger asChild>
                   <span
                     className={css({
-                      m: -4,
-                      p: 4,
+                      m: -3,
+                      p: 3,
                       color: "brand.DEFAULT",
                     })}
                   >
