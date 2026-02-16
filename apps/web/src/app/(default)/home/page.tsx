@@ -38,7 +38,7 @@ const features: Array<{
   {
     id: "google-map",
     title: "口コミ返信",
-    description: "Google Mapの口コミへ自動返信",
+    description: "Google MAPの口コミ作成",
     icon: MessageCircleReplyIcon,
     color: "#27AE60",
     path: "/google-map",
@@ -73,7 +73,7 @@ const aiFeatures = [
   {
     title: "AI自動生成",
     description:
-      "高度な自然言語処理AIが、あなたのビジネスに最適化されたコンテンツを瞬時に生成。Instagram投稿、Google Mapの口コミ返信、SEO記事まで、プロフェッショナルな品質を数秒で実現します。",
+      "高度な自然言語処理AIが、あなたのビジネスに最適化されたコンテンツを瞬時に生成。Instagram投稿、Google MAPの口コミ作成、SEO記事まで、プロフェッショナルな品質を数秒で実現します。",
   },
   {
     title: "業務効率化",
