@@ -49,16 +49,21 @@ jobs:
      
       # 5) Wrangler CLI で Pages にデプロイ
       - name: Deploy Web to Cloudflare Pages
-        working-directory: apps/web
+        uses: nick-fields/retry-action@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          retry_wait_seconds: 30
+          command: |
+            cd apps/web
+            echo "Deploying to branch: ${{ github.ref_name }}"
+            npx wrangler@latest pages deploy .vercel/output/static \
+            --project-name insiteai-web \
+            --branch ${{ github.ref_name }} \
+            --commit-dirty
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          echo "Deploying to branch: ${{ github.ref_name }}"
-          npx wrangler@latest pages deploy .vercel/output/static \
-          --project-name insiteai-web \
-          --branch ${{ github.ref_name }} \
-          --commit-dirty
 
   # ────────────────────────────────────────────────
   # ② apps/management のビルド & デプロイ
@@ -92,13 +97,18 @@ jobs:
           ls -la .vercel/output/
      
       - name: Deploy Management to Cloudflare Pages
-        working-directory: apps/management
+        uses: nick-fields/retry-action@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          retry_wait_seconds: 30
+          command: |
+            cd apps/management
+            echo "Deploying to branch: ${{ github.ref_name }}"
+            npx wrangler@latest pages deploy .vercel/output/static \
+            --project-name insiteai-management \
+            --branch ${{ github.ref_name }} \
+            --commit-dirty
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          echo "Deploying to branch: ${{ github.ref_name }}"
-          npx wrangler@latest pages deploy .vercel/output/static \
-          --project-name insiteai-management \
-          --branch ${{ github.ref_name }} \
-          --commit-dirty
