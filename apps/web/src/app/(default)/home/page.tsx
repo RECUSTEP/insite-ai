@@ -3,6 +3,7 @@ import { FeaturesCarousel } from "@/components/features-carousel";
 import { createClient } from "@/lib/api";
 import type { LucideIcon } from "lucide-react";
 import {
+  FileTextIcon,
   ImagePlusIcon,
   MessageCircleReplyIcon,
   StoreIcon,
