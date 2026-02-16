@@ -19,25 +19,30 @@ export function FeaturesCarousel({ features }: FeaturesCarouselProps) {
   const [isAnimating, setIsAnimating] = useState(false);
 
   const goNext = () => {
-    if (isAnimating) return;
+    if (isAnimating || features.length === 0) return;
     setIsAnimating(true);
     setActiveIndex((prev) => (prev + 1) % features.length);
     setTimeout(() => setIsAnimating(false), 600);
   };
 
   const goPrev = () => {
-    if (isAnimating) return;
+    if (isAnimating || features.length === 0) return;
     setIsAnimating(true);
     setActiveIndex((prev) => (prev - 1 + features.length) % features.length);
     setTimeout(() => setIsAnimating(false), 600);
   };
 
   useEffect(() => {
+    if (features.length === 0) return;
     const timer = setInterval(goNext, 6000);
     return () => clearInterval(timer);
-  }, [isAnimating]);
+  }, [isAnimating, features.length]);
 
   const current = features[activeIndex];
+
+  if (!current) {
+    return null;
+  }
 
   return (
     <Box
@@ -125,7 +130,7 @@ export function FeaturesCarousel({ features }: FeaturesCarouselProps) {
         {/* 中央 - メインコンテンツ */}
         <VStack
           gap={8}
-          align="stretch"
+          alignItems="stretch"
           flex={1}
           className={css({
             pl: { base: 0, md: 8 },
