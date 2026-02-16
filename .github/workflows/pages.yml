@@ -47,23 +47,43 @@ jobs:
           echo "Verifying build output..."
           ls -la .vercel/output/
      
-      # 5) Wrangler CLI で Pages にデプロイ
+      # 5) Wrangler CLI で Pages にデプロイ（リトライ付き）
       - name: Deploy Web to Cloudflare Pages
-        uses: nick-fields/retry-action@v2
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          retry_wait_seconds: 30
-          command: |
-            cd apps/web
-            echo "Deploying to branch: ${{ github.ref_name }}"
-            npx wrangler@latest pages deploy .vercel/output/static \
-            --project-name insiteai-web \
-            --branch ${{ github.ref_name }} \
-            --commit-dirty
+        working-directory: apps/web
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          echo "Deploying to branch: ${{ github.ref_name }}"
+          
+          max_attempts=3
+          attempt=1
+          success=false
+          
+          while [ $attempt -le $max_attempts ]; do
+            echo "Deployment attempt $attempt of $max_attempts..."
+            
+            if npx wrangler@latest pages deploy .vercel/output/static \
+              --project-name insiteai-web \
+              --branch ${{ github.ref_name }} \
+              --commit-dirty; then
+              echo "Deployment successful!"
+              success=true
+              break
+            else
+              echo "Deployment failed (attempt $attempt)"
+              if [ $attempt -lt $max_attempts ]; then
+                echo "Retrying in 30 seconds..."
+                sleep 30
+              fi
+              attempt=$((attempt + 1))
+            fi
+          done
+          
+          if [ "$success" = false ]; then
+            echo "Deployment failed after $max_attempts attempts"
+            exit 1
+          fi
 
   # ────────────────────────────────────────────────
   # ② apps/management のビルド & デプロイ
@@ -97,18 +117,38 @@ jobs:
           ls -la .vercel/output/
      
       - name: Deploy Management to Cloudflare Pages
-        uses: nick-fields/retry-action@v2
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          retry_wait_seconds: 30
-          command: |
-            cd apps/management
-            echo "Deploying to branch: ${{ github.ref_name }}"
-            npx wrangler@latest pages deploy .vercel/output/static \
-            --project-name insiteai-management \
-            --branch ${{ github.ref_name }} \
-            --commit-dirty
+        working-directory: apps/management
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          echo "Deploying to branch: ${{ github.ref_name }}"
+          
+          max_attempts=3
+          attempt=1
+          success=false
+          
+          while [ $attempt -le $max_attempts ]; do
+            echo "Deployment attempt $attempt of $max_attempts..."
+            
+            if npx wrangler@latest pages deploy .vercel/output/static \
+              --project-name insiteai-management \
+              --branch ${{ github.ref_name }} \
+              --commit-dirty; then
+              echo "Deployment successful!"
+              success=true
+              break
+            else
+              echo "Deployment failed (attempt $attempt)"
+              if [ $attempt -lt $max_attempts ]; then
+                echo "Retrying in 30 seconds..."
+                sleep 30
+              fi
+              attempt=$((attempt + 1))
+            fi
+          done
+          
+          if [ "$success" = false ]; then
+            echo "Deployment failed after $max_attempts attempts"
+            exit 1
+          fi
