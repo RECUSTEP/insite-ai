@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { css } from "styled-system/css";
 import { Box, Flex, VStack } from "styled-system/jsx";
 
@@ -17,15 +16,26 @@ interface FeaturesCarouselProps {
 
 export function FeaturesCarousel({ features }: FeaturesCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  const goNext = () => setActiveIndex((prev) => (prev + 1) % features.length);
-  const goPrev = () =>
+  const goNext = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setActiveIndex((prev) => (prev + 1) % features.length);
+    setTimeout(() => setIsAnimating(false), 600);
+  };
+
+  const goPrev = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
     setActiveIndex((prev) => (prev - 1 + features.length) % features.length);
+    setTimeout(() => setIsAnimating(false), 600);
+  };
 
   useEffect(() => {
     const timer = setInterval(goNext, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [isAnimating]);
 
   const current = features[activeIndex];
 
@@ -52,20 +62,11 @@ export function FeaturesCarousel({ features }: FeaturesCarouselProps) {
           pointerEvents: "none",
           lineHeight: 1,
           letterSpacing: "-0.05em",
+          transition: "opacity 0.6s ease",
         })}
+        key={activeIndex}
       >
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={activeIndex}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.1 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className={css({ display: "block" })}
-          >
-            {String(activeIndex + 1).padStart(2, "0")}
-          </motion.span>
-        </AnimatePresence>
+        {String(activeIndex + 1).padStart(2, "0")}
       </Box>
 
       {/* メインコンテンツ */}
@@ -105,18 +106,18 @@ export function FeaturesCarousel({ features }: FeaturesCarouselProps) {
               mt: 8,
             })}
           >
-            <motion.div
+            <div
               className={css({
                 position: "absolute",
                 top: 0,
                 left: 0,
                 w: "full",
                 bg: current.color,
+                transition: "height 0.5s ease",
               })}
-              animate={{
+              style={{
                 height: `${((activeIndex + 1) / features.length) * 100}%`,
               }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             />
           </Box>
         </Flex>
@@ -133,74 +134,42 @@ export function FeaturesCarousel({ features }: FeaturesCarouselProps) {
         >
           {/* タイトル */}
           <Box className={css({ minH: "80px" })}>
-            <AnimatePresence mode="wait">
-              <motion.h3
-                key={activeIndex}
-                className={css({
-                  fontSize: { base: "3xl", md: "4xl" },
-                  fontWeight: 700,
-                  color: current.color,
-                  lineHeight: 1.2,
-                })}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-              >
-                {current.title.split(" ").map((word, i) => (
-                  <motion.span
-                    key={i}
-                    className={css({ display: "inline-block", mr: "0.3em" })}
-                    variants={{
-                      hidden: { opacity: 0, y: 20 },
-                      visible: {
-                        opacity: 1,
-                        y: 0,
-                        transition: {
-                          duration: 0.5,
-                          delay: i * 0.05,
-                          ease: [0.22, 1, 0.36, 1],
-                        },
-                      },
-                      exit: {
-                        opacity: 0,
-                        y: -10,
-                        transition: { duration: 0.2, delay: i * 0.02 },
-                      },
-                    }}
-                  >
-                    {word}
-                  </motion.span>
-                ))}
-              </motion.h3>
-            </AnimatePresence>
+            <h3
+              key={activeIndex}
+              className={css({
+                fontSize: { base: "3xl", md: "4xl" },
+                fontWeight: 700,
+                color: current.color,
+                lineHeight: 1.2,
+                animation: "fadeIn 0.6s ease",
+              })}
+            >
+              {current.title}
+            </h3>
           </Box>
 
           {/* 説明文 */}
           <Box className={css({ minH: "120px" })}>
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={activeIndex}
-                className={css({
-                  fontSize: "md",
-                  color: "text.secondary",
-                  lineHeight: 1.9,
-                  letterSpacing: "0.3px",
-                })}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4, delay: 0.2 }}
-              >
-                {current.description}
-              </motion.p>
-            </AnimatePresence>
+            <p
+              key={`desc-${activeIndex}`}
+              className={css({
+                fontSize: "md",
+                color: "text.secondary",
+                lineHeight: 1.9,
+                letterSpacing: "0.3px",
+                animation: "fadeIn 0.6s ease 0.2s both",
+              })}
+            >
+              {current.description}
+            </p>
           </Box>
 
           {/* ナビゲーション */}
           <Flex gap={4} align="center" justify="flex-end">
-            <motion.button
+            <button
               type="button"
               onClick={goPrev}
+              disabled={isAnimating}
               className={css({
                 position: "relative",
                 w: 12,
@@ -213,12 +182,16 @@ export function FeaturesCarousel({ features }: FeaturesCarouselProps) {
                 justifyContent: "center",
                 cursor: "pointer",
                 transition: "all 0.2s",
+                bg: "white",
                 _hover: {
                   bg: "gray.100",
                   borderColor: current.color,
                 },
+                _disabled: {
+                  opacity: 0.5,
+                  cursor: "not-allowed",
+                },
               })}
-              whileTap={{ scale: 0.95 }}
             >
               <svg
                 width="18"
@@ -235,11 +208,12 @@ export function FeaturesCarousel({ features }: FeaturesCarouselProps) {
                   strokeLinejoin="round"
                 />
               </svg>
-            </motion.button>
+            </button>
 
-            <motion.button
+            <button
               type="button"
               onClick={goNext}
+              disabled={isAnimating}
               className={css({
                 position: "relative",
                 w: 12,
@@ -252,12 +226,16 @@ export function FeaturesCarousel({ features }: FeaturesCarouselProps) {
                 justifyContent: "center",
                 cursor: "pointer",
                 transition: "all 0.2s",
+                bg: "white",
                 _hover: {
                   bg: "gray.100",
                   borderColor: current.color,
                 },
+                _disabled: {
+                  opacity: 0.5,
+                  cursor: "not-allowed",
+                },
               })}
-              whileTap={{ scale: 0.95 }}
             >
               <svg
                 width="18"
@@ -274,7 +252,7 @@ export function FeaturesCarousel({ features }: FeaturesCarouselProps) {
                   strokeLinejoin="round"
                 />
               </svg>
-            </motion.button>
+            </button>
           </Flex>
         </VStack>
       </Flex>
