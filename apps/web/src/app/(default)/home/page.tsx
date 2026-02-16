@@ -1,5 +1,5 @@
 import { Text } from "@/components/ui/text";
-import { FeaturesCarousel } from "@/components/features-carousel";
+import { FeaturesBento } from "@/components/features-bento";
 import { createClient } from "@/lib/api";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -74,25 +74,41 @@ const aiFeatures = [
     title: "AI自動生成",
     description:
       "高度な自然言語処理AIが、あなたのビジネスに最適化されたコンテンツを瞬時に生成。Instagram投稿、Google Mapの口コミ返信、SEO記事まで、プロフェッショナルな品質を数秒で実現します。",
-    color: "#2F80ED",
   },
   {
     title: "業務効率化",
     description:
       "SNS運用、口コミ対応、コンテンツ作成など、日々の煩雑な業務を自動化。手作業の時間を最大90%削減し、戦略立案やお客様との対話など、本質的な業務に集中できる環境を実現します。",
-    color: "#27AE60",
   },
   {
-    title: "データ駆動の戦略立案",
+    title: "リアルタイムデータ分析",
     description:
-      "市場トレンド、競合店舗の動向、自社アカウントのパフォーマンスを統合的に分析。AIが膨大なデータから意味のある洞察を抽出し、次の一手を的確に提案します。",
-    color: "#9B51E0",
+      "市場トレンド、競合店舗の動向、自社アカウントのパフォーマンスを統合的に分析。AIが膨大なデータから意味のある洞察を抽出し、次の一手を的確に提案。競合他社の投稿頻度、エンゲージメント率、フォロワーの増減パターンまで、あらゆる指標をリアルタイムで監視し、戦略的な意思決定をサポートします。",
   },
   {
-    title: "持続的な成長支援",
+    title: "24時間365日稼働",
     description:
-      "AIが24時間365日、あなたのビジネスの成長をサポート。最適化されたマーケティング施策、効果的なコンテンツ戦略、データに基づく改善提案により、集客力と売上の向上を実現します。",
-    color: "#F2994A",
+      "AIアシスタントが休むことなく、あなたのビジネスを見守ります。深夜の口コミにも即座に返信し、早朝のトレンドを逃さずキャッチ。人間では不可能な継続的な監視と対応で、機会損失をゼロに。",
+  },
+  {
+    title: "マルチプラットフォーム対応",
+    description:
+      "Instagram、Google Map、SEO記事、ブログなど、複数のプラットフォームに最適化されたコンテンツを一元管理。各プラットフォームの特性を理解したAIが、最適なフォーマット、文字数、トーンで自動生成します。",
+  },
+  {
+    title: "高度なカスタマイズ",
+    description:
+      "あなたのブランドボイス、ターゲット層、業種に完全適応。初期設定でビジネスの特徴を学習し、生成されるコンテンツは常にあなたらしさを保ちます。トーン、キーワード、スタイルまで細かく調整可能。",
+  },
+  {
+    title: "セキュアなデータ管理",
+    description:
+      "エンタープライズグレードのセキュリティで、お客様の大切なビジネスデータを保護。すべての通信は暗号化され、データは安全なクラウド環境で管理。GDPR、個人情報保護法に完全準拠し、安心してご利用いただけます。",
+  },
+  {
+    title: "コスト削減効果",
+    description:
+      "専任のマーケティング担当者を雇用する費用の1/10以下で、プロフェッショナルレベルのコンテンツ制作が可能。時間とコストを大幅に削減しながら、品質は向上。ROIを最大化します。",
   },
 ];
 
@@ -257,7 +273,7 @@ export default async function HomePage() {
       </Box>
 
       {/* INSITE AIの特徴セクション */}
-      <VStack gap={16} w="full" maxW="1100px" mb={12}>
+      <VStack gap={12} w="full" maxW="1400px" mb={12}>
         <VStack gap={4} textAlign="center">
           <Text
             size="4xl"
@@ -288,7 +304,7 @@ export default async function HomePage() {
           </Text>
         </VStack>
 
-        <FeaturesCarousel features={aiFeatures} />
+        <FeaturesBento features={aiFeatures} />
       </VStack>
     </Flex>
   );
