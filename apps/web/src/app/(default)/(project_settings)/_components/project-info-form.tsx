@@ -19,6 +19,11 @@ import { saveProjectInfoAction } from "../_actions/project-info";
 const formFields = {
   business: [
     {
+      label: "店舗名",
+      key: "storeName",
+      multiline: false,
+    },
+    {
       label: "業種",
       key: "businessType",
     },
@@ -62,11 +67,6 @@ const formFields = {
     },
   ],
   instagram: [
-    {
-      label: "店舗名",
-      key: "storeName",
-      multiline: false,
-    },
     {
       label: "テンプレート文章",
       key: "instagramTemplate",
