@@ -42,138 +42,138 @@ const insights = [
 ];
 
 export function SeoInsightsBrowse() {
-  const cardStyles = {
-    flex: 1,
-    minW: "350px",
-    maxW: "450px",
-    minH: "500px",
-  };
-
   return (
-    <Flex
-      direction="column"
-      gap={6}
+    <Box
       py={8}
+      px={4}
       className={css({
         animation: "slideIn 0.3s ease",
       })}
     >
-      <VStack gap={4} px={4} w="full" maxW="1400px" mx="auto">
-        <Text
-          size="2xl"
-          className={css({
-            fontWeight: 700,
-            color: "text.primary",
-            textAlign: "center",
-          })}
-        >
-          SEO/AIO記事の最新トレンド
-        </Text>
-        <Text
-          className={css({
-            color: "text.secondary",
-            textAlign: "center",
-            maxW: "2xl",
-            fontSize: "md",
-          })}
-        >
-          検索エンジンで高評価を得るための最新情報とベストプラクティスをまとめました
-        </Text>
-      </VStack>
-
-      <Flex
-        gap={4}
-        px={4}
-        w="full"
-        justify="center"
-        flexWrap="wrap"
-        maxW="1400px"
-        mx="auto"
-      >
-        {insights.map((insight) => (
-          <Box
-            key={insight.id}
+      <VStack gap={8} w="full" maxW="900px" mx="auto">
+        <VStack gap={3} textAlign="center">
+          <Text
+            size="2xl"
             className={css({
-              ...cardStyles,
-              bg: "bg.card",
-              borderRadius: "card",
-              boxShadow: "card",
-              p: 8,
-              display: "flex",
-              flexDirection: "column",
-              gap: 4,
-              transition: "all 0.3s ease",
-              _hover: {
-                boxShadow: "cardHover",
-                transform: "translateY(-4px)",
-              },
+              fontWeight: 700,
+              color: "text.primary",
             })}
           >
-            <Flex align="center" gap={3}>
-              <Box
-                className={css({
-                  w: 12,
-                  h: 12,
-                  borderRadius: "full",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  bg: `${insight.color}20`,
-                })}
-              >
-                <insight.icon
-                  size={24}
-                  className={css({
-                    color: insight.color,
-                  })}
-                />
-              </Box>
-              <Text
-                size="lg"
-                className={css({
-                  fontWeight: 600,
-                  color: "text.primary",
-                })}
-              >
-                {insight.title}
-              </Text>
-            </Flex>
+            SEO/AIO記事の最新トレンド
+          </Text>
+          <Text
+            className={css({
+              color: "text.secondary",
+              maxW: "2xl",
+              fontSize: "md",
+            })}
+          >
+            検索エンジンで高評価を得るための最新情報とベストプラクティス
+          </Text>
+        </VStack>
 
-            <VStack
-              gap={3}
-              alignItems="stretch"
-              flex={1}
+        <VStack gap={6} w="full" alignItems="stretch">
+          {insights.map((insight, idx) => (
+            <Box
+              key={insight.id}
+              className={css({
+                borderLeft: "4px solid",
+                borderColor: insight.color,
+                pl: 6,
+                pr: 4,
+                py: 4,
+                bg: {
+                  base: "white",
+                  _dark: "#374151",
+                },
+                borderRadius: "md",
+                transition: "all 0.2s ease",
+                _hover: {
+                  transform: "translateX(8px)",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                },
+              })}
             >
-              {insight.items.map((item, index) => (
+              <Flex align="center" gap={3} mb={4}>
                 <Box
-                  key={index}
                   className={css({
-                    py: 3,
-                    px: 3,
-                    borderRadius: "md",
-                    bg: "gray.50",
-                    transition: "background 0.2s ease",
-                    _hover: {
-                      bg: "gray.100",
-                    },
+                    w: 10,
+                    h: 10,
+                    borderRadius: "full",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    bg: `${insight.color}20`,
                   })}
                 >
-                  <Text
+                  <insight.icon
+                    size={20}
                     className={css({
-                      fontSize: "md",
-                      color: "text.secondary",
-                      lineHeight: 1.7,
-                      width: "100%",
+                      color: insight.color,
+                    })}
+                  />
+                </Box>
+                <Text
+                  size="lg"
+                  className={css({
+                    fontWeight: 700,
+                    color: "text.primary",
+                  })}
+                >
+                  {insight.title}
+                </Text>
+              </Flex>
+
+              <VStack gap={2} alignItems="stretch">
+                {insight.items.map((item, itemIdx) => (
+                  <Flex
+                    key={itemIdx}
+                    gap={3}
+                    align="flex-start"
+                    className={css({
+                      py: 2,
                     })}
                   >
-                    {item}
-                  </Text>
-                </Box>
-              ))}
-            </VStack>
-          </Box>
-        ))}
-      </Flex>
-    </Flex>
+                    <Box
+                      className={css({
+                        w: 6,
+                        h: 6,
+                        borderRadius: "full",
+                        bg: `${insight.color}30`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                        mt: 1,
+                      })}
+                    >
+                      <Text
+                        className={css({
+                          fontSize: "xs",
+                          fontWeight: 700,
+                          color: insight.color,
+                        })}
+                      >
+                        {itemIdx + 1}
+                      </Text>
+                    </Box>
+                    <Text
+                      className={css({
+                        fontSize: "md",
+                        color: "text.secondary",
+                        lineHeight: 1.8,
+                        flex: 1,
+                      })}
+                    >
+                      {item}
+                    </Text>
+                  </Flex>
+                ))}
+              </VStack>
+            </Box>
+          ))}
+        </VStack>
+      </VStack>
+    </Box>
   );
 }

@@ -17,9 +17,9 @@ export function TabPanel({ panels }: TabPanelProps) {
           <Tabs.Trigger
             key={option.id}
             value={option.id}
-            color="subfont"
+            color="text.secondary"
             _selected={{
-              color: "font",
+              color: "text.primary",
             }}
           >
             {option.label}

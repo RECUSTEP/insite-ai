@@ -66,7 +66,7 @@ export function ThemeToggle() {
           <MoonIcon
             size={14}
             className={css({
-              color: "gray.700",
+              color: "#3B82F6",
             })}
           />
         ) : (

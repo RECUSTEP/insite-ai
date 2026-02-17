@@ -11,19 +11,22 @@ export function Logout() {
       variant="outline"
       onClick={async () => await logout()}
       className={css({
-        color: "text.primary",
+        color: {
+          base: "gray.700",
+          _dark: "white",
+        },
         borderColor: {
           base: "gray.300",
           _dark: "gray.600",
         },
         bg: {
           base: "white",
-          _dark: "gray.700",
+          _dark: "#1A202C",
         },
         _hover: {
           bg: {
             base: "gray.100",
-            _dark: "gray.600",
+            _dark: "#374151",
           },
           borderColor: {
             base: "gray.400",
