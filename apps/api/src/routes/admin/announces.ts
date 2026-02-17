@@ -2,15 +2,16 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { adminGuard } from "./_factory";
 
-export const announceSchema = z.object({
-  id: z.number().optional(),
+const createAnnounceSchema = z.object({
   title: z.string().min(1),
   content: z.string().min(1),
-  createdAt: z.number().optional(),
-  updatedAt: z.number().optional(),
 });
 
-export const announcesSchema = z.array(announceSchema);
+const updateAnnounceSchema = z.object({
+  id: z.number(),
+  title: z.string().min(1),
+  content: z.string().min(1),
+});
 
 const getAllHandler = adminGuard.createHandlers(async (c) => {
   const result = await c.var.announceUsecase.getAll();
@@ -21,7 +22,7 @@ const getAllHandler = adminGuard.createHandlers(async (c) => {
 });
 
 const createHandler = adminGuard.createHandlers(
-  zValidator("json", announceSchema),
+  zValidator("json", createAnnounceSchema),
   async (c) => {
     const data = c.req.valid("json");
     const result = await c.var.announceUsecase.create(data);
@@ -33,12 +34,9 @@ const createHandler = adminGuard.createHandlers(
 );
 
 const updateHandler = adminGuard.createHandlers(
-  zValidator("json", announceSchema),
+  zValidator("json", updateAnnounceSchema),
   async (c) => {
     const data = c.req.valid("json");
-    if (!data.id) {
-      return c.json({ error: "ID is required" }, 400);
-    }
     const result = await c.var.announceUsecase.update(data.id, data);
     if (!result.ok) {
       return c.json({ error: result.val }, 500);

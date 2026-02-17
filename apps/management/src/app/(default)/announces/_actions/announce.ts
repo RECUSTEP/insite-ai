@@ -13,7 +13,7 @@ type AnnounceInput = {
 export async function saveAnnounce(input: AnnounceInput) {
   const client = createClient();
 
-  if (input.id) {
+  if (input.id !== undefined) {
     // 更新
     const response = await client.admin.announces.$put(
       {
