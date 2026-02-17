@@ -15,16 +15,16 @@ export function FileUpload(props: StyledFileUpload.RootProps) {
       accept={acceptMimeTypes}
       {...props}
     >
-      <StyledFileUpload.Dropzone bg="inputAreaBg" py={8} minH="0" height="fit-content">
+      <StyledFileUpload.Dropzone bg="inputAreaBg" py={8} minH="0" height="fit-content" borderColor={{ base: "gray.200", _dark: "gray.600" }}>
         <StyledFileUpload.Label
           display="flex"
           flexDir="column"
           alignItems="center"
           gap="1.5"
-          color="brand.DEFAULT"
+          color={{ base: "brand.DEFAULT", _dark: "text.primary" }}
         >
           <ImageIcon size={40} />
-          <Text as="span" color="brand.DEFAULT">
+          <Text as="span" color={{ base: "brand.DEFAULT", _dark: "text.primary" }}>
             <Text as="span" display="none" md={{ display: "inline" }}>
               ドロップして
             </Text>
