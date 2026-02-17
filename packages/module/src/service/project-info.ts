@@ -24,16 +24,22 @@ export class ProjectInfoUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
     }
     const projectInfo = parseResult.data;
     try {
-      const exists = await this.db.query.projects.findFirst({
-        where: eq(schemas.projects.projectId, projectInfo.projectId),
-      });
+      const [exists] = await this.db
+        .select()
+        .from(schemas.projects)
+        .where(eq(schemas.projects.projectId, projectInfo.projectId))
+        .limit(1);
       if (!exists) {
         return Err(ProjectInfoUseCaseError.ProjectNotFound);
       }
+      const { projectId, ...updateData } = projectInfo;
       const [result] = await this.db
         .insert(schemas.projectInfo)
         .values(projectInfo)
-        .onConflictDoUpdate({ target: schemas.projectInfo.projectId, set: projectInfo })
+        .onConflictDoUpdate({
+          target: schemas.projectInfo.projectId,
+          set: updateData,
+        })
         .returning();
       if (!result) {
         return Err(CommonUseCaseError.UnknownError);
@@ -51,9 +57,11 @@ export class ProjectInfoUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
     }
     const projectInfo = parseResult.data;
     try {
-      const result = await this.db.query.projectInfo.findFirst({
-        where: eq(schemas.projectInfo.projectId, projectInfo.projectId),
-      });
+      const [result] = await this.db
+        .select()
+        .from(schemas.projectInfo)
+        .where(eq(schemas.projectInfo.projectId, projectInfo.projectId))
+        .limit(1);
       if (!result) {
         return Err(ProjectInfoUseCaseError.ProjectInfoNotFound);
       }

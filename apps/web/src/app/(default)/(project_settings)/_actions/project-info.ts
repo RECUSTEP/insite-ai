@@ -40,8 +40,13 @@ export async function saveProjectInfoAction(
 
   if (!response.ok) {
     const data = (await response.json().catch(() => ({}))) as { error?: string };
+    const errorMsg = data.error ?? "プロジェクト情報の保存に失敗しました";
+    const displayMsg =
+      errorMsg === "UnknownError"
+        ? "プロジェクト情報の保存に失敗しました。しばらくしてから再度お試しください。"
+        : errorMsg;
     return submission.reply({
-      formErrors: [data.error ?? "プロジェクト情報の保存に失敗しました"],
+      formErrors: [displayMsg],
     });
   }
 
