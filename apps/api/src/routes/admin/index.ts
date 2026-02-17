@@ -7,6 +7,7 @@ import { route as promptsRoute } from "./prompts";
 import { route as sessionRoute } from "./session";
 import { route as instructionGuideRoute } from "./instruction-guide";
 import { route as authRoute } from "./auth";
+import { route as announcesRoute } from "./announces";
 
 export const route = new Hono()
   .route("/application-settings", applicationSettingsRoute)
@@ -16,4 +17,5 @@ export const route = new Hono()
   .route("/prompts", promptsRoute)
   .route("/session", sessionRoute)
   .route("/instruction-guide", instructionGuideRoute)
-  .route("/auth", authRoute);
+  .route("/auth", authRoute)
+  .route("/announces", announcesRoute);

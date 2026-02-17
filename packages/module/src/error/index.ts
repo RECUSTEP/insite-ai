@@ -44,3 +44,7 @@ export const SessionUseCaseError = {
 export const InstructionGuideUseCaseError = {
   InstructionGuideNotFound: "InstructionGuideNotFound",
 } as const;
+
+export const AnnounceUseCaseError = {
+  AnnounceNotFound: "AnnounceNotFound",
+} as const;

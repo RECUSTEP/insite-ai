@@ -166,6 +166,14 @@ const instructionGuide = sqliteTable("instruction_guide", {
   text: text("text").notNull(),
 });
 
+const announces = sqliteTable("announce", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  createdAt: integer("created_at").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+});
+
 const projectRelations = relations(projects, ({ one, many }) => ({
   apiUsage: many(apiUsage),
   analysisHistory: many(analysisHistory),
@@ -213,6 +221,7 @@ export {
   prompts,
   applicationSettings,
   instructionGuide,
+  announces,
   projectRelations,
   apiUsageRelations,
   analysisHistoryRelations,

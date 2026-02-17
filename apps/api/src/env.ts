@@ -10,6 +10,7 @@ import type {
   SessionUseCase,
   InstructionGuideUseCase,
   AuthUseCase,
+  AnnounceUseCase,
 } from "@repo/module/service";
 
 export type Bindings = {
@@ -31,6 +32,7 @@ export type Variables = {
   promptUseCase: PromptUseCase<"d1">;
   applicationSettingUseCase: ApplicationSettingUseCase<"d1">;
   instructionGuideUsecase: InstructionGuideUseCase<"d1">;
+  announceUsecase: AnnounceUseCase<"d1">;
 };
 
 export type Env = {

@@ -66,3 +66,9 @@ export const instructionGuideInsertSchema = createInsertSchema(schemas.instructi
 
 export type InstructionGuideSelect = typeof schemas.instructionGuide.$inferSelect;
 export const instructionGuideSelectSchema = createSelectSchema(schemas.instructionGuide);
+
+export type AnnounceInsert = typeof schemas.announces.$inferInsert;
+export const announceInsertSchema = createInsertSchema(schemas.announces);
+
+export type AnnounceSelect = typeof schemas.announces.$inferSelect;
+export const announceSelectSchema = createSelectSchema(schemas.announces);

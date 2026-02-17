@@ -30,6 +30,10 @@ const navigation = [
     path: "/instruction-guide",
     label: "生成指示ガイド設定",
   },
+  {
+    path: "/announces",
+    label: "お知らせ管理",
+  },
 ];
 
 export function Header() {

@@ -2,6 +2,7 @@ import * as schema from "@repo/db/schema";
 import {
   AdminSessionUseCase,
   AnalysisHistoryUseCase,
+  AnnounceUseCase,
   ApiUsageUseCase,
   ApplicationSettingUseCase,
   AuthUseCase,
@@ -35,6 +36,7 @@ export const initApp = <E extends Env>(app: Hono<E>) => {
     const promptUseCase = new PromptUseCase<"d1">(db);
     const applicationSettingUseCase = new ApplicationSettingUseCase<"d1">(db);
     const instructionGuideUsecase = new InstructionGuideUseCase<"d1">(db);
+    const announceUsecase = new AnnounceUseCase<"d1">(db);
     c.set("authUseCase", authUseCase);
     c.set("projectUseCase", projectUseCase);
     c.set("apiUsageUseCase", apiUsageUseCase);
@@ -46,6 +48,7 @@ export const initApp = <E extends Env>(app: Hono<E>) => {
     c.set("promptUseCase", promptUseCase);
     c.set("applicationSettingUseCase", applicationSettingUseCase);
     c.set("instructionGuideUsecase", instructionGuideUsecase);
+    c.set("announceUsecase", announceUsecase);
     await next();
   });
 };
