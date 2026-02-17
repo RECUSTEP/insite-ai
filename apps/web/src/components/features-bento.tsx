@@ -82,10 +82,16 @@ const PlusCard = ({
       className={css({
         position: "relative",
         border: "2px dashed",
-        borderColor: "gray.300",
+        borderColor: {
+          base: "gray.300",
+          _dark: "gray.600",
+        },
         borderRadius: "lg",
         p: 8,
-        bg: "white",
+        bg: {
+          base: "white",
+          _dark: "#374151",
+        },
         minH: "200px",
         display: "flex",
         flexDirection: "column",

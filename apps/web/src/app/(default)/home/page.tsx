@@ -86,9 +86,9 @@ const aiFeatures = [
       "市場トレンド、競合店舗の動向、自社アカウントのパフォーマンスを統合的に分析。AIが膨大なデータから意味のある洞察を抽出し、次の一手を的確に提案。競合他社の投稿頻度、エンゲージメント率、フォロワーの増減パターンまで、あらゆる指標をリアルタイムで監視し、戦略的な意思決定をサポートします。",
   },
   {
-    title: "24時間365日稼働",
+    title: "いつでも利用可能",
     description:
-      "AIアシスタントが休むことなく、あなたのビジネスを見守ります。深夜の口コミにも即座に返信し、早朝のトレンドを逃さずキャッチ。人間では不可能な継続的な監視と対応で、機会損失をゼロに。",
+      "必要なときにいつでもAIを活用できます。早朝や深夜でも、思い立ったタイミングで投稿作成や分析レポートを生成。時間や場所を選ばず、ビジネスのあらゆる場面でサポートを受けられます。",
   },
   {
     title: "マルチプラットフォーム対応",
@@ -137,14 +137,12 @@ export default async function HomePage() {
       justify="flex-start"
       minH="calc(100vh - 200px)"
       gap={20}
-      px={4}
       py={12}
-      bg="bg.base"
       className={css({
         animation: "fadeIn 0.4s ease",
       })}
     >
-      <VStack gap={3} textAlign="center" maxW="3xl">
+      <VStack gap={3} textAlign="center" maxW="3xl" px={4}>
         <Text
           size="4xl"
           className={css({
@@ -180,9 +178,9 @@ export default async function HomePage() {
             lineHeight: 1.8,
           })}
         >
-          SNS投稿、口コミ返信、市場分析、SEO記事作成まで。
+          SNS投稿、口コミ作成、市場分析、SEO記事生成まで。
           <br />
-          AIが24時間365日、あなたのビジネスをサポートします。
+          AIがあなたのビジネス運営を効率化し、成長を加速させます。
         </Text>
       </VStack>
 
@@ -196,13 +194,17 @@ export default async function HomePage() {
           gap: { base: 4, md: 6 },
           maxW: "900px",
           w: "full",
+          px: 4,
         })}
       >
         {visibleFeatures.map((feature) => (
           <Link key={feature.id} href={feature.path}>
             <Box
               className={css({
-                bg: "white",
+                bg: {
+                  base: "white",
+                  _dark: "#374151",
+                },
                 borderRadius: "xl",
                 boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
                 p: 8,
@@ -216,7 +218,10 @@ export default async function HomePage() {
                 gap: 4,
                 textAlign: "center",
                 border: "1px solid",
-                borderColor: "gray.100",
+                borderColor: {
+                  base: "gray.100",
+                  _dark: "gray.600",
+                },
                 _hover: {
                   transform: "translateY(-8px)",
                   boxShadow: "0 12px 24px rgba(0, 0, 0, 0.12)",
@@ -268,7 +273,7 @@ export default async function HomePage() {
       </Box>
 
       {/* INSITE AIの特徴セクション */}
-      <VStack gap={12} w="full" maxW="1400px" mb={12}>
+      <VStack gap={12} w="full" maxW="1400px" mb={12} px={4}>
         <VStack gap={4} textAlign="center">
           <Text
             size="4xl"
