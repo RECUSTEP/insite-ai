@@ -11,7 +11,7 @@ export type Env = {
       id: string;
       authId: string;
       expiresAt: number;
-      projectId: string;
+      projectId: string | undefined;
     };
   };
 };
@@ -39,17 +39,16 @@ export function initApp(app: Hono<Env>) {
     }
 
     const res = await c.var.projectUseCase.getByAuthId(session.authId);
-    if (!res.ok) {
-      await next();
+    let projectId: string | undefined;
+    if (res.ok && res.val[0]) {
+      projectId = res.val[0].projectId;
+      const updatedSession = { ...session, projectId };
+      c.set("session", updatedSession);
+      await c.var.sessionUseCase.updateSession(updatedSession);
     } else {
-      const firstProject = res.val[0];
-      if (firstProject) {
-        const updatedSession = { ...session, projectId: firstProject.projectId };
-        c.set("session", updatedSession);
-        await c.var.sessionUseCase.updateSession(updatedSession);
-      }
-      await next();
+      c.set("session", { ...session, projectId: undefined });
     }
+    await next();
   });
 }
 

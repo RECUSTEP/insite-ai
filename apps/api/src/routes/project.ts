@@ -5,6 +5,12 @@ import { z } from "zod";
 
 const getProjectHandler = projectGuard.createHandlers(async (c) => {
   const { projectId } = c.var.session;
+  if (!projectId) {
+    return c.json(
+      { error: "プロジェクトが選択されていません。プロジェクトを作成してください。" },
+      404,
+    );
+  }
   const projectResult = await c.var.projectUseCase.getProject({ projectId });
   if (!projectResult.ok) {
     return c.json({ error: projectResult.val }, 400);

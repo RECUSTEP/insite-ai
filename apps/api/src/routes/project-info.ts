@@ -5,6 +5,12 @@ import { projectGuard } from "./_factory";
 
 const getProjectHandler = projectGuard.createHandlers(async (c) => {
   const { projectId } = c.var.session;
+  if (!projectId) {
+    return c.json(
+      { error: "プロジェクトが選択されていません" },
+      400,
+    );
+  }
   const result = await c.var.projectInfoUseCase.getProjectInfo({ projectId });
   if (!result.ok) {
     return c.json(
@@ -38,6 +44,15 @@ const saveProjectHandler = projectGuard.createHandlers(
   zValidator("json", projectInfoSchema),
   async (c) => {
     const { projectId } = c.var.session;
+    if (!projectId) {
+      return c.json(
+        {
+          error:
+            "プロジェクトが選択されていません。プロジェクトを作成するか、プロジェクトを選択してください。",
+        },
+        400,
+      );
+    }
     const result = await c.var.projectInfoUseCase.saveProjectInfo({
       ...c.req.valid("json"),
       projectId,

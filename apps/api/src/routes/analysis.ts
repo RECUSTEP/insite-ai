@@ -216,6 +216,13 @@ const analysisHandler = projectGuard.createHandlers(
   zValidator("query", analysisQuerySchema),
   formValidator,
   async (c) => {
+    const { projectId } = c.var.session;
+    if (!projectId) {
+      return c.json(
+        { error: "プロジェクトが選択されていません。プロジェクトを作成するか、プロジェクトを選択してください。" },
+        400,
+      );
+    }
     const { type } = c.req.valid("query");
     const result = await analysisSchemaByType[type].safeParseAsync(c.req.valid("form"));
 
@@ -225,10 +232,10 @@ const analysisHandler = projectGuard.createHandlers(
     const form = result.data;
 
     const project = await c.var.projectUseCase.getProject({
-      projectId: c.var.session.projectId,
+      projectId,
     });
     const monthlyUsage = await c.var.apiUsageUseCase.getMonthlyApiUsageCount({
-      projectId: c.var.session.projectId,
+      projectId,
     });
 
     if (!project.ok || !monthlyUsage.ok) {
@@ -255,7 +262,7 @@ const analysisHandler = projectGuard.createHandlers(
       const prompt = await c.var.promptUseCase.getPromptByAiType("seo-article");
       if (!prompt.ok && prompt.val === CommonUseCaseError.NotFound) {
         const projectInfo = await c.var.projectInfoUseCase.getProjectInfo({
-          projectId: c.var.session.projectId,
+          projectId,
         });
         const values = {
           ...(projectInfo.ok ? omit(projectInfo.val, ["id"]) : {}),
@@ -273,7 +280,7 @@ const analysisHandler = projectGuard.createHandlers(
         user = replacePlaceholders(defaultPrompt.user, filtered);
       } else {
         const got = await getPrompt(c.var.promptUseCase, c.var.projectInfoUseCase)(
-          c.var.session.projectId,
+          projectId,
           type,
           "instruction" in form ? form.instruction : undefined,
         );
@@ -282,7 +289,7 @@ const analysisHandler = projectGuard.createHandlers(
       }
     } else {
       const got = await getPrompt(c.var.promptUseCase, c.var.projectInfoUseCase)(
-        c.var.session.projectId,
+        projectId,
         type,
         "instruction" in form ? form.instruction : undefined,
       );
@@ -430,12 +437,12 @@ const analysisHandler = projectGuard.createHandlers(
 
     let image: string | undefined;
     if ("images" in form && form.images[0] instanceof File) {
-      image = await upload(c, c.var.session.projectId, form.images[0]);
+      image = await upload(c, projectId, form.images[0]);
     }
 
     c.executionCtx.waitUntil(
       c.var.apiUsageUseCase.createApiUsage({
-        projectId: c.var.session.projectId,
+        projectId,
       }),
     );
 
@@ -452,7 +459,7 @@ const analysisHandler = projectGuard.createHandlers(
       }
 
       await c.var.analysisHistoryUseCase.createAnalysisHistory({
-        projectId: c.var.session.projectId,
+        projectId,
         aiType: type,
         input: JSON.parse(
           JSON.stringify({

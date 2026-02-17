@@ -12,7 +12,8 @@ export const imageHandler = projectGuard.createHandlers(
   zValidator("param", imageParamSchema),
   async (c) => {
     const { projectId, filename } = c.req.valid("param");
-    if (projectId !== c.var.session.projectId) {
+    const sessionProjectId = c.var.session.projectId;
+    if (!sessionProjectId || projectId !== sessionProjectId) {
       return c.text("Unauthorized", 401);
     }
 

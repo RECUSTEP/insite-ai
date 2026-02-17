@@ -21,13 +21,20 @@ const reviseSeoArticleSchema = z.object({
 const handler = projectGuard.createHandlers(
   zValidator("json", reviseSeoArticleSchema),
   async (c) => {
+    const { projectId } = c.var.session;
+    if (!projectId) {
+      return c.json(
+        { error: "プロジェクトが選択されていません。プロジェクトを作成するか、プロジェクトを選択してください。" },
+        400,
+      );
+    }
     const { historyId, revisionInstruction } = c.req.valid("json");
 
     const project = await c.var.projectUseCase.getProject({
-      projectId: c.var.session.projectId,
+      projectId,
     });
     const monthlyUsage = await c.var.apiUsageUseCase.getMonthlyApiUsageCount({
-      projectId: c.var.session.projectId,
+      projectId,
     });
     if (!project.ok || !monthlyUsage.ok) {
       return c.json({ error: "Internal Server Error" }, 500);
@@ -41,7 +48,7 @@ const handler = projectGuard.createHandlers(
       return c.json({ error: "履歴が見つかりません" }, 404);
     }
     const history = historyResult.val;
-    if (history.projectId !== c.var.session.projectId || history.aiType !== "seo-article") {
+    if (history.projectId !== projectId || history.aiType !== "seo-article") {
       return c.json({ error: "SEO記事の履歴のみ修正できます" }, 400);
     }
 
@@ -68,7 +75,7 @@ const handler = projectGuard.createHandlers(
     const prompt = await c.var.promptUseCase.getPromptByAiType("seo-article");
     if (!prompt.ok && prompt.val === CommonUseCaseError.NotFound) {
       const projectInfo = await c.var.projectInfoUseCase.getProjectInfo({
-        projectId: c.var.session.projectId,
+        projectId,
       });
       const values = {
         ...(projectInfo.ok ? omit(projectInfo.val, ["id"]) : {}),
@@ -81,7 +88,7 @@ const handler = projectGuard.createHandlers(
       system = replacePlaceholders(getSeoArticleDefaultPrompt().system, filtered);
     } else {
       const promptResult = await getPrompt(c.var.promptUseCase, c.var.projectInfoUseCase)(
-        c.var.session.projectId,
+        projectId,
         "seo-article",
         revisionInstruction,
       );
@@ -131,7 +138,7 @@ const handler = projectGuard.createHandlers(
 
     const rootId = history.revisionParentId ?? history.id;
     const historiesResult = await c.var.analysisHistoryUseCase.getAnalysisHistories({
-      projectId: c.var.session.projectId,
+      projectId,
     });
     if (!historiesResult.ok) {
       return c.json({ error: "Internal Server Error" }, 500);
@@ -146,7 +153,7 @@ const handler = projectGuard.createHandlers(
     const nextVersion = maxVersion + 1;
 
     const createResult = await c.var.analysisHistoryUseCase.createAnalysisHistory({
-      projectId: c.var.session.projectId,
+      projectId,
       aiType: "seo-article",
       revisionParentId: rootId,
       version: nextVersion,
@@ -163,7 +170,7 @@ const handler = projectGuard.createHandlers(
 
     c.executionCtx.waitUntil(
       c.var.apiUsageUseCase.createApiUsage({
-        projectId: c.var.session.projectId,
+        projectId,
       }),
     );
 

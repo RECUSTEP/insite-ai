@@ -22,8 +22,15 @@ JSON配列のみで返してください。例: ["キーワード1", "キーワ�
 最寄り駅: \${nearestStation}`;
 
 const handler = projectGuard.createHandlers(async (c) => {
+  const { projectId } = c.var.session;
+  if (!projectId) {
+    return c.json(
+      { error: "プロジェクトが選択されていません。プロジェクトを作成するか、プロジェクトを選択してください。" },
+      400,
+    );
+  }
   const project = await c.var.projectUseCase.getProject({
-    projectId: c.var.session.projectId,
+    projectId,
   });
   if (!project.ok) {
     return c.json({ error: "Internal Server Error" }, 500);
@@ -40,7 +47,7 @@ const handler = projectGuard.createHandlers(async (c) => {
   }
 
   const projectInfo = await c.var.projectInfoUseCase.getProjectInfo({
-    projectId: c.var.session.projectId,
+    projectId,
   });
   const projectInfoValues: Record<string, unknown> = projectInfo.ok
     ? omit(projectInfo.val, ["id", "projectId"])

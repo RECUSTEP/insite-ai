@@ -39,6 +39,10 @@ const getAnalysisHistorySchema = analysisHistorySchema.pick({ id: true });
 const getAnalysisHistoryHandler = projectGuard.createHandlers(
   zValidator("param", getAnalysisHistorySchema),
   async (c) => {
+    const { projectId } = c.var.session;
+    if (!projectId) {
+      return c.json({ error: "プロジェクトが選択されていません" }, 400);
+    }
     const { id } = c.req.valid("param");
     const result = await c.var.analysisHistoryUseCase.getAnalysisHistory({ id });
     if (!result.ok) {
@@ -47,7 +51,7 @@ const getAnalysisHistoryHandler = projectGuard.createHandlers(
       }
       return c.json({ error: result.val }, 400);
     }
-    if (result.val.projectId !== c.var.session.projectId) {
+    if (result.val.projectId !== projectId) {
       return c.json({ error: AnalysisHistoryUseCaseError.AnalysisHistoryNotFound }, 404);
     }
     return c.json(analysisHistorySchema.parse(result.val));
@@ -56,6 +60,9 @@ const getAnalysisHistoryHandler = projectGuard.createHandlers(
 
 const getAnalysisHistoriesHandler = projectGuard.createHandlers(async (c) => {
   const { projectId } = c.var.session;
+  if (!projectId) {
+    return c.json({ error: "プロジェクトが選択されていません" }, 400);
+  }
   const historiesResult = await c.var.analysisHistoryUseCase.getAnalysisHistories({ projectId });
 
   if (!historiesResult.ok) {
