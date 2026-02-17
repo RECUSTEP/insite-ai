@@ -104,13 +104,22 @@ function filterObject<T extends Record<string, unknown>, U>(
 }
 
 /** コード内デフォルト（DB に seo-article プロンプトが無い場合に使用） */
-export function getSeoArticleDefaultPrompt() {
+export function getSeoArticleDefaultPrompt(perspective: "third-party" | "representative" = "representative") {
+  const perspectiveGuidance = perspective === "representative"
+    ? `- 一人称視点で執筆する（「私たち」「当社」「私の経験では」など、状況に応じて自然な表現を使う）
+- 実体験や独自の見解を強調し、サービス提供者としての信頼性を高める
+- 読者に語りかけるような、親しみやすい文体を心がける`
+    : `- 客観的な第三者視点で執筆する
+- 一般的な事実や統計データを中心に構成する
+- 中立的で公平な論調を保つ`;
+
   const system = `あなたはSEO・AIO向けの記事ライターです。以下のルールに従って記事を執筆してください。
 
 【基本方針】
 - 結論ファーストで、読者がすぐに要点を把握できる構成にする
 - 体験談や独自の意見を盛り込み、説得力を高める
 - 指定キーワードを自然な形で適切な回数配置する（不自然な詰め込みは避ける）
+${perspectiveGuidance}
 
 【文字数・構成】
 - 文字数: 800〜1200字（instruction で指定があればそれに従う）

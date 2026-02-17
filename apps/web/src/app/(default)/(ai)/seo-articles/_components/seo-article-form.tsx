@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import { useCallback, useEffect, useState } from "react";
-import { Stack } from "styled-system/jsx";
+import { css } from "styled-system/css";
+import { Flex, Stack } from "styled-system/jsx";
 import { Form, GenerateButton, Output, Root } from "../../_components/form-fields";
 
 type SeoHistory = {
@@ -21,6 +22,7 @@ type SeoHistory = {
 
 export function SeoArticleForm() {
   const [instruction, setInstruction] = useState("");
+  const [perspective, setPerspective] = useState<"third-party" | "representative">("representative");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [suggestLoading, setSuggestLoading] = useState(false);
   const [histories, setHistories] = useState<SeoHistory[]>([]);
@@ -147,6 +149,89 @@ export function SeoArticleForm() {
         <Form>
           <Stack gap="4">
             <SectionTitle>キーワード・指示</SectionTitle>
+            <Field.Root>
+              <Field.Label>記事の視点</Field.Label>
+              <Flex gap="4" direction="row" flexWrap="wrap">
+                <label
+                  className={css({
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "2",
+                    cursor: "pointer",
+                    padding: "2",
+                    borderRadius: "md",
+                    transition: "all 0.2s",
+                    _hover: {
+                      bg: "gray.50",
+                      _dark: {
+                        bg: "gray.700",
+                      },
+                    },
+                  })}
+                >
+                  <input
+                    type="radio"
+                    name="perspective"
+                    value="representative"
+                    checked={perspective === "representative"}
+                    onChange={(e) => setPerspective(e.target.value as "representative")}
+                    className={css({
+                      width: "4",
+                      height: "4",
+                      cursor: "pointer",
+                    })}
+                  />
+                  <span
+                    className={css({
+                      fontSize: "sm",
+                      color: perspective === "representative" ? "text.primary" : "text.secondary",
+                      fontWeight: perspective === "representative" ? "semibold" : "normal",
+                    })}
+                  >
+                    代表者視点（一人称）
+                  </span>
+                </label>
+                <label
+                  className={css({
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "2",
+                    cursor: "pointer",
+                    padding: "2",
+                    borderRadius: "md",
+                    transition: "all 0.2s",
+                    _hover: {
+                      bg: "gray.50",
+                      _dark: {
+                        bg: "gray.700",
+                      },
+                    },
+                  })}
+                >
+                  <input
+                    type="radio"
+                    name="perspective"
+                    value="third-party"
+                    checked={perspective === "third-party"}
+                    onChange={(e) => setPerspective(e.target.value as "third-party")}
+                    className={css({
+                      width: "4",
+                      height: "4",
+                      cursor: "pointer",
+                    })}
+                  />
+                  <span
+                    className={css({
+                      fontSize: "sm",
+                      color: perspective === "third-party" ? "text.primary" : "text.secondary",
+                      fontWeight: perspective === "third-party" ? "semibold" : "normal",
+                    })}
+                  >
+                    第三者視点（客観的）
+                  </span>
+                </label>
+              </Flex>
+            </Field.Root>
             <Field.Root>
               <Textarea
                 name="instruction"

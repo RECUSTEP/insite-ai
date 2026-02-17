@@ -161,6 +161,10 @@ export const analysisSchemaByType = {
     instruction: z
       .string({ message: "キーワードを入力してください" })
       .min(1, "キーワードを入力してください"),
+    perspective: z
+      .enum(["third-party", "representative"])
+      .optional()
+      .default("representative"),
   }),
 } as const;
 
@@ -261,7 +265,10 @@ const analysisHandler = projectGuard.createHandlers(
         const filtered = Object.fromEntries(
           Object.entries(values).filter(([, v]) => isString(v)),
         ) as Record<string, string>;
-        const defaultPrompt = getSeoArticleDefaultPrompt();
+        const perspective = "perspective" in form && (form.perspective === "third-party" || form.perspective === "representative") 
+          ? form.perspective 
+          : "representative" as const;
+        const defaultPrompt = getSeoArticleDefaultPrompt(perspective);
         system = replacePlaceholders(defaultPrompt.system, filtered);
         user = replacePlaceholders(defaultPrompt.user, filtered);
       } else {
