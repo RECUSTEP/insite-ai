@@ -37,6 +37,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>((props, r
     <StyledTextarea
       ref={textareaRef}
       bg="inputAreaBg"
+      color="text.primary"
       onChange={(e) => {
         handleChange();
         onChange?.(e);

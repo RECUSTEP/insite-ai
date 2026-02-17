@@ -64,9 +64,6 @@ export default defineConfig({
           sidebarBg: {
             value: "#292f3b",
           },
-          inputAreaBg: {
-            value: "#fbfbf8",
-          },
           font: {
             value: "#292f3b",
           },
@@ -137,7 +134,7 @@ export default defineConfig({
             base: {
               value: {
                 base: "#F0F4F8",
-                _dark: "#1A202C",
+                _dark: "#2D3748",
               },
             },
             card: {
@@ -151,6 +148,13 @@ export default defineConfig({
                 base: "rgba(0, 0, 0, 0.4)",
                 _dark: "rgba(0, 0, 0, 0.6)",
               },
+            },
+          },
+          // 入力エリア背景
+          inputAreaBg: {
+            value: {
+              base: "#fbfbf8",
+              _dark: "#1A202C",
             },
           },
           // テキスト

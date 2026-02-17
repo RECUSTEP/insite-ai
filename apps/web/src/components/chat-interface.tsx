@@ -65,7 +65,9 @@ export function ChatInterface({
             <Box
               maxW="70%"
               className={css({
-                bg: message.type === "user" ? "gray.100" : "#EBF8FF",
+                bg: message.type === "user" 
+                  ? { base: "gray.100", _dark: "gray.600" }
+                  : { base: "#EBF8FF", _dark: "#1e40af" },
                 borderRadius: message.type === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
                 p: 4,
                 boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
@@ -89,7 +91,7 @@ export function ChatInterface({
           <Flex justify="flex-start" w="full">
             <Box
               className={css({
-                bg: "#EBF8FF",
+                bg: { base: "#EBF8FF", _dark: "#1e40af" },
                 borderRadius: "16px 16px 16px 4px",
                 p: 4,
                 display: "flex",
@@ -135,7 +137,10 @@ export function ChatInterface({
       <Box
         className={css({
           borderTop: "1px solid",
-          borderColor: "gray.200",
+          borderColor: {
+            base: "gray.200",
+            _dark: "gray.600",
+          },
           pt: 4,
           px: 4,
         })}
@@ -145,11 +150,17 @@ export function ChatInterface({
             flex={1}
             direction="column"
             className={css({
-              bg: "gray.50",
+              bg: {
+                base: "gray.50",
+                _dark: "#1A202C",
+              },
               borderRadius: "button",
               p: 3,
               border: "1px solid",
-              borderColor: "gray.200",
+              borderColor: {
+                base: "gray.200",
+                _dark: "gray.600",
+              },
               transition: "all 0.2s ease",
               _focusWithin: {
                 borderColor: "brand.DEFAULT",
