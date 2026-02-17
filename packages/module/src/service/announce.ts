@@ -18,10 +18,10 @@ export class AnnounceUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
       const result = await this.db
         .select()
         .from(schemas.announces)
-        .orderBy(desc(schemas.announces.createdAt))
-        .all();
+        .orderBy(desc(schemas.announces.createdAt));
       return Ok(result);
-    } catch {
+    } catch (error) {
+      console.error("Error fetching announces:", error);
       return Err(CommonUseCaseError.UnknownError);
     }
   }

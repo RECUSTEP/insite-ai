@@ -57,6 +57,13 @@
       "when": 1739774400000,
       "tag": "0007_add_announce_table",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1739775000000,
+      "tag": "0008_insert_initial_announces",
+      "breakpoints": true
     }
   ]
 }

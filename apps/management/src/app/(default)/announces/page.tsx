@@ -6,19 +6,26 @@ import { AnnouncesManager } from "./_components/announces-manager";
 
 export default async function Page() {
   const client = createClient();
-  const response = await client.admin.announces.$get(
-    {},
-    {
-      headers: {
-        cookie: cookies().toString(),
+  let announces: any[] = [];
+  
+  try {
+    const response = await client.admin.announces.$get(
+      {},
+      {
+        headers: {
+          cookie: cookies().toString(),
+        },
       },
-    },
-  );
+    );
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch announces");
+    if (response.ok) {
+      announces = await response.json();
+    } else {
+      console.error("Failed to fetch announces:", response.status);
+    }
+  } catch (error) {
+    console.error("Error fetching announces:", error);
   }
-  const announces = await response.json();
 
   return (
     <VStack maxW="4xl" mx="auto" py="8" gap="8" alignItems="stretch">
