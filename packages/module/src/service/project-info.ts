@@ -33,18 +33,31 @@ export class ProjectInfoUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(ProjectInfoUseCaseError.ProjectNotFound);
       }
       const { projectId, ...updateData } = projectInfo;
-      const [result] = await this.db
+      const [existing] = await this.db
+        .select()
+        .from(schemas.projectInfo)
+        .where(eq(schemas.projectInfo.projectId, projectId))
+        .limit(1);
+      if (existing) {
+        await this.db
+          .update(schemas.projectInfo)
+          .set(updateData)
+          .where(eq(schemas.projectInfo.projectId, projectId));
+        const [updated] = await this.db
+          .select()
+          .from(schemas.projectInfo)
+          .where(eq(schemas.projectInfo.projectId, projectId))
+          .limit(1);
+        return Ok(updated ?? { ...existing, ...updateData });
+      }
+      const [insertResult] = await this.db
         .insert(schemas.projectInfo)
         .values(projectInfo)
-        .onConflictDoUpdate({
-          target: schemas.projectInfo.projectId,
-          set: updateData,
-        })
         .returning();
-      if (!result) {
+      if (!insertResult) {
         return Err(CommonUseCaseError.UnknownError);
       }
-      return Ok(result);
+      return Ok(insertResult);
     } catch {
       return Err(CommonUseCaseError.UnknownError);
     }
