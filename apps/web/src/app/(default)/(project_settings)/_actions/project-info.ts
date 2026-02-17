@@ -44,7 +44,9 @@ export async function saveProjectInfoAction(
     const displayMsg =
       errorMsg === "UnknownError"
         ? "プロジェクト情報の保存に失敗しました。しばらくしてから再度お試しください。"
-        : errorMsg;
+        : errorMsg.startsWith("UnknownError: ")
+          ? `保存に失敗しました: ${errorMsg.slice(14)}`
+          : errorMsg;
     return submission.reply({
       formErrors: [displayMsg],
     });

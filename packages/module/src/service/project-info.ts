@@ -33,6 +33,9 @@ export class ProjectInfoUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(ProjectInfoUseCaseError.ProjectNotFound);
       }
       const { projectId, ...updateData } = projectInfo;
+      const filteredUpdate = Object.fromEntries(
+        Object.entries(updateData).filter(([, v]) => v !== undefined),
+      ) as Record<string, string>;
       const [existing] = await this.db
         .select()
         .from(schemas.projectInfo)
@@ -41,14 +44,14 @@ export class ProjectInfoUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
       if (existing) {
         await this.db
           .update(schemas.projectInfo)
-          .set(updateData)
+          .set(filteredUpdate)
           .where(eq(schemas.projectInfo.projectId, projectId));
         const [updated] = await this.db
           .select()
           .from(schemas.projectInfo)
           .where(eq(schemas.projectInfo.projectId, projectId))
           .limit(1);
-        return Ok(updated ?? { ...existing, ...updateData });
+        return Ok(updated ?? { ...existing, ...filteredUpdate });
       }
       const [insertResult] = await this.db
         .insert(schemas.projectInfo)
@@ -58,8 +61,9 @@ export class ProjectInfoUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(CommonUseCaseError.UnknownError);
       }
       return Ok(insertResult);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return Err(`UnknownError: ${msg}`);
     }
   }
 
