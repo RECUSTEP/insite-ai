@@ -5,7 +5,6 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { Textarea } from "@/components/ui/textarea";
-import { toaster } from "@/app/_components/toast";
 import { useState } from "react";
 import { css } from "styled-system/css";
 import { Box, Flex, VStack } from "styled-system/jsx";
@@ -49,10 +48,7 @@ export function AnnouncesManager({ initialAnnounces }: AnnouncesManagerProps) {
 
   const handleSave = async () => {
     if (!formData.title.trim() || !formData.content.trim()) {
-      toaster.error({
-        title: "エラー",
-        description: "タイトルと内容を入力してください",
-      });
+      alert("タイトルと内容を入力してください");
       return;
     }
 
@@ -66,25 +62,16 @@ export function AnnouncesManager({ initialAnnounces }: AnnouncesManagerProps) {
       if (editingId) {
         // 更新
         setAnnounces(announces.map((a) => (a.id === editingId ? result : a)));
-        toaster.success({
-          title: "成功",
-          description: "お知らせを更新しました",
-        });
+        alert("お知らせを更新しました");
       } else {
         // 新規作成
         setAnnounces([result, ...announces]);
-        toaster.success({
-          title: "成功",
-          description: "お知らせを作成しました",
-        });
+        alert("お知らせを作成しました");
       }
 
       handleCancel();
     } catch (error) {
-      toaster.error({
-        title: "エラー",
-        description: "保存に失敗しました",
-      });
+      alert("保存に失敗しました");
     }
   };
 
@@ -96,15 +83,9 @@ export function AnnouncesManager({ initialAnnounces }: AnnouncesManagerProps) {
     try {
       await deleteAnnounce(id);
       setAnnounces(announces.filter((a) => a.id !== id));
-      toaster.success({
-        title: "成功",
-        description: "お知らせを削除しました",
-      });
+      alert("お知らせを削除しました");
     } catch (error) {
-      toaster.error({
-        title: "エラー",
-        description: "削除に失敗しました",
-      });
+      alert("削除に失敗しました");
     }
   };
 

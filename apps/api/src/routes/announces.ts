@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import type { Env } from "../bindings";
+import type { Env } from "../env";
 
 export const route = new Hono<Env>().get("/", async (c) => {
   const result = await c.var.announceUsecase.getAll();
