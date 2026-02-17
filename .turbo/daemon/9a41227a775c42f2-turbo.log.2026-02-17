@@ -347,3 +347,11 @@
 2026-02-17T06:25:42.842159Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("management"), path: AnchoredSystemPathBuf("apps/management") }}))
 2026-02-17T06:25:51.141561Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/management/src/app/(default)/announces"), AnchoredSystemPathBuf("apps/management/src/app/(default)/announces/page.tsx")}
 2026-02-17T06:25:51.141569Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("management"), path: AnchoredSystemPathBuf("apps/management") }}))
+2026-02-17T06:26:32.141964Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/management/src/app/(default)/announces/_components"), AnchoredSystemPathBuf("apps/management/src/app/(default)/announces/_components/announces-manager.tsx")}
+2026-02-17T06:26:32.141977Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("management"), path: AnchoredSystemPathBuf("apps/management") }}))
+2026-02-17T06:26:41.641866Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/management/src/app/(default)/announces/_actions"), AnchoredSystemPathBuf("apps/management/src/app/(default)/announces/_actions/announce.ts")}
+2026-02-17T06:26:41.641877Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("management"), path: AnchoredSystemPathBuf("apps/management") }}))
+2026-02-17T06:26:56.041851Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/src/app/announce/page.tsx")}
+2026-02-17T06:26:56.041863Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("web"), path: AnchoredSystemPathBuf("apps/web") }}))
+2026-02-17T06:27:01.441533Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/src/app/announce/announce.md")}
+2026-02-17T06:27:01.441540Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("web"), path: AnchoredSystemPathBuf("apps/web") }}))
