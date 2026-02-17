@@ -1,5 +1,5 @@
 import * as schemas from "@repo/db/schema";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { Err, Ok, type Result } from "ts-results";
 import { z } from "zod";
 import { UseCase } from "../core/usecase";
@@ -15,9 +15,11 @@ export type UpdateAnnounceInput = z.infer<typeof updateAnnounceSchema>;
 export class AnnounceUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
   async getAll(): Promise<Result<AnnounceSelect[], string>> {
     try {
-      const result = await this.db.query.announces.findMany({
-        orderBy: (announces, { desc }) => [desc(announces.createdAt)],
-      });
+      const result = await this.db
+        .select()
+        .from(schemas.announces)
+        .orderBy(desc(schemas.announces.createdAt))
+        .all();
       return Ok(result);
     } catch {
       return Err(CommonUseCaseError.UnknownError);

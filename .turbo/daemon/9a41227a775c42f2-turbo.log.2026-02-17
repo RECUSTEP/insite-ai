@@ -473,3 +473,18 @@
 2026-02-17T07:01:12.363274Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("management"), path: AnchoredSystemPathBuf("apps/management") }}))
 2026-02-17T07:01:20.263653Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/management/src/app/(default)/announces/_components/announces-manager.tsx")}
 2026-02-17T07:01:20.263666Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("management"), path: AnchoredSystemPathBuf("apps/management") }}))
+2026-02-17T07:15:52.058554Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/module/src/service/announce.ts")}
+2026-02-17T07:15:52.058582Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@repo/module"), path: AnchoredSystemPathBuf("packages/module") }}))
+2026-02-17T07:15:53.358081Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/.wrangler/tmp/dev-irX3ys/index.js.map"), AnchoredSystemPathBuf("apps/api/.wrangler/tmp/dev-irX3ys/index.js")}
+2026-02-17T07:15:53.358095Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-02-17T07:15:53.364368Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-02-17T07:15:59.357329Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/module/src/service/announce.ts")}
+2026-02-17T07:15:59.357338Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@repo/module"), path: AnchoredSystemPathBuf("packages/module") }}))
+2026-02-17T07:15:59.456960Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/.wrangler/tmp/dev-irX3ys/index.js.map")}
+2026-02-17T07:15:59.456967Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-02-17T07:15:59.456989Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-02-17T07:16:06.957502Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/module/src/service/announce.ts")}
+2026-02-17T07:16:06.957513Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@repo/module"), path: AnchoredSystemPathBuf("packages/module") }}))
+2026-02-17T07:16:07.057764Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/.wrangler/tmp/dev-irX3ys/index.js"), AnchoredSystemPathBuf("apps/api/.wrangler/tmp/dev-irX3ys/index.js.map")}
+2026-02-17T07:16:07.057770Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-02-17T07:16:07.057794Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
