@@ -47,7 +47,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID:  ${{ env.CLOUDFLARE_ACCOUNT_ID }}
       
       # 5.5) 最新マイグレーションを個別に適用（冪等性保証）
-      - name: Apply Latest Migration - Add Revision Columns & SEO Addon
+      - name: Apply Latest Migration - Add Revision Columns & SEO Addon & Project Info
         run: |
           cd apps/api
           if [ "${{ github.ref_name }}" = "prd" ]; then
@@ -55,11 +55,21 @@ jobs:
             npx wrangler@4 d1 execute database --remote --command "ALTER TABLE analysis_history ADD COLUMN version INTEGER DEFAULT 1 NOT NULL;" || echo "Column may already exist"
             npx wrangler@4 d1 execute database --remote --command "CREATE INDEX IF NOT EXISTS analysis_history_revision_parent_id_idx ON analysis_history (revision_parent_id);" || echo "Index may already exist"
             npx wrangler@4 d1 execute database --remote --command "ALTER TABLE project ADD COLUMN seo_addon_enabled INTEGER DEFAULT 0 NOT NULL;" || echo "Column may already exist"
+            npx wrangler@4 d1 execute database --remote --command "ALTER TABLE project_info ADD COLUMN store_name text;" || echo "Column may already exist"
+            npx wrangler@4 d1 execute database --remote --command "ALTER TABLE project_info ADD COLUMN instagram_template text;" || echo "Column may already exist"
+            npx wrangler@4 d1 execute database --remote --command "ALTER TABLE project_info ADD COLUMN instagram_keyword1 text;" || echo "Column may already exist"
+            npx wrangler@4 d1 execute database --remote --command "ALTER TABLE project_info ADD COLUMN instagram_keyword2 text;" || echo "Column may already exist"
+            npx wrangler@4 d1 execute database --remote --command "ALTER TABLE project_info ADD COLUMN instagram_keyword3 text;" || echo "Column may already exist"
           else
             npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE analysis_history ADD COLUMN revision_parent_id TEXT;" || echo "Column may already exist"
             npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE analysis_history ADD COLUMN version INTEGER DEFAULT 1 NOT NULL;" || echo "Column may already exist"
             npx wrangler@4 d1 execute database --remote --env preview --command "CREATE INDEX IF NOT EXISTS analysis_history_revision_parent_id_idx ON analysis_history (revision_parent_id);" || echo "Index may already exist"
             npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE project ADD COLUMN seo_addon_enabled INTEGER DEFAULT 0 NOT NULL;" || echo "Column may already exist"
+            npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE project_info ADD COLUMN store_name text;" || echo "Column may already exist"
+            npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE project_info ADD COLUMN instagram_template text;" || echo "Column may already exist"
+            npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE project_info ADD COLUMN instagram_keyword1 text;" || echo "Column may already exist"
+            npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE project_info ADD COLUMN instagram_keyword2 text;" || echo "Column may already exist"
+            npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE project_info ADD COLUMN instagram_keyword3 text;" || echo "Column may already exist"
           fi
         env:
           CLOUDFLARE_API_TOKEN:   ${{ env.CLOUDFLARE_API_TOKEN }}
