@@ -5,6 +5,7 @@ import { toaster } from "@/app/_components/toast";
 import { MarkdownRenderer } from "@/components/markdown";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useCallback, useEffect, useState } from "react";
 import { css } from "styled-system/css";
@@ -21,7 +22,9 @@ type SeoHistory = {
 };
 
 export function SeoArticleForm() {
-  const [instruction, setInstruction] = useState("");
+  const [keywords, setKeywords] = useState<string[]>([]);
+  const [keywordInput, setKeywordInput] = useState("");
+  const [otherInstruction, setOtherInstruction] = useState("");
   const [perspective, setPerspective] = useState<"third-party" | "representative">("representative");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [suggestLoading, setSuggestLoading] = useState(false);
@@ -92,7 +95,20 @@ export function SeoArticleForm() {
   };
 
   const handleKeywordClick = (keyword: string) => {
-    setInstruction((prev) => (prev ? `${prev} ${keyword}` : keyword));
+    setKeywords((prev) => (prev.includes(keyword) ? prev : [...prev, keyword]));
+  };
+
+  const handleAddKeywords = () => {
+    const parsed = keywordInput
+      .split(/[\s\u3000]+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (parsed.length === 0) return;
+    setKeywords((prev) => {
+      const set = new Set([...prev, ...parsed]);
+      return [...set];
+    });
+    setKeywordInput("");
   };
 
   const handleRevise = async () => {
@@ -233,16 +249,58 @@ export function SeoArticleForm() {
               </Flex>
             </Field.Root>
             <Field.Root>
+              <Field.Label>キーワード</Field.Label>
+              <Flex gap="2" direction="row" flexWrap="wrap" align="center">
+                <Input
+                  placeholder="キーワードを入力（スペース区切りで複数追加可）"
+                  value={keywordInput}
+                  onChange={(e) => setKeywordInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddKeywords();
+                    }
+                  }}
+                  className={css({ flex: "1", minW: "200px" })}
+                />
+                <Button type="button" variant="outline" onClick={handleAddKeywords}>
+                  追加
+                </Button>
+              </Flex>
+            </Field.Root>
+            {keywords.length > 0 && (
+              <Stack gap="2">
+                <SectionTitle>追加済みキーワード（クリックで削除）</SectionTitle>
+                <Stack direction="row" gap="2" flexWrap="wrap">
+                  {keywords.map((kw) => (
+                    <Button
+                      key={kw}
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setKeywords((prev) => prev.filter((k) => k !== kw))}
+                    >
+                      {kw}
+                    </Button>
+                  ))}
+                </Stack>
+              </Stack>
+            )}
+            <Field.Root>
+              <Field.Label>その他の指示（任意）</Field.Label>
               <Textarea
-                name="instruction"
-                rows={3}
+                rows={2}
                 resize="none"
-                placeholder="キーワードを入力（例: 〇〇 目標文字数: 1000字）"
-                value={instruction}
-                onChange={(e) => setInstruction(e.target.value)}
-                required
+                placeholder="例: 目標文字数: 1000字"
+                value={otherInstruction}
+                onChange={(e) => setOtherInstruction(e.target.value)}
               />
             </Field.Root>
+            <input
+              type="hidden"
+              name="instruction"
+              value={[keywords.join(" "), otherInstruction].filter(Boolean).join(" ")}
+            />
             <Stack gap="2" direction="row" flexWrap="wrap">
               <Button
                 type="button"
@@ -252,7 +310,11 @@ export function SeoArticleForm() {
               >
                 キーワードを提案
               </Button>
-              <GenerateButton>記事を生成</GenerateButton>
+              <GenerateButton
+                disabled={keywords.length === 0 && !otherInstruction.trim()}
+              >
+                記事を生成
+              </GenerateButton>
             </Stack>
             {suggestions.length > 0 && (
               <Stack gap="2">
