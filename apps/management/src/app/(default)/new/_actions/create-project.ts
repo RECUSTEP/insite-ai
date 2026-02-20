@@ -34,22 +34,32 @@ export async function createProjectAction(
   );
 
   if (!response.ok) {
-    const data = await response.json();
-    if (response.status === 400 && "error" in data) {
-      if (data.error === ProjectUseCaseError.ProjectAlreadyExists) {
+    const data = (await response.json().catch(() => ({}))) as { error?: string };
+    const errorMsg = data.error ?? "プロジェクトの作成に失敗しました";
+    if (response.status === 400 && errorMsg) {
+      if (errorMsg === ProjectUseCaseError.ProjectAlreadyExists) {
         return submission.reply({
           fieldErrors: {
             projectId: ["このプロジェクトIDは既に使用されています"],
           },
         });
       }
-      if (data.error === ProjectUseCaseError.AuthNotFound) {
+      if (errorMsg === ProjectUseCaseError.AuthNotFound) {
         return submission.reply({
           fieldErrors: {
             authId: ["この認証IDは存在しません"],
           },
         });
       }
+      const displayMsg =
+        errorMsg === "UnknownError"
+          ? "プロジェクトの作成に失敗しました。しばらくしてから再度お試しください。"
+          : errorMsg.startsWith("UnknownError: ")
+            ? `作成に失敗しました: ${errorMsg.slice(14)}`
+            : errorMsg;
+      return submission.reply({
+        formErrors: [displayMsg],
+      });
     }
 
     return submission.reply({

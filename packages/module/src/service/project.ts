@@ -71,8 +71,9 @@ export class ProjectUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(ProjectUseCaseError.ProjectCreationFailed);
       }
       return Ok(result);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return Err(`UnknownError: ${msg}`);
     }
   }
 
