@@ -40,14 +40,13 @@ export function BottomNavigation() {
         bottom: 0,
         left: 0,
         right: 0,
-        bg: "bg.card",
+        bg: "bg.base",
         borderTop: "1px solid",
-        borderColor: "gray.200",
-        boxShadow: "0 -2px 8px rgba(0, 0, 0, 0.08)",
+        borderColor: { base: "#E4E4E7", _dark: "#27272A" },
         zIndex: 40,
       })}
     >
-      <Flex justify="space-around" py={2}>
+      <Flex justify="space-around" py={1}>
         {navItems.map((item) => {
           const isActive = pathname === item.path;
           return (
@@ -55,19 +54,31 @@ export function BottomNavigation() {
               <Flex
                 direction="column"
                 align="center"
-                gap={1}
-                px={4}
+                gap={0.5}
+                px={5}
                 py={2}
                 className={css({
-                  transition: "all 0.2s ease",
-                  color: isActive ? "brand.DEFAULT" : "text.secondary",
+                  transition: "all 0.15s ease",
+                  color: isActive ? "text.primary" : "text.muted",
+                  borderRadius: "8px",
                   _hover: {
-                    color: "brand.DEFAULT",
-                    transform: "scale(1.05)",
+                    color: "text.primary",
                   },
                 })}
               >
-                <item.icon size={24} />
+                <Box
+                  className={css({
+                    w: 8,
+                    h: 8,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "8px",
+                    bg: isActive ? { base: "#F4F4F5", _dark: "#27272A" } : "transparent",
+                  })}
+                >
+                  <item.icon size={20} />
+                </Box>
                 <span
                   className={css({
                     fontSize: "xs",

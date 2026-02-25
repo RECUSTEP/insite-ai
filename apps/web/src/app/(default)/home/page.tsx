@@ -1,22 +1,26 @@
 import { Text } from "@/components/ui/text";
-import { FeaturesBento } from "@/components/features-bento";
-import { createClient } from "@/lib/api";
+import { createClient, createFetch } from "@/lib/api";
+import { PROJECT_TAG } from "@/lib/tags";
 import type { LucideIcon } from "lucide-react";
 import {
+  ArrowRightIcon,
   FileTextIcon,
   ImagePlusIcon,
+  MapPinIcon,
   MessageCircleReplyIcon,
+  NotebookPenIcon,
   StoreIcon,
   TrendingUpIcon,
+  UserRoundSearchIcon,
 } from "lucide-react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { css } from "styled-system/css";
-import { Box, Flex, VStack } from "styled-system/jsx";
+import { Box, Flex, Grid, VStack } from "styled-system/jsx";
 
 export const metadata: Metadata = {
-  title: "ホーム - SAI",
+  title: "ホーム",
 };
 
 const features: Array<{
@@ -26,14 +30,16 @@ const features: Array<{
   icon: LucideIcon;
   color: string;
   path: string;
+  category: string;
 }> = [
   {
     id: "writing",
-    title: "インスタ投稿作成",
+    title: "インスタ投稿",
     description: "画像・文章・タグを自動生成",
     icon: ImagePlusIcon,
     color: "#2F80ED",
     path: "/writing",
+    category: "ライティング",
   },
   {
     id: "google-map",
@@ -42,6 +48,7 @@ const features: Array<{
     icon: MessageCircleReplyIcon,
     color: "#27AE60",
     path: "/google-map",
+    category: "ライティング",
   },
   {
     id: "analysis",
@@ -50,6 +57,7 @@ const features: Array<{
     icon: TrendingUpIcon,
     color: "#9B51E0",
     path: "/competitor-analysis",
+    category: "分析",
   },
   {
     id: "operation",
@@ -58,254 +66,324 @@ const features: Array<{
     icon: StoreIcon,
     color: "#F2994A",
     path: "/improvement-proposal",
+    category: "分析",
   },
   {
     id: "seo-articles",
-    title: "SEO/AIO記事生成",
-    description: "検索最適化された長文記事を自動作成",
+    title: "SEO記事生成",
+    description: "検索最適化された記事を自動作成",
     icon: FileTextIcon,
     color: "#E74C3C",
     path: "/seo-articles",
+    category: "ライティング",
   },
 ];
 
-const aiFeatures = [
+const quickLinks = [
   {
-    title: "AI自動生成",
-    description:
-      "高度な自然言語処理AIが、あなたのビジネスに最適化されたコンテンツを瞬時に生成。Instagram投稿、Google MAPの口コミ作成、SEO記事まで、プロフェッショナルな品質を数秒で実現します。",
+    icon: UserRoundSearchIcon,
+    label: "分析AI",
+    path: "/competitor-analysis",
   },
   {
-    title: "業務効率化",
-    description:
-      "SNS運用、口コミ対応、コンテンツ作成など、日々の煩雑な業務を自動化。手作業の時間を最大90%削減し、戦略立案やお客様との対話など、本質的な業務に集中できる環境を実現します。",
+    icon: NotebookPenIcon,
+    label: "ライティング",
+    path: "/writing",
   },
   {
-    title: "リアルタイムデータ分析",
-    description:
-      "市場トレンド、競合店舗の動向、自社アカウントのパフォーマンスを統合的に分析。AIが膨大なデータから意味のある洞察を抽出し、次の一手を的確に提案。競合他社の投稿頻度、エンゲージメント率、フォロワーの増減パターンまで、あらゆる指標をリアルタイムで監視し、戦略的な意思決定をサポートします。",
-  },
-  {
-    title: "いつでも利用可能",
-    description:
-      "必要なときにいつでもAIを活用できます。早朝や深夜でも、思い立ったタイミングで投稿作成や分析レポートを生成。時間や場所を選ばず、ビジネスのあらゆる場面でサポートを受けられます。",
-  },
-  {
-    title: "マルチプラットフォーム対応",
-    description:
-      "Instagram、Google Map、SEO記事、ブログなど、複数のプラットフォームに最適化されたコンテンツを一元管理。各プラットフォームの特性を理解したAIが、最適なフォーマット、文字数、トーンで自動生成します。",
-  },
-  {
-    title: "高度なカスタマイズ",
-    description:
-      "あなたのブランドボイス、ターゲット層、業種に完全適応。初期設定でビジネスの特徴を学習し、生成されるコンテンツは常にあなたらしさを保ちます。トーン、キーワード、スタイルまで細かく調整可能。",
-  },
-  {
-    title: "セキュアなデータ管理",
-    description:
-      "エンタープライズグレードのセキュリティで、お客様の大切なビジネスデータを保護。すべての通信は暗号化され、データは安全なクラウド環境で管理。GDPR、個人情報保護法に完全準拠し、安心してご利用いただけます。",
+    icon: MapPinIcon,
+    label: "Google Map",
+    path: "/google-map",
   },
 ];
 
 export default async function HomePage() {
-  // プロジェクト情報を取得してSEOアドオンの有効状態を確認
-  const client = createClient();
+  const fetcher = createFetch({ next: { revalidate: 0, tags: [PROJECT_TAG] } });
+  const client = createClient(fetcher);
+
   const projectRes = await client.project.$get(
     {},
-    {
-      headers: {
-        cookie: cookies().toString(),
-      },
-    },
+    { headers: { cookie: cookies().toString() } },
   );
 
   let seoAddonEnabled = false;
+  let projectName = "";
+  let apiUsageCount = 0;
+  let apiUsageLimit = 0;
+
   if (projectRes.ok) {
     const project = await projectRes.json();
     seoAddonEnabled = project.seoAddonEnabled ?? false;
+    projectName = project.name ?? "";
+    apiUsageCount = project.apiUsageCount ?? 0;
+    apiUsageLimit = project.apiUsageLimit ?? 0;
   }
 
-  // SEOアドオンが有効な場合のみSEO機能を表示
-  const visibleFeatures = features.filter(f => 
-    f.id !== 'seo-articles' || seoAddonEnabled
+  const visibleFeatures = features.filter(
+    (f) => f.id !== "seo-articles" || seoAddonEnabled,
   );
+
+  const usagePercent = apiUsageLimit > 0 ? (apiUsageCount / apiUsageLimit) * 100 : 0;
 
   return (
     <Flex
       direction="column"
-      align="center"
-      justify="flex-start"
-      minH="calc(100vh - 200px)"
-      gap={20}
-      py={12}
-      className={css({
-        animation: "fadeIn 0.4s ease",
-      })}
+      gap={8}
+      py={6}
+      className={css({ animation: "fadeIn 0.3s ease" })}
     >
-      <VStack gap={3} textAlign="center" maxW="3xl" px={4}>
+      {/* ページタイトル */}
+      <VStack gap={1} alignItems="flex-start">
         <Text
-          size="4xl"
           className={css({
+            fontSize: "2xl",
             fontWeight: 700,
-            background: "brand.gradient",
-            backgroundClip: "text",
-            color: "transparent",
-            "& ::selection": {
-              background: "brand.light",
-              color: "white",
-            },
-          })}
-          style={{
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
-          INSITE AI
-        </Text>
-        <Text
-          size="xl"
-          className={css({
-            fontWeight: 600,
             color: "text.primary",
+            letterSpacing: "-0.02em",
           })}
         >
-          店舗・ビジネスを成長させるAIアシスタント
+          {projectName ? `${projectName}` : "ダッシュボード"}
         </Text>
         <Text
-          size="md"
           className={css({
+            fontSize: "sm",
             color: "text.secondary",
-            lineHeight: 1.8,
           })}
         >
-          SNS投稿、口コミ作成、市場分析、SEO記事生成まで。
-          <br />
-          AIがあなたのビジネス運営を効率化し、成長を加速させます。
+          ようこそ。AIツールでビジネスを加速させましょう。
         </Text>
       </VStack>
 
+      {/* API使用状況 */}
       <Box
         className={css({
-          display: "grid",
-          gridTemplateColumns: {
-            base: "1fr", // モバイル: 1列
-            md: "repeat(2, 1fr)", // タブレット以上: 2列
-          },
-          gap: { base: 4, md: 6 },
-          maxW: "900px",
-          w: "full",
-          px: 4,
+          bg: "bg.card",
+          border: "1px solid",
+          borderColor: { base: "#E4E4E7", _dark: "#27272A" },
+          borderRadius: "12px",
+          p: 5,
         })}
       >
-        {visibleFeatures.map((feature) => (
-          <Link key={feature.id} href={feature.path}>
-            <Box
+        <Flex justify="space-between" align="center" mb={3}>
+          <Text
+            className={css({
+              fontSize: "sm",
+              fontWeight: 600,
+              color: "text.primary",
+            })}
+          >
+            今月のAPI使用状況
+          </Text>
+          <Text
+            className={css({
+              fontSize: "sm",
+              color: "text.secondary",
+              fontVariantNumeric: "tabular-nums",
+            })}
+          >
+            {apiUsageCount.toLocaleString()} / {apiUsageLimit.toLocaleString()} 回
+          </Text>
+        </Flex>
+        <Box
+          className={css({
+            h: "6px",
+            bg: { base: "#E4E4E7", _dark: "#27272A" },
+            borderRadius: "full",
+            overflow: "hidden",
+          })}
+        >
+          <Box
+            style={{ width: `${Math.min(usagePercent, 100)}%` }}
+            className={css({
+              h: "full",
+              bg: usagePercent > 80 ? "#E74C3C" : "brand.DEFAULT",
+              borderRadius: "full",
+              transition: "width 0.5s ease",
+            })}
+          />
+        </Box>
+        <Text
+          className={css({
+            fontSize: "xs",
+            color: "text.muted",
+            mt: 2,
+          })}
+        >
+          残り {Math.max(0, apiUsageLimit - apiUsageCount).toLocaleString()} 回
+        </Text>
+      </Box>
+
+      {/* AIツール一覧 */}
+      <Box>
+        <Text
+          className={css({
+            fontSize: "sm",
+            fontWeight: 600,
+            color: "text.secondary",
+            mb: 3,
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+          })}
+        >
+          AIツール
+        </Text>
+        <Grid
+          className={css({
+            gridTemplateColumns: {
+              base: "1fr",
+              sm: "repeat(2, 1fr)",
+              lg: "repeat(3, 1fr)",
+            },
+            gap: 3,
+          })}
+        >
+          {visibleFeatures.map((feature) => (
+            <Link key={feature.id} href={feature.path}>
+              <Box
+                className={css({
+                  bg: "bg.card",
+                  border: "1px solid",
+                  borderColor: { base: "#E4E4E7", _dark: "#27272A" },
+                  borderRadius: "12px",
+                  p: 5,
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 4,
+                  _hover: {
+                    borderColor: feature.color,
+                    boxShadow: `0 0 0 1px ${feature.color}33`,
+                    transform: "translateY(-1px)",
+                  },
+                })}
+              >
+                <Box
+                  className={css({
+                    w: 10,
+                    h: 10,
+                    borderRadius: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  })}
+                  style={{ background: `${feature.color}18` }}
+                >
+                  <feature.icon size={20} style={{ color: feature.color }} />
+                </Box>
+                <Box flex="1" minW={0}>
+                  <Text
+                    className={css({
+                      fontSize: "sm",
+                      fontWeight: 600,
+                      color: "text.primary",
+                      mb: 1,
+                    })}
+                  >
+                    {feature.title}
+                  </Text>
+                  <Text
+                    className={css({
+                      fontSize: "xs",
+                      color: "text.secondary",
+                      lineHeight: 1.5,
+                    })}
+                  >
+                    {feature.description}
+                  </Text>
+                </Box>
+                <ArrowRightIcon
+                  size={16}
+                  className={css({ color: "text.muted", flexShrink: 0, mt: 1 })}
+                />
+              </Box>
+            </Link>
+          ))}
+        </Grid>
+      </Box>
+
+      {/* クイックリンク */}
+      <Box>
+        <Text
+          className={css({
+            fontSize: "sm",
+            fontWeight: 600,
+            color: "text.secondary",
+            mb: 3,
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+          })}
+        >
+          クイックアクセス
+        </Text>
+        <Flex gap={3} flexWrap="wrap">
+          {quickLinks.map((link) => (
+            <Link key={link.path} href={link.path}>
+              <Flex
+                align="center"
+                gap={2}
+                className={css({
+                  bg: "bg.card",
+                  border: "1px solid",
+                  borderColor: { base: "#E4E4E7", _dark: "#27272A" },
+                  borderRadius: "8px",
+                  px: 4,
+                  py: 2.5,
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                  _hover: {
+                    borderColor: "brand.DEFAULT",
+                    color: "brand.DEFAULT",
+                  },
+                })}
+              >
+                <link.icon size={16} className={css({ color: "brand.DEFAULT" })} />
+                <Text
+                  className={css({
+                    fontSize: "sm",
+                    fontWeight: 500,
+                    color: "text.primary",
+                  })}
+                >
+                  {link.label}
+                </Text>
+              </Flex>
+            </Link>
+          ))}
+          <Link href="/history">
+            <Flex
+              align="center"
+              gap={2}
               className={css({
-                bg: {
-                  base: "white",
-                  _dark: "#374151",
-                },
-                borderRadius: "xl",
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                p: 8,
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                h: { base: "220px", md: "240px" },
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 4,
-                textAlign: "center",
+                bg: "bg.card",
                 border: "1px solid",
-                borderColor: {
-                  base: "gray.100",
-                  _dark: "gray.600",
-                },
+                borderColor: { base: "#E4E4E7", _dark: "#27272A" },
+                borderRadius: "8px",
+                px: 4,
+                py: 2.5,
+                cursor: "pointer",
+                transition: "all 0.15s ease",
                 _hover: {
-                  transform: "translateY(-8px)",
-                  boxShadow: "0 12px 24px rgba(0, 0, 0, 0.12)",
-                  borderColor: feature.color,
+                  borderColor: "brand.DEFAULT",
+                  color: "brand.DEFAULT",
                 },
               })}
             >
-              {/* シンプルなアイコン */}
-              <Box
-                className={css({
-                  w: 16,
-                  h: 16,
-                  borderRadius: "full",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  bg: `${feature.color}20`,
-                })}
-              >
-                <feature.icon
-                  size={32}
-                  className={css({
-                    color: feature.color,
-                  })}
-                />
-              </Box>
-
               <Text
-                size="xl"
                 className={css({
-                  fontWeight: 600,
+                  fontSize: "sm",
+                  fontWeight: 500,
                   color: "text.primary",
                 })}
               >
-                {feature.title}
+                履歴を見る
               </Text>
-              <Text
-                className={css({
-                  color: "text.secondary",
-                  fontSize: "sm",
-                  lineHeight: 1.6,
-                })}
-              >
-                {feature.description}
-              </Text>
-            </Box>
+              <ArrowRightIcon size={14} className={css({ color: "text.muted" })} />
+            </Flex>
           </Link>
-        ))}
+        </Flex>
       </Box>
-
-      {/* INSITE AIの特徴セクション */}
-      <VStack gap={12} w="full" maxW="1400px" mb={12} px={4}>
-        <VStack gap={4} textAlign="center">
-          <Text
-            size="4xl"
-            className={css({
-              fontWeight: 700,
-              background: "brand.gradient",
-              backgroundClip: "text",
-              color: "transparent",
-            })}
-            style={{
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            INSITE AIの特徴
-          </Text>
-          <Text
-            size="lg"
-            className={css({
-              color: "text.secondary",
-              maxW: "3xl",
-              lineHeight: 1.8,
-            })}
-          >
-            最先端のAI技術とデータサイエンスを駆使し、
-            <br />
-            あなたのビジネスを次のステージへ導きます
-          </Text>
-        </VStack>
-
-        <FeaturesBento features={aiFeatures} />
-      </VStack>
     </Flex>
   );
 }

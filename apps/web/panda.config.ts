@@ -76,21 +76,21 @@ export default defineConfig({
         },
         shadows: {
           card: {
-            value: "0 2px 8px rgba(0, 0, 0, 0.08)",
+            value: "0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)",
           },
           cardHover: {
-            value: "0 4px 16px rgba(47, 128, 237, 0.2)",
+            value: "0 4px 12px rgba(0, 0, 0, 0.10)",
           },
           float: {
-            value: "0 8px 24px rgba(0, 0, 0, 0.12)",
+            value: "0 4px 24px rgba(0, 0, 0, 0.08)",
           },
         },
         radii: {
           card: {
-            value: "16px",
+            value: "12px",
           },
           button: {
-            value: "12px",
+            value: "8px",
           },
         },
       },
@@ -129,52 +129,61 @@ export default defineConfig({
               },
             },
           },
-          // 背景色
+          // 背景色 — ライト=白、ダーク=黒
           bg: {
             base: {
               value: {
-                base: "#F0F4F8",
-                _dark: "#2D3748",
+                base: "#FFFFFF",
+                _dark: "#09090B",
               },
             },
             card: {
               value: {
-                base: "#FFFFFF",
-                _dark: "#2D3748",
+                base: "#F4F4F5",
+                _dark: "#18181B",
               },
             },
             overlay: {
               value: {
                 base: "rgba(0, 0, 0, 0.4)",
-                _dark: "rgba(0, 0, 0, 0.6)",
+                _dark: "rgba(0, 0, 0, 0.7)",
               },
             },
           },
           // 入力エリア背景
           inputAreaBg: {
             value: {
-              base: "#fbfbf8",
-              _dark: "#1A202C",
+              base: "#FAFAFA",
+              _dark: "#18181B",
+            },
+          },
+          // ボーダー
+          border: {
+            subtle: {
+              value: {
+                base: "#E4E4E7",
+                _dark: "#27272A",
+              },
             },
           },
           // テキスト
           text: {
             primary: {
               value: {
-                base: "#2D3748",
-                _dark: "#F7FAFC",
+                base: "#09090B",
+                _dark: "#FAFAFA",
               },
             },
             secondary: {
               value: {
-                base: "#718096",
-                _dark: "#CBD5E0",
+                base: "#71717A",
+                _dark: "#A1A1AA",
               },
             },
             muted: {
               value: {
-                base: "#A0AEC0",
-                _dark: "#A0AEC0",
+                base: "#A1A1AA",
+                _dark: "#52525B",
               },
             },
           },

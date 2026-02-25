@@ -16,46 +16,34 @@ export function GlobalHeader() {
         left: 0,
         right: 0,
         zIndex: 40,
-        bg: "bg.card",
+        bg: "bg.base",
         borderBottom: "1px solid",
-        borderColor: {
-          base: "gray.200",
-          _dark: "gray.700",
-        },
-        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
+        borderColor: { base: "#E4E4E7", _dark: "#27272A" },
       })}
     >
       <Flex
         justify="flex-end"
         align="center"
-        gap={3}
+        gap={2}
         px={4}
-        py={3}
-        className={css({
-          maxW: "100%",
-          mx: "auto",
-        })}
+        py={2.5}
       >
-        {/* テーマ切り替え */}
         <ThemeToggle />
-        
-        {/* お知らせボタン */}
         <Link href="/announce">
           <Button
             size="sm"
             variant="ghost"
             className={css({
-              gap: 2,
+              gap: 1.5,
+              color: "text.secondary",
               _hover: {
-                bg: {
-                  base: "gray.100",
-                  _dark: "gray.700",
-                },
+                bg: { base: "#F4F4F5", _dark: "#27272A" },
+                color: "text.primary",
               },
             })}
           >
-            <BellIcon size={18} />
-            <Box display={{ base: "none", md: "inline" }}>お知らせ</Box>
+            <BellIcon size={16} />
+            <Box display={{ base: "none", md: "inline" }} fontSize="sm">お知らせ</Box>
           </Button>
         </Link>
       </Flex>
