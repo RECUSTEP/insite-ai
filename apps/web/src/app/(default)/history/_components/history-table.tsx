@@ -185,7 +185,7 @@ export function HistoryTable({ histories: rawHistories }: Props) {
                       "&[data-pin=right]": {
                         position: "sticky",
                         right: 0,
-                        bg: "bg.default",
+                        bg: "bg.base",
                       },
                     }}
                   >

@@ -75,7 +75,29 @@ export async function HistoryDetail({ id }: Props) {
 
 function Heading({ children, ...props }: TextProps) {
   return (
-    <Text as="h2" size="lg" borderColor="brand.DEFAULT" borderBottom="3px solid" pb={1} {...props}>
+    <Text
+      as="h2"
+      size="sm"
+      fontWeight="600"
+      letterSpacing="0.02em"
+      color="text.secondary"
+      textTransform="uppercase"
+      display="flex"
+      alignItems="center"
+      gap="2"
+      className={css({
+        _before: {
+          content: '""',
+          display: "block",
+          width: "3px",
+          height: "14px",
+          borderRadius: "2px",
+          bg: "brand.DEFAULT",
+          flexShrink: 0,
+        },
+      })}
+      {...props}
+    >
       {children}
     </Text>
   );

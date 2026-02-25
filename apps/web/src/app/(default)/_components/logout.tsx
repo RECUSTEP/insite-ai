@@ -11,27 +11,13 @@ export function Logout() {
       variant="outline"
       onClick={async () => await logout()}
       className={css({
-        color: {
-          base: "gray.700",
-          _dark: "white",
-        },
-        borderColor: {
-          base: "gray.300",
-          _dark: "gray.600",
-        },
-        bg: {
-          base: "white",
-          _dark: "#1A202C",
-        },
+        color: "text.secondary",
+        borderColor: { base: "#E4E4E7", _dark: "#27272A" },
+        bg: "transparent",
         _hover: {
-          bg: {
-            base: "gray.100",
-            _dark: "#374151",
-          },
-          borderColor: {
-            base: "gray.400",
-            _dark: "gray.500",
-          },
+          bg: { base: "#F4F4F5", _dark: "#27272A" },
+          color: "text.primary",
+          borderColor: { base: "#D4D4D8", _dark: "#3F3F46" },
         },
       })}
     >

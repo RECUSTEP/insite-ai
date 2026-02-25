@@ -39,7 +39,7 @@ export async function ProjectOverview() {
           </span>
         </Stack>
         <Progress.Root value={project.apiUsageCount} min={0} max={project.apiUsageLimit}>
-          <Progress.Track bg="gray.200">
+          <Progress.Track bg={{ base: "#E4E4E7", _dark: "#27272A" }}>
             <Progress.Range bg="brand.DEFAULT" />
           </Progress.Track>
         </Progress.Root>

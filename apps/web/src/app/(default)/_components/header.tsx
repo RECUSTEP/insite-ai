@@ -21,7 +21,7 @@ export function Header({ seoAddonEnabled }: HeaderProps) {
         zIndex: 50,
         bg: "bg.card",
         borderBottom: "1px solid",
-        borderColor: "gray.200",
+        borderColor: { base: "#E4E4E7", _dark: "#27272A" },
         py: 2,
         px: 4,
         justifyContent: "space-between",

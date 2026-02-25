@@ -12,6 +12,14 @@ import { useFormState } from "react-dom";
 import { css } from "styled-system/css";
 import { Box, HStack } from "styled-system/jsx";
 import { stack } from "styled-system/patterns";
+
+const cardClass = css({
+  bg: "bg.card",
+  border: "1px solid",
+  borderColor: { base: "#E4E4E7", _dark: "#27272A" },
+  borderRadius: "12px",
+  p: 6,
+});
 import type { z } from "zod";
 import { SectionTitle } from "../../_components/section-title";
 import { saveProjectInfoAction } from "../_actions/project-info";
@@ -122,7 +130,7 @@ export function ProjectInfoForm({ defaultValue }: ProjectInfoFormProps) {
       action={formAction}
       noValidate
     >
-      <section className={stack({ gap: 4 })}>
+      <section className={`${cardClass} ${stack({ gap: 4 })}`}>
         <SectionTitle>ビジネスの概要</SectionTitle>
         {formFields.business.map((field) => (
           <Field.Root
@@ -147,7 +155,7 @@ export function ProjectInfoForm({ defaultValue }: ProjectInfoFormProps) {
           </Field.Root>
         ))}
       </section>
-      <section className={stack({ gap: 4 })}>
+      <section className={`${cardClass} ${stack({ gap: 4 })}`}>
         <SectionTitle>ターゲット層</SectionTitle>
         {formFields.target.map((field) => (
           <Field.Root
@@ -172,7 +180,7 @@ export function ProjectInfoForm({ defaultValue }: ProjectInfoFormProps) {
           </Field.Root>
         ))}
       </section>
-      <section className={stack({ gap: 4 })}>
+      <section className={`${cardClass} ${stack({ gap: 4 })}`}>
         <SectionTitle>Instagram設定</SectionTitle>
         {formFields.instagram.map((field) => (
           <Field.Root
@@ -197,7 +205,7 @@ export function ProjectInfoForm({ defaultValue }: ProjectInfoFormProps) {
           </Field.Root>
         ))}
       </section>
-      <section className={stack({ gap: 4 })}>
+      <section className={`${cardClass} ${stack({ gap: 4 })}`}>
         <SectionTitle>既存顧客の分析</SectionTitle>
         <Field.Root
           className={stack({ gap: 1.5 })}

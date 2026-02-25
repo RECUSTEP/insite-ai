@@ -18,7 +18,8 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Stack } from "styled-system/jsx";
+import { css } from "styled-system/css";
+import { Box, Stack } from "styled-system/jsx";
 import type { z } from "zod";
 import { revalidateTagAction } from "../../_action/revalidate";
 import { FileUpload as BaseFileUpload } from "./file-upload";
@@ -215,21 +216,46 @@ export function Output() {
 
   if (loading && !output) {
     return (
-      <Stack>
-        <Skeleton h="4" />
-        <Skeleton h="4" />
-        <Skeleton h="4" />
-        <Skeleton h="4" />
-      </Stack>
+      <Box
+        className={css({
+          bg: "bg.card",
+          border: "1px solid",
+          borderColor: { base: "#E4E4E7", _dark: "#27272A" },
+          borderRadius: "12px",
+          p: 6,
+        })}
+      >
+        <Stack>
+          <Skeleton h="4" />
+          <Skeleton h="4" />
+          <Skeleton h="4" />
+          <Skeleton h="4" />
+        </Stack>
+      </Box>
     );
   }
 
+  if (!output) {
+    return null;
+  }
+
   return (
-    <Stack>
-      {output.length >= 1 && (
+    <Box
+      className={css({
+        bg: "bg.card",
+        border: "1px solid",
+        borderColor: { base: "#E4E4E7", _dark: "#27272A" },
+        borderRadius: "12px",
+        p: 6,
+      })}
+    >
+      <Stack>
         <Tooltip.Root open={isOpen}>
-          <Tooltip.Trigger>
+          <Tooltip.Trigger asChild>
             <Button
+              size="sm"
+              variant="outline"
+              w="fit-content"
               onClick={() => {
                 navigator.clipboard.writeText(output);
                 setIsOpen(true);
@@ -239,7 +265,7 @@ export function Output() {
               }}
             >
               結果をコピーする
-              <Copy />
+              <Copy size={14} />
             </Button>
           </Tooltip.Trigger>
           <Tooltip.Positioner>
@@ -251,8 +277,8 @@ export function Output() {
             </Tooltip.Content>
           </Tooltip.Positioner>
         </Tooltip.Root>
-      )}
-      <MarkdownRenderer>{output}</MarkdownRenderer>
-    </Stack>
+        <MarkdownRenderer>{output}</MarkdownRenderer>
+      </Stack>
+    </Box>
   );
 }

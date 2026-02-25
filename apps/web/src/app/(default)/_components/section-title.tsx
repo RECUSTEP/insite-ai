@@ -3,14 +3,23 @@ import { styled } from "styled-system/jsx";
 
 const sectionTitleStyle = cva({
   base: {
-    display: "block",
-    width: "fit-content",
-    fontSize: "lg",
-    pb: 0.5,
-    px: 1.5,
-    borderLeft: "2px solid",
-    borderBottom: "2px solid",
-    borderColor: "brand.DEFAULT",
+    display: "flex",
+    alignItems: "center",
+    gap: "2",
+    fontSize: "sm",
+    fontWeight: "600",
+    letterSpacing: "0.02em",
+    color: "text.secondary",
+    textTransform: "uppercase",
+    _before: {
+      content: '""',
+      display: "block",
+      width: "3px",
+      height: "14px",
+      borderRadius: "2px",
+      bg: "brand.DEFAULT",
+      flexShrink: 0,
+    },
   },
 });
 

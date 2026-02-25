@@ -7,6 +7,7 @@ import { type SubmissionResult, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { createProjectSchema } from "api/schema";
 import { useFormState } from "react-dom";
+import { css } from "styled-system/css";
 import { stack } from "styled-system/patterns";
 import type { z } from "zod";
 
@@ -30,13 +31,21 @@ export function ProjectForm({ defaultValue, action }: Props) {
 
   return (
     <form
-      className={stack({ gap: 8 })}
+      className={stack({ gap: 6 })}
       id={form.id}
       onSubmit={form.onSubmit}
       action={formAction}
       noValidate
     >
-      <div className={stack({ gap: 4 })}>
+      <div
+        className={`${css({
+          bg: "bg.card",
+          border: "1px solid",
+          borderColor: { base: "#E4E4E7", _dark: "#27272A" },
+          borderRadius: "12px",
+          p: 6,
+        })} ${stack({ gap: 4 })}`}
+      >
         <Field.Root className={stack({ gap: 1.5 })} invalid={!!fields.name.errors?.length}>
           <Field.Label>プロジェクト名</Field.Label>
           <Field.Input asChild>
