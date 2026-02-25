@@ -1,9 +1,8 @@
 "use client";
 
-import { SectionTitle } from "@/app/(default)/_components/section-title";
 import { useState } from "react";
 import { Stack } from "styled-system/jsx";
-import { FileUpload, Form, GenerateButton, Output, Root } from "../../_components/form-fields";
+import { FileUpload, Form, GenerateButton, OutputSection, Root } from "../../_components/form-fields";
 
 export function InsightAnalysisForm() {
   const [files, setFiles] = useState<File[]>([]);
@@ -21,10 +20,7 @@ export function InsightAnalysisForm() {
             <GenerateButton />
           </Stack>
         </Form>
-        <Stack gap="4">
-          <SectionTitle>改善提案</SectionTitle>
-          <Output />
-        </Stack>
+        <OutputSection title="改善提案" />
       </Root>
     </Stack>
   );

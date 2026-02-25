@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useCallback, useEffect, useState } from "react";
 import { css } from "styled-system/css";
 import { Flex, Stack } from "styled-system/jsx";
-import { Form, GenerateButton, Output, Root } from "../../_components/form-fields";
+import { Form, GenerateButton, OutputSection, Root } from "../../_components/form-fields";
 
 type SeoHistory = {
   id: string;
@@ -178,10 +178,7 @@ export function SeoArticleForm() {
                     borderRadius: "md",
                     transition: "all 0.2s",
                     _hover: {
-                      bg: "gray.50",
-                      _dark: {
-                        bg: "gray.700",
-                      },
+                      bg: { base: "#F4F4F5", _dark: "#27272A" },
                     },
                   })}
                 >
@@ -217,10 +214,7 @@ export function SeoArticleForm() {
                     borderRadius: "md",
                     transition: "all 0.2s",
                     _hover: {
-                      bg: "gray.50",
-                      _dark: {
-                        bg: "gray.700",
-                      },
+                      bg: { base: "#F4F4F5", _dark: "#27272A" },
                     },
                   })}
                 >
@@ -336,11 +330,17 @@ export function SeoArticleForm() {
             )}
           </Stack>
         </Form>
-        <Stack gap="4">
-          <SectionTitle>生成結果</SectionTitle>
-          <Output />
-        </Stack>
-        <Stack gap="4">
+        <OutputSection />
+        <Stack
+          gap="4"
+          className={css({
+            bg: "bg.card",
+            border: "1px solid",
+            borderColor: { base: "#E4E4E7", _dark: "#27272A" },
+            borderRadius: "12px",
+            p: 6,
+          })}
+        >
           <SectionTitle>生成済み記事の修正</SectionTitle>
           <Field.Root>
             <Field.Label>修正対象の記事</Field.Label>
@@ -381,7 +381,16 @@ export function SeoArticleForm() {
             </Button>
           </Stack>
           {revisedOutput ? (
-            <Stack gap="2">
+            <Stack
+              gap="4"
+              className={css({
+                bg: "bg.base",
+                border: "1px solid",
+                borderColor: { base: "#E4E4E7", _dark: "#27272A" },
+                borderRadius: "8px",
+                p: 4,
+              })}
+            >
               <SectionTitle>修正結果</SectionTitle>
               <MarkdownRenderer>{revisedOutput}</MarkdownRenderer>
             </Stack>

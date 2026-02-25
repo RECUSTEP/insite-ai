@@ -8,7 +8,7 @@ import {
   Form,
   GenerateButton,
   Instruction,
-  Output,
+  OutputSection,
   Root,
 } from "../../_components/form-fields";
 
@@ -31,10 +31,7 @@ export function ProfileForm(props: { placeholder?: string }) {
             <GenerateButton />
           </Stack>
         </Form>
-        <Stack gap="4">
-          <SectionTitle>生成結果</SectionTitle>
-          <Output />
-        </Stack>
+        <OutputSection />
       </Root>
     </Stack>
   );

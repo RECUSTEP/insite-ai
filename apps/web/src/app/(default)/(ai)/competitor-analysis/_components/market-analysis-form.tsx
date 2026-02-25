@@ -1,9 +1,8 @@
 "use client";
 
-import { SectionTitle } from "@/app/(default)/_components/section-title";
 import { useState } from "react";
 import { Stack } from "styled-system/jsx";
-import { FileUpload, Form, GenerateButton, Output, Root } from "../../_components/form-fields";
+import { FileUpload, Form, GenerateButton, OutputSection, Root } from "../../_components/form-fields";
 
 export function MarketAnalysisForm() {
   const [files, setFiles] = useState<File[]>([]);
@@ -21,10 +20,7 @@ export function MarketAnalysisForm() {
             <GenerateButton />
           </Stack>
         </Form>
-        <Stack gap="4">
-          <SectionTitle>市場の動向 / 投稿の傾向 / 関連するハッシュタグ</SectionTitle>
-          <Output />
-        </Stack>
+        <OutputSection title="市場の動向 / 投稿の傾向 / 関連するハッシュタグ" />
       </Root>
     </Stack>
   );

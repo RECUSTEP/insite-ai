@@ -2,7 +2,7 @@
 
 import { SectionTitle } from "@/app/(default)/_components/section-title";
 import { Stack } from "styled-system/jsx";
-import { Form, GenerateButton, Instruction, Output, Root } from "../../_components/form-fields";
+import { Form, GenerateButton, Instruction, OutputSection, Root } from "../../_components/form-fields";
 
 export function NoImageForm(props: { placeholder?: string }) {
   return (
@@ -15,10 +15,7 @@ export function NoImageForm(props: { placeholder?: string }) {
             <GenerateButton />
           </Stack>
         </Form>
-        <Stack gap="4">
-          <SectionTitle>生成結果</SectionTitle>
-          <Output />
-        </Stack>
+        <OutputSection />
       </Root>
     </Stack>
   );

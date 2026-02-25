@@ -22,7 +22,16 @@ import { css } from "styled-system/css";
 import { Box, Stack } from "styled-system/jsx";
 import type { z } from "zod";
 import { revalidateTagAction } from "../../_action/revalidate";
+import { SectionTitle } from "../../_components/section-title";
 import { FileUpload as BaseFileUpload } from "./file-upload";
+
+const cardCss = css({
+  bg: "bg.card",
+  border: "1px solid",
+  borderColor: { base: "#E4E4E7", _dark: "#27272A" },
+  borderRadius: "12px",
+  p: 6,
+});
 
 const { acceptExtensions, maxFileSizeMb } = fileUpload;
 
@@ -165,7 +174,7 @@ export function Form({ children, ...props }: FormProps) {
   }, [output]);
 
   return (
-    <form onSubmit={handleSubmit} {...props}>
+    <form onSubmit={handleSubmit} className={`${cardCss} ${props.className ?? ""}`} {...props}>
       {children}
     </form>
   );
@@ -210,74 +219,70 @@ export function GenerateButton({ children, ...props }: ButtonProps) {
   );
 }
 
-export function Output() {
+function OutputContent() {
   const [isOpen, setIsOpen] = useState(false);
   const { loading, output } = useContext(FormContext);
 
   if (loading && !output) {
     return (
-      <Box
-        className={css({
-          bg: "bg.card",
-          border: "1px solid",
-          borderColor: { base: "#E4E4E7", _dark: "#27272A" },
-          borderRadius: "12px",
-          p: 6,
-        })}
-      >
-        <Stack>
-          <Skeleton h="4" />
-          <Skeleton h="4" />
-          <Skeleton h="4" />
-          <Skeleton h="4" />
-        </Stack>
-      </Box>
+      <Stack>
+        <Skeleton h="4" />
+        <Skeleton h="4" />
+        <Skeleton h="4" />
+        <Skeleton h="4" />
+      </Stack>
     );
   }
 
-  if (!output) {
-    return null;
-  }
+  if (!output) return null;
 
   return (
-    <Box
-      className={css({
-        bg: "bg.card",
-        border: "1px solid",
-        borderColor: { base: "#E4E4E7", _dark: "#27272A" },
-        borderRadius: "12px",
-        p: 6,
-      })}
-    >
-      <Stack>
-        <Tooltip.Root open={isOpen}>
-          <Tooltip.Trigger asChild>
-            <Button
-              size="sm"
-              variant="outline"
-              w="fit-content"
-              onClick={() => {
-                navigator.clipboard.writeText(output);
-                setIsOpen(true);
-                setTimeout(() => {
-                  setIsOpen(false);
-                }, 1000);
-              }}
-            >
-              結果をコピーする
-              <Copy size={14} />
-            </Button>
-          </Tooltip.Trigger>
-          <Tooltip.Positioner>
-            <Tooltip.Content>
-              <Tooltip.Arrow>
-                <Tooltip.ArrowTip />
-              </Tooltip.Arrow>
-              コピーしました
-            </Tooltip.Content>
-          </Tooltip.Positioner>
-        </Tooltip.Root>
-        <MarkdownRenderer>{output}</MarkdownRenderer>
+    <Stack gap={3}>
+      <Tooltip.Root open={isOpen}>
+        <Tooltip.Trigger asChild>
+          <Button
+            size="sm"
+            variant="outline"
+            w="fit-content"
+            onClick={() => {
+              navigator.clipboard.writeText(output);
+              setIsOpen(true);
+              setTimeout(() => setIsOpen(false), 1000);
+            }}
+          >
+            結果をコピーする
+            <Copy size={14} />
+          </Button>
+        </Tooltip.Trigger>
+        <Tooltip.Positioner>
+          <Tooltip.Content>
+            <Tooltip.Arrow>
+              <Tooltip.ArrowTip />
+            </Tooltip.Arrow>
+            コピーしました
+          </Tooltip.Content>
+        </Tooltip.Positioner>
+      </Tooltip.Root>
+      <MarkdownRenderer>{output}</MarkdownRenderer>
+    </Stack>
+  );
+}
+
+/** カードなし — 後方互換のため残す（OutputSection 推奨） */
+export function Output() {
+  return <OutputContent />;
+}
+
+export function OutputSection({ title = "生成結果" }: { title?: string }) {
+  const { output, loading } = useContext(FormContext);
+
+  if (!output && !loading) return null;
+
+  return (
+    <Box className={cardCss}>
+      <Stack gap={4}>
+        <SectionTitle>{title}</SectionTitle>
+        <OutputContent />
       </Stack>
     </Box>
   );
