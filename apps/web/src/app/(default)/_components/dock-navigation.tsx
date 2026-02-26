@@ -2,6 +2,7 @@
 
 import { Dock, DockIcon, DockItem, DockLabel } from '@/components/ui/dock';
 import {
+  AtSignIcon,
   FileTextIcon,
   HistoryIcon,
   HomeIcon,
@@ -33,6 +34,7 @@ export function DockNavigation({ seoAddonEnabled }: Props) {
     { icon: <UserRoundSearchIcon />, label: '分析AI', path: '/competitor-analysis' },
     { icon: <TrendingUpIcon />, label: 'AI店舗運営', path: '/improvement-proposal' },
     { icon: <NotebookPenIcon />, label: 'ライティング(IG)', path: '/writing' },
+    { icon: <AtSignIcon />, label: 'Threads', path: '/threads' },
     { icon: <MapPinIcon />, label: 'Google Map', path: '/google-map' },
     ...(seoAddonEnabled
       ? [{ icon: <FileTextIcon />, label: 'SEO記事', path: '/seo-articles' }]

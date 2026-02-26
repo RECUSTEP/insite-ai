@@ -20,6 +20,8 @@ export const promptSchema = z.object({
   profile: jsonSchema.optional(),
   "google-map": jsonSchema.optional(),
   "google-map-no-image": jsonSchema.optional(),
+  threads: jsonSchema.optional(),
+  "threads-no-image": jsonSchema.optional(),
 });
 
 function toUseCase(value: z.infer<typeof promptSchema>): SavePromptInput {

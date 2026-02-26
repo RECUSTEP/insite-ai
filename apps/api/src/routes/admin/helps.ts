@@ -15,6 +15,8 @@ export const helpSchema = z.object({
   profile: z.string().optional(),
   "google-map": z.string().optional(),
   "google-map-no-image": z.string().optional(),
+  threads: z.string().optional(),
+  "threads-no-image": z.string().optional(),
 });
 
 function toUseCase(value: z.infer<typeof helpSchema>): SaveHelpInput {

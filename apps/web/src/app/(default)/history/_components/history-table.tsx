@@ -49,6 +49,8 @@ const aiTypeToValueMap = {
   profile: "writing",
   "google-map": "google-map",
   "google-map-no-image": "google-map",
+  threads: "threads",
+  "threads-no-image": "threads",
   "seo-article": "seo-article",
 } as const;
 
@@ -56,6 +58,7 @@ const aiTypeMap = {
   competitor: "分析AI",
   improvement: "AI店舗運営",
   writing: "ライティングAI（Instagram）",
+  threads: "ライティングAI（Threads）",
   "google-map": "ライティングAI（Google Map）",
   "seo-article": "SEO・AIO記事",
 } as const;

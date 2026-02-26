@@ -20,6 +20,8 @@ export const analysisHistorySchema = z.object({
     z.literal("profile"),
     z.literal("google-map"),
     z.literal("google-map-no-image"),
+    z.literal("threads"),
+    z.literal("threads-no-image"),
     z.literal("seo-article"),
   ]),
   revisionParentId: z.string().nullable(),

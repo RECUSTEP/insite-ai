@@ -11,6 +11,8 @@ const formNameSchema = z.union([
   z.literal("profile"),
   z.literal("google-map"),
   z.literal("google-map-no-image"),
+  z.literal("threads"),
+  z.literal("threads-no-image"),
 ]);
 
 const findInstructionGuideSchema = z.object({

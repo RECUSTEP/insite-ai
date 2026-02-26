@@ -157,6 +157,10 @@ export const analysisSchemaByType = {
   "google-map-no-image": z.object({
     instruction: z.string({ message: "指示を入力してください" }),
   }),
+  threads: instagramWritingAiSchema,
+  "threads-no-image": z.object({
+    instruction: z.string({ message: "指示を入力してください" }),
+  }),
   "seo-article": z.object({
     instruction: z
       .string({ message: "キーワードを入力してください" })
@@ -182,6 +186,8 @@ export const analysisQuerySchema = z.object({
       z.literal("profile"),
       z.literal("google-map"),
       z.literal("google-map-no-image"),
+      z.literal("threads"),
+      z.literal("threads-no-image"),
       z.literal("seo-article"),
     ],
     { message: "Invalid type" },
