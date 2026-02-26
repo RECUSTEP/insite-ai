@@ -4,6 +4,7 @@ import { PROJECT_TAG } from "@/lib/tags";
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowRightIcon,
+  AtSignIcon,
   FileTextIcon,
   ImagePlusIcon,
   MapPinIcon,
@@ -69,6 +70,15 @@ const features: Array<{
     category: "分析",
   },
   {
+    id: "threads",
+    title: "Threads投稿",
+    description: "Threads用の投稿文を自動生成",
+    icon: AtSignIcon,
+    color: "#000000",
+    path: "/threads",
+    category: "ライティング",
+  },
+  {
     id: "seo-articles",
     title: "SEO記事生成",
     description: "検索最適化された記事を自動作成",
@@ -94,6 +104,11 @@ const quickLinks = [
     icon: MapPinIcon,
     label: "Google Map",
     path: "/google-map",
+  },
+  {
+    icon: AtSignIcon,
+    label: "Threads",
+    path: "/threads",
   },
 ];
 

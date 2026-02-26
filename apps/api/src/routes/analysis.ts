@@ -456,11 +456,12 @@ const analysisHandler = projectGuard.createHandlers(
       outputFromSeoFlow = output;
     } else {
       const isConsultType = type === "improvement" || type === "improvement-no-image";
+      const rawForm = c.req.valid("form");
       chat = (await chatgpt(c.var.applicationSettingUseCase))(
         system,
         user,
         "images" in form ? form.images : undefined,
-        isConsultType ? form.conversationHistory : undefined,
+        isConsultType ? rawForm.conversationHistory : undefined,
       );
     }
 
