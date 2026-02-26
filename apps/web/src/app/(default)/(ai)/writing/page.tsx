@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { cookies } from "next/headers";
 import { css } from "styled-system/css";
-import { Flex, HStack } from "styled-system/jsx";
+import { Box, Flex, HStack } from "styled-system/jsx";
 import { ProjectSelector } from "../../_components/project-selector";
 import { HelpPopover } from "../_components/help-popover";
 import { PageHistory } from "../_components/page-history";
@@ -107,6 +107,7 @@ export default async function Page() {
         animation: "fadeIn 0.4s ease",
       })}
     >
+      <Box display={{ base: "none", xl: "block" }} w="300px" flexShrink={0} />
       <Flex direction="column" gap={8} flex="1" minW={0}>
         <HStack>
           <Text

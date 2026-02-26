@@ -3,7 +3,7 @@ import { createClient } from "@/lib/api";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { css } from "styled-system/css";
-import { Flex } from "styled-system/jsx";
+import { Box, Flex } from "styled-system/jsx";
 import { ProjectSelector } from "../../_components/project-selector";
 import { PageHistory } from "../_components/page-history";
 import { ConsultChat } from "./_components/consult-chat";
@@ -54,6 +54,7 @@ export default async function Page() {
       align={{ xl: "flex-start" }}
       className={css({ animation: "fadeIn 0.4s ease" })}
     >
+      <Box display={{ base: "none", xl: "block" }} w="300px" flexShrink={0} />
       <Flex direction="column" gap={4} flex="1" minW={0}>
         <Flex justify="space-between" align="center">
           <Text
