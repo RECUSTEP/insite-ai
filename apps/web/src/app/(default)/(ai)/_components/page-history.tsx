@@ -19,14 +19,16 @@ type Props = {
   aiTypes: string[];
 };
 
-const cardCss = css({
+const cardStyle = {
   bg: "bg.card",
   border: "1px solid",
   borderColor: { base: "#E4E4E7", _dark: "#27272A" },
   borderRadius: "12px",
   p: 4,
   w: "full",
-});
+} as const;
+
+const cardCss = css(cardStyle);
 
 function SkeletonItem() {
   return (
@@ -144,7 +146,7 @@ export function PageHistory({ aiTypes }: Props) {
               <Link key={h.id} href={`/history/${h.id}`}>
                 <Box
                   className={css({
-                    ...cardCss,
+                    ...cardStyle,
                     transition: "border-color 0.15s ease, background 0.15s ease",
                     _hover: {
                       borderColor: { base: "#D4D4D8", _dark: "#3F3F46" },
