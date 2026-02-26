@@ -72,3 +72,9 @@ export const announceInsertSchema = createInsertSchema(schemas.announces);
 
 export type AnnounceSelect = typeof schemas.announces.$inferSelect;
 export const announceSelectSchema = createSelectSchema(schemas.announces);
+
+export type ChatSessionInsert = typeof schemas.chatSessions.$inferInsert;
+export const chatSessionInsertSchema = createInsertSchema(schemas.chatSessions);
+
+export type ChatSessionSelect = typeof schemas.chatSessions.$inferSelect;
+export const chatSessionSelectSchema = createSelectSchema(schemas.chatSessions);

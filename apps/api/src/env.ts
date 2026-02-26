@@ -3,6 +3,7 @@ import type {
   AnalysisHistoryUseCase,
   ApiUsageUseCase,
   ApplicationSettingUseCase,
+  ChatSessionUseCase,
   HelpUseCase,
   ProjectInfoUseCase,
   ProjectUseCase,
@@ -33,6 +34,7 @@ export type Variables = {
   applicationSettingUseCase: ApplicationSettingUseCase<"d1">;
   instructionGuideUsecase: InstructionGuideUseCase<"d1">;
   announceUsecase: AnnounceUseCase<"d1">;
+  chatSessionUseCase: ChatSessionUseCase<"d1">;
 };
 
 export type Env = {

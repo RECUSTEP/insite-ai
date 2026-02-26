@@ -30,7 +30,7 @@ const navigationBefore = [
   },
   {
     icon: <TrendingUpIcon size="16" />,
-    label: "AI店舗運営",
+    label: "AIコンサルティング",
     path: "/improvement-proposal",
   },
   {

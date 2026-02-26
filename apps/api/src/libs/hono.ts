@@ -6,6 +6,7 @@ import {
   ApiUsageUseCase,
   ApplicationSettingUseCase,
   AuthUseCase,
+  ChatSessionUseCase,
   HelpUseCase,
   InstructionGuideUseCase,
   ProjectInfoUseCase,
@@ -37,6 +38,7 @@ export const initApp = <E extends Env>(app: Hono<E>) => {
     const applicationSettingUseCase = new ApplicationSettingUseCase<"d1">(db);
     const instructionGuideUsecase = new InstructionGuideUseCase<"d1">(db);
     const announceUsecase = new AnnounceUseCase<"d1">(db);
+    const chatSessionUseCase = new ChatSessionUseCase<"d1">(db);
     c.set("authUseCase", authUseCase);
     c.set("projectUseCase", projectUseCase);
     c.set("apiUsageUseCase", apiUsageUseCase);
@@ -49,6 +51,7 @@ export const initApp = <E extends Env>(app: Hono<E>) => {
     c.set("applicationSettingUseCase", applicationSettingUseCase);
     c.set("instructionGuideUsecase", instructionGuideUsecase);
     c.set("announceUsecase", announceUsecase);
+    c.set("chatSessionUseCase", chatSessionUseCase);
     await next();
   });
 };

@@ -56,7 +56,7 @@ const aiTypeToValueMap = {
 
 const aiTypeMap = {
   competitor: "分析AI",
-  improvement: "AI店舗運営",
+  improvement: "AIコンサルティング",
   writing: "ライティングAI（Instagram）",
   threads: "ライティングAI（Threads）",
   "google-map": "ライティングAI（Google Map）",
@@ -269,7 +269,7 @@ function AiTypeSelect({ column }: { column: Column<History> }) {
     () => [
       { label: "全て", value: "" },
       { label: "分析AI", value: "competitor" },
-      { label: "AI店舗運営", value: "improvement" },
+      { label: "AIコンサルティング", value: "improvement" },
       { label: "ライティングAI（Instagram）", value: "writing" },
       { label: "ライティングAI（Google Map）", value: "google-map" },
       { label: "SEO・AIO記事", value: "seo-article" },

@@ -14,6 +14,7 @@ import { route as instructionGuideRoute } from "./instruction-guide";
 import { route as seoArticleReviseRoute } from "./seo-article-revise";
 import { route as seoSuggestKeywordsRoute } from "./seo-suggest-keywords";
 import { route as announcesRoute } from "./announces";
+import { route as chatSessionsRoute } from "./chat-sessions";
 
 export const route = new Hono()
   .route("/admin", adminRoute)
@@ -30,4 +31,5 @@ export const route = new Hono()
   .route("/instruction-guide", instructionGuideRoute)
   .route("/seo-article-revise", seoArticleReviseRoute)
   .route("/seo-suggest-keywords", seoSuggestKeywordsRoute)
-  .route("/announces", announcesRoute);
+  .route("/announces", announcesRoute)
+  .route("/chat-sessions", chatSessionsRoute);

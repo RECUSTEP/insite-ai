@@ -32,7 +32,7 @@ export function DockNavigation({ seoAddonEnabled }: Props) {
   const navItems: NavItem[] = [
     { icon: <HomeIcon />, label: 'ホーム', path: '/home' },
     { icon: <UserRoundSearchIcon />, label: '分析AI', path: '/competitor-analysis' },
-    { icon: <TrendingUpIcon />, label: 'AI店舗運営', path: '/improvement-proposal' },
+    { icon: <TrendingUpIcon />, label: 'AIコンサルティング', path: '/improvement-proposal' },
     { icon: <NotebookPenIcon />, label: 'ライティング(IG)', path: '/writing' },
     { icon: <AtSignIcon />, label: 'Threads', path: '/threads' },
     { icon: <MapPinIcon />, label: 'Google Map', path: '/google-map' },

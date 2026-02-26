@@ -5,7 +5,7 @@ import { MarkdownRenderer } from "@/components/markdown";
 import { Button } from "@/components/ui/button";
 import { PROJECT_TAG } from "@/lib/tags";
 import { fileUpload } from "@repo/configuration";
-import { ImageIcon, PaperclipIcon, RotateCcwIcon, SendIcon, XIcon } from "lucide-react";
+import { ImageIcon, PaperclipIcon, PlusIcon, SendIcon, XIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { css } from "styled-system/css";
 import { Box, Flex, Stack } from "styled-system/jsx";
@@ -13,20 +13,21 @@ import { revalidateTagAction } from "../../../_action/revalidate";
 
 const { acceptMimeTypes, maxFileSize } = fileUpload;
 
+export type ChatMessage = {
+  role: "user" | "assistant";
+  content: string;
+  hasImage?: boolean;
+  timestamp: number;
+};
+
 type Message = {
   id: string;
   role: "user" | "assistant";
   content: string;
-  image?: string; // data URL for preview (not persisted)
-  hasImage?: boolean; // persisted flag: whether the message had an image
-  loading?: boolean;
-};
-
-type PersistedMessage = {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
+  image?: string; // data URL (not persisted)
   hasImage?: boolean;
+  loading?: boolean;
+  timestamp: number;
 };
 
 async function* readStream(stream: ReadableStream<Uint8Array>) {
@@ -43,73 +44,67 @@ const WELCOME_MESSAGE: Message = {
   id: "welcome",
   role: "assistant",
   content:
-    "こんにちは！AI店舗運営コンサルタントです。\n\n集客・SNS運用・店舗改善など、どのようなことでもお気軽にご相談ください。画像（Instagramの投稿・競合店の写真など）を添付していただくと、より具体的なアドバイスが可能です。",
+    "こんにちは！AIコンサルタントです。\n\n集客・SNS運用・店舗改善など、どのようなことでもお気軽にご相談ください。画像（Instagramの投稿・競合店の写真など）を添付していただくと、より具体的なアドバイスが可能です。",
+  timestamp: 0,
 };
 
-function getStorageKey(projectId?: string) {
-  return projectId ? `consult-chat-${projectId}` : "consult-chat";
-}
-
-function loadMessages(projectId?: string): Message[] {
-  try {
-    const raw = localStorage.getItem(getStorageKey(projectId));
-    if (!raw) return [WELCOME_MESSAGE];
-    const parsed: PersistedMessage[] = JSON.parse(raw);
-    return parsed.map((m) => ({
-      ...m,
-      // Restore hasImage as a note in content if image existed
-      content: m.hasImage && m.role === "user" && !m.content
-        ? "（画像のみ）"
-        : m.content,
+function msgsToChatMessages(messages: Message[]): ChatMessage[] {
+  return messages
+    .filter((m) => !m.loading)
+    .map((m) => ({
+      role: m.role,
+      content: m.content || (m.hasImage ? "（画像を送信）" : ""),
+      hasImage: m.hasImage,
+      timestamp: m.timestamp,
     }));
-  } catch {
-    return [WELCOME_MESSAGE];
-  }
-}
-
-function saveMessages(messages: Message[], projectId?: string) {
-  try {
-    const toSave: PersistedMessage[] = messages
-      .filter((m) => !m.loading)
-      .map(({ id, role, content, hasImage, image }) => ({
-        id,
-        role,
-        content,
-        hasImage: hasImage || !!image,
-      }));
-    localStorage.setItem(getStorageKey(projectId), JSON.stringify(toSave));
-  } catch {
-    // ignore storage errors (e.g., quota exceeded)
-  }
 }
 
 type Props = {
   projectId?: string;
+  selectedSessionId?: string | null;
+  onSessionCreated?: (sessionId: string) => void;
 };
 
-export function ConsultChat({ projectId }: Props) {
+export function ConsultChat({ projectId, selectedSessionId, onSessionCreated }: Props) {
   const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
-  const [initialized, setInitialized] = useState(false);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [sessionLoading, setSessionLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load from localStorage on mount
+  // Load session when selectedSessionId changes
   useEffect(() => {
-    const loaded = loadMessages(projectId);
-    setMessages(loaded);
-    setInitialized(true);
-  }, [projectId]);
+    if (!selectedSessionId) return;
+    if (selectedSessionId === currentSessionId) return;
 
-  // Save to localStorage whenever messages change (after initial load)
-  useEffect(() => {
-    if (!initialized) return;
-    saveMessages(messages, projectId);
-  }, [messages, projectId, initialized]);
+    setSessionLoading(true);
+    fetch(`/api/chat-sessions/${selectedSessionId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("セッションの読み込みに失敗しました");
+        return res.json() as Promise<{ id: string; messages: ChatMessage[] }>;
+      })
+      .then((data) => {
+        const restored: Message[] = data.messages.map((m, i) => ({
+          id: `restored-${i}`,
+          role: m.role,
+          content: m.content,
+          hasImage: m.hasImage,
+          timestamp: m.timestamp,
+        }));
+        setMessages(restored.length ? restored : [WELCOME_MESSAGE]);
+        setCurrentSessionId(data.id);
+      })
+      .catch((e) => {
+        toaster.error({ title: "エラー", description: e.message });
+      })
+      .finally(() => setSessionLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSessionId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -134,9 +129,9 @@ export function ConsultChat({ projectId }: Props) {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleReset = () => {
-    localStorage.removeItem(getStorageKey(projectId));
+  const handleNewChat = () => {
     setMessages([WELCOME_MESSAGE]);
+    setCurrentSessionId(null);
     setInput("");
     handleRemoveImage();
   };
@@ -148,6 +143,7 @@ export function ConsultChat({ projectId }: Props) {
 
     const userMsgId = crypto.randomUUID();
     const aiMsgId = crypto.randomUUID();
+    const now = Date.now();
 
     const userMsg: Message = {
       id: userMsgId,
@@ -155,12 +151,14 @@ export function ConsultChat({ projectId }: Props) {
       content: trimmed,
       image: imagePreview ?? undefined,
       hasImage: !!image,
+      timestamp: now,
     };
     const aiMsg: Message = {
       id: aiMsgId,
       role: "assistant",
       content: "",
       loading: true,
+      timestamp: now + 1,
     };
 
     const currentMessages = [...messages, userMsg];
@@ -171,6 +169,7 @@ export function ConsultChat({ projectId }: Props) {
     if (fileInputRef.current) fileInputRef.current.value = "";
     setLoading(true);
 
+    let finalContent = "";
     try {
       const type = image ? "improvement" : "improvement-no-image";
       const form = new FormData();
@@ -198,12 +197,43 @@ export function ConsultChat({ projectId }: Props) {
 
       revalidateTagAction(PROJECT_TAG);
 
-      let accumulated = "";
       for await (const chunk of readStream(response.body)) {
-        accumulated += chunk;
+        finalContent += chunk;
         setMessages((prev) =>
-          prev.map((m) => (m.id === aiMsgId ? { ...m, content: accumulated, loading: false } : m))
+          prev.map((m) => (m.id === aiMsgId ? { ...m, content: finalContent, loading: false } : m))
         );
+      }
+
+      // Persist to DB
+      const aiMsgPersisted: Message = {
+        id: aiMsgId,
+        role: "assistant",
+        content: finalContent,
+        timestamp: Date.now(),
+      };
+      const allMessages = [...currentMessages, aiMsgPersisted];
+      const chatMessages = msgsToChatMessages(allMessages);
+
+      if (!currentSessionId) {
+        // Create new session
+        const title = trimmed.slice(0, 35) + (trimmed.length > 35 ? "…" : "");
+        const res = await fetch("/api/chat-sessions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title, messages: chatMessages }),
+        });
+        if (res.ok) {
+          const session = (await res.json()) as { id: string };
+          setCurrentSessionId(session.id);
+          onSessionCreated?.(session.id);
+        }
+      } else {
+        // Update existing session
+        await fetch(`/api/chat-sessions/${currentSessionId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: chatMessages }),
+        });
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "エラーが発生しました。";
@@ -241,7 +271,7 @@ export function ConsultChat({ projectId }: Props) {
         overflow: "hidden",
       })}
     >
-      {/* Header with reset button */}
+      {/* Header */}
       <Flex
         justify="flex-end"
         align="center"
@@ -253,10 +283,15 @@ export function ConsultChat({ projectId }: Props) {
           bg: { base: "#FAFAFA", _dark: "#18181B" },
         })}
       >
+        {sessionLoading && (
+          <span className={css({ fontSize: "xs", color: "text.muted", mr: "auto" })}>
+            読み込み中...
+          </span>
+        )}
         <Button
           size="xs"
           variant="ghost"
-          onClick={handleReset}
+          onClick={handleNewChat}
           className={css({
             color: "text.muted",
             fontSize: "xs",
@@ -264,8 +299,8 @@ export function ConsultChat({ projectId }: Props) {
             _hover: { color: "text.secondary", bg: { base: "#F4F4F5", _dark: "#27272A" } },
           })}
         >
-          <RotateCcwIcon size={12} />
-          会話をリセット
+          <PlusIcon size={12} />
+          新しい会話
         </Button>
       </Flex>
 
@@ -299,7 +334,7 @@ export function ConsultChat({ projectId }: Props) {
                 {msg.role === "user" ? "あなた" : "AI コンサルタント"}
               </span>
 
-              {/* Image preview (user) */}
+              {/* Image preview (user, current session) */}
               {msg.image && (
                 <img
                   src={msg.image}
@@ -314,7 +349,7 @@ export function ConsultChat({ projectId }: Props) {
                   })}
                 />
               )}
-              {/* Restored image indicator (no preview available) */}
+              {/* Image indicator for persisted messages */}
               {!msg.image && msg.hasImage && msg.role === "user" && (
                 <span
                   className={css({
@@ -334,7 +369,8 @@ export function ConsultChat({ projectId }: Props) {
                   px={4}
                   py={3}
                   className={css({
-                    borderRadius: msg.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+                    borderRadius:
+                      msg.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
                     bg:
                       msg.role === "user"
                         ? { base: "#09090B", _dark: "#FAFAFA" }

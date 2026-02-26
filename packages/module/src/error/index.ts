@@ -48,3 +48,8 @@ export const InstructionGuideUseCaseError = {
 export const AnnounceUseCaseError = {
   AnnounceNotFound: "AnnounceNotFound",
 } as const;
+
+export const ChatSessionUseCaseError = {
+  ChatSessionNotFound: "ChatSessionNotFound",
+  ProjectNotFound: "ChatSessionProjectNotFound",
+} as const;

@@ -62,8 +62,8 @@ const features: Array<{
   },
   {
     id: "operation",
-    title: "店舗運営相談",
-    description: "売上・スタッフ配置のアドバイス",
+    title: "AIコンサルティング",
+    description: "集客・SNS・店舗改善をAIに相談",
     icon: StoreIcon,
     color: "#F2994A",
     path: "/improvement-proposal",

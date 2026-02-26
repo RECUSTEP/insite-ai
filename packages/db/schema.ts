@@ -166,6 +166,26 @@ const instructionGuide = sqliteTable("instruction_guide", {
   text: text("text").notNull(),
 });
 
+const chatSessions = sqliteTable(
+  "chat_sessions",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.projectId, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    messages: text("messages", { mode: "json" }).notNull(),
+    createdAt: integer("created_at").notNull(),
+    updatedAt: integer("updated_at").notNull(),
+  },
+  (table) => ({
+    projectIdIdx: index("chat_sessions_project_id_idx").on(table.projectId),
+  }),
+);
+
 const announces = sqliteTable("announce", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
@@ -174,9 +194,17 @@ const announces = sqliteTable("announce", {
   updatedAt: integer("updated_at").notNull(),
 });
 
+const chatSessionsRelations = relations(chatSessions, ({ one }) => ({
+  project: one(projects, {
+    fields: [chatSessions.projectId],
+    references: [projects.projectId],
+  }),
+}));
+
 const projectRelations = relations(projects, ({ one, many }) => ({
   apiUsage: many(apiUsage),
   analysisHistory: many(analysisHistory),
+  chatSessions: many(chatSessions),
   projectInfo: one(projectInfo),
   sessions: many(sessions),
 }));
@@ -214,6 +242,7 @@ export {
   projects,
   apiUsage,
   analysisHistory,
+  chatSessions,
   projectInfo,
   sessions,
   adminSessions,
@@ -225,6 +254,7 @@ export {
   projectRelations,
   apiUsageRelations,
   analysisHistoryRelations,
+  chatSessionsRelations,
   projectInfoRelations,
   sessionRelations,
 };
