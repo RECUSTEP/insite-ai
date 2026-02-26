@@ -45,6 +45,7 @@ export function DockNavigation({ seoAddonEnabled }: Props) {
 
   return (
     <div
+      style={{ viewTransitionName: "dock-nav" }}
       className={css({
         position: 'fixed',
         bottom: '16px',

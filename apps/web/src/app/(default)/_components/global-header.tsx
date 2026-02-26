@@ -11,6 +11,7 @@ import { Logout } from "./logout";
 export function GlobalHeader() {
   return (
     <Box
+      style={{ viewTransitionName: "global-header" }}
       className={css({
         position: "fixed",
         top: { base: 12, md: 0 },

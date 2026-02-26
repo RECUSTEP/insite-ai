@@ -73,3 +73,53 @@
     }
   }
 }
+
+/* ===== View Transitions: スムーズなページ遷移 ===== */
+
+/* ルートのページコンテンツにフェード+わずかなスライドを適用 */
+::view-transition-old(root) {
+  animation: vt-fade-out 120ms ease forwards;
+}
+::view-transition-new(root) {
+  animation: vt-fade-in 180ms ease forwards;
+}
+
+@keyframes vt-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ヘッダー・Dockナビゲーションは独自の view-transition-name を持つため
+   ページ遷移中もアニメーションせず固定位置を維持する
+   (global-header / dock-nav はコンポーネント側で style 指定済み) */
+::view-transition-old(global-header),
+::view-transition-new(global-header),
+::view-transition-old(dock-nav),
+::view-transition-new(dock-nav) {
+  animation: none;
+}
+
+/* モーション低減設定を尊重する */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
