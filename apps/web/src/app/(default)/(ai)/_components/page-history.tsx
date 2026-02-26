@@ -5,7 +5,7 @@ import { ExternalLinkIcon, HistoryIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { css } from "styled-system/css";
-import { Box, Flex, Stack, VStack } from "styled-system/jsx";
+import { Box, Flex, Stack } from "styled-system/jsx";
 
 type HistoryEntry = {
   id: string;
@@ -112,7 +112,7 @@ export function PageHistory({ aiTypes }: Props) {
           </span>
         </Flex>
 
-        <VStack gap="2" align="stretch">
+        <Stack gap="2">
           {loading ? (
             <>
               <SkeletonItem />
@@ -207,7 +207,7 @@ export function PageHistory({ aiTypes }: Props) {
               </Link>
             ))
           )}
-        </VStack>
+        </Stack>
       </Stack>
     </Box>
   );
