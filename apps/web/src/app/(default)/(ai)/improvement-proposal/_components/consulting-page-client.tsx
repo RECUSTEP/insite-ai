@@ -24,7 +24,7 @@ export function ConsultingPageClient({ projectId, children }: Props) {
   };
 
   return (
-    <Flex gap={8} align="flex-start">
+    <Flex gap={6} align="flex-start" direction={{ base: "column", xl: "row" }}>
       <Flex direction="column" gap={4} flex="1" minW={0}>
         {children}
         <ConsultChat

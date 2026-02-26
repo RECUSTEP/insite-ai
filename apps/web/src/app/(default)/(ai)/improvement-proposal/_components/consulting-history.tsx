@@ -50,7 +50,7 @@ export function ConsultingHistory({ selectedSessionId, onSelectSession, refreshK
 
   return (
     <Box
-      w={{ base: "full", xl: "300px" }}
+      w={{ base: "full", xl: "260px" }}
       flexShrink={0}
       display={{ base: "none", xl: "block" }}
       className={css({

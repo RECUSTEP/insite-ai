@@ -88,7 +88,7 @@ export function PageHistory({ aiTypes }: Props) {
   return (
     <Box
       className={css({
-        w: { base: "full", xl: "300px" },
+        w: { base: "full", xl: "260px" },
         flexShrink: 0,
         position: { xl: "sticky" },
         top: { xl: "80px" },

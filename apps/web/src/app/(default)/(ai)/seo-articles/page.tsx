@@ -120,7 +120,6 @@ export default async function Page() {
           animation: "fadeIn 0.4s ease",
         })}
       >
-        <Box display={{ base: "none", xl: "block" }} w="300px" flexShrink={0} />
         <Flex direction="column" gap={8} flex="1" minW={0}>
           <Text
             as="h1"
