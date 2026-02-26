@@ -245,7 +245,7 @@ export function ConsultChat({ projectId, selectedSessionId, onSessionCreated }: 
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && e.shiftKey) {
       e.preventDefault();
       handleSubmit();
     }
@@ -482,7 +482,7 @@ export function ConsultChat({ projectId, selectedSessionId, onSessionCreated }: 
                   adjustTextarea();
                 }}
                 onKeyDown={handleKeyDown}
-                placeholder="相談内容を入力... (Shift+Enter で改行)"
+                placeholder="相談内容を入力... (Shift+Enter で送信)"
                 rows={1}
                 className={css({
                   w: "full",
@@ -536,7 +536,7 @@ export function ConsultChat({ projectId, selectedSessionId, onSessionCreated }: 
           </Flex>
 
           <span className={css({ fontSize: "xs", color: "text.muted", textAlign: "center" })}>
-            Enter で送信 · Shift+Enter で改行 · 画像添付で詳細なアドバイスが可能
+            Shift+Enter で送信 · Enter で改行 · 画像添付で詳細なアドバイスが可能
           </span>
         </Stack>
       </Box>
