@@ -23,12 +23,26 @@ export function GlobalHeader() {
       })}
     >
       <Flex
-        justify="flex-end"
+        justify="space-between"
         align="center"
         gap={2}
         px={4}
         py={2.5}
       >
+        <Link href="/home">
+          <span
+            className={css({
+              fontSize: "sm",
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              color: "text.primary",
+              userSelect: "none",
+            })}
+          >
+            INSITE AI
+          </span>
+        </Link>
+        <Flex align="center" gap={2}>
         <Link href="/announce">
           <Button
             size="sm"
@@ -48,6 +62,7 @@ export function GlobalHeader() {
         </Link>
         <ThemeToggle />
         <Logout />
+        </Flex>
       </Flex>
     </Box>
   );
