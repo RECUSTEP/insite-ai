@@ -5,7 +5,7 @@ import { MarkdownRenderer } from "@/components/markdown";
 import { Button } from "@/components/ui/button";
 import { PROJECT_TAG } from "@/lib/tags";
 import { fileUpload } from "@repo/configuration";
-import { ImageIcon, PaperclipIcon, SendIcon, XIcon } from "lucide-react";
+import { ImageIcon, PaperclipIcon, RotateCcwIcon, SendIcon, XIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { css } from "styled-system/css";
 import { Box, Flex, Stack } from "styled-system/jsx";
@@ -17,8 +17,16 @@ type Message = {
   id: string;
   role: "user" | "assistant";
   content: string;
-  image?: string; // data URL for preview
+  image?: string; // data URL for preview (not persisted)
+  hasImage?: boolean; // persisted flag: whether the message had an image
   loading?: boolean;
+};
+
+type PersistedMessage = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  hasImage?: boolean;
 };
 
 async function* readStream(stream: ReadableStream<Uint8Array>) {
@@ -38,8 +46,50 @@ const WELCOME_MESSAGE: Message = {
     "こんにちは！AI店舗運営コンサルタントです。\n\n集客・SNS運用・店舗改善など、どのようなことでもお気軽にご相談ください。画像（Instagramの投稿・競合店の写真など）を添付していただくと、より具体的なアドバイスが可能です。",
 };
 
-export function ConsultChat() {
+function getStorageKey(projectId?: string) {
+  return projectId ? `consult-chat-${projectId}` : "consult-chat";
+}
+
+function loadMessages(projectId?: string): Message[] {
+  try {
+    const raw = localStorage.getItem(getStorageKey(projectId));
+    if (!raw) return [WELCOME_MESSAGE];
+    const parsed: PersistedMessage[] = JSON.parse(raw);
+    return parsed.map((m) => ({
+      ...m,
+      // Restore hasImage as a note in content if image existed
+      content: m.hasImage && m.role === "user" && !m.content
+        ? "（画像のみ）"
+        : m.content,
+    }));
+  } catch {
+    return [WELCOME_MESSAGE];
+  }
+}
+
+function saveMessages(messages: Message[], projectId?: string) {
+  try {
+    const toSave: PersistedMessage[] = messages
+      .filter((m) => !m.loading)
+      .map(({ id, role, content, hasImage, image }) => ({
+        id,
+        role,
+        content,
+        hasImage: hasImage || !!image,
+      }));
+    localStorage.setItem(getStorageKey(projectId), JSON.stringify(toSave));
+  } catch {
+    // ignore storage errors (e.g., quota exceeded)
+  }
+}
+
+type Props = {
+  projectId?: string;
+};
+
+export function ConsultChat({ projectId }: Props) {
   const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
+  const [initialized, setInitialized] = useState(false);
   const [input, setInput] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -47,6 +97,19 @@ export function ConsultChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const loaded = loadMessages(projectId);
+    setMessages(loaded);
+    setInitialized(true);
+  }, [projectId]);
+
+  // Save to localStorage whenever messages change (after initial load)
+  useEffect(() => {
+    if (!initialized) return;
+    saveMessages(messages, projectId);
+  }, [messages, projectId, initialized]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -71,6 +134,13 @@ export function ConsultChat() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const handleReset = () => {
+    localStorage.removeItem(getStorageKey(projectId));
+    setMessages([WELCOME_MESSAGE]);
+    setInput("");
+    handleRemoveImage();
+  };
+
   const handleSubmit = async () => {
     const trimmed = input.trim();
     if (!trimmed && !image) return;
@@ -84,6 +154,7 @@ export function ConsultChat() {
       role: "user",
       content: trimmed,
       image: imagePreview ?? undefined,
+      hasImage: !!image,
     };
     const aiMsg: Message = {
       id: aiMsgId,
@@ -92,7 +163,8 @@ export function ConsultChat() {
       loading: true,
     };
 
-    setMessages((prev) => [...prev, userMsg, aiMsg]);
+    const currentMessages = [...messages, userMsg];
+    setMessages([...currentMessages, aiMsg]);
     setInput("");
     setImage(null);
     setImagePreview(null);
@@ -104,6 +176,16 @@ export function ConsultChat() {
       const form = new FormData();
       form.append("instruction", trimmed);
       if (image) form.append("images", image);
+
+      // Build conversation history (exclude loading messages and welcome, limit to last 20)
+      const history = currentMessages
+        .filter((m) => m.id !== "welcome" && !m.loading)
+        .slice(-20)
+        .map((m) => ({
+          role: m.role as "user" | "assistant",
+          content: m.content || (m.hasImage ? "（画像を送信）" : ""),
+        }));
+      form.append("conversationHistory", JSON.stringify(history));
 
       const response = await fetch(`/api/analysis?type=${type}`, {
         method: "POST",
@@ -159,6 +241,34 @@ export function ConsultChat() {
         overflow: "hidden",
       })}
     >
+      {/* Header with reset button */}
+      <Flex
+        justify="flex-end"
+        align="center"
+        px={4}
+        py={2}
+        className={css({
+          borderBottom: "1px solid",
+          borderColor: { base: "#E4E4E7", _dark: "#27272A" },
+          bg: { base: "#FAFAFA", _dark: "#18181B" },
+        })}
+      >
+        <Button
+          size="xs"
+          variant="ghost"
+          onClick={handleReset}
+          className={css({
+            color: "text.muted",
+            fontSize: "xs",
+            gap: 1,
+            _hover: { color: "text.secondary", bg: { base: "#F4F4F5", _dark: "#27272A" } },
+          })}
+        >
+          <RotateCcwIcon size={12} />
+          会話をリセット
+        </Button>
+      </Flex>
+
       {/* Chat messages area */}
       <Box
         flex="1"
@@ -203,6 +313,18 @@ export function ConsultChat() {
                     borderColor: { base: "#E4E4E7", _dark: "#27272A" },
                   })}
                 />
+              )}
+              {/* Restored image indicator (no preview available) */}
+              {!msg.image && msg.hasImage && msg.role === "user" && (
+                <span
+                  className={css({
+                    fontSize: "xs",
+                    color: "text.muted",
+                    px: 1,
+                  })}
+                >
+                  （画像あり）
+                </span>
               )}
 
               {/* Bubble */}

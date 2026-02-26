@@ -44,9 +44,19 @@ export async function chatgptOnce(
   return response.choices[0]?.message?.content ?? "";
 }
 
+export type ConversationMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
 export async function chatgpt(applicationSettings: ApplicationSettingUseCase<"d1">) {
   const { client, model } = await getOpenAiClient(applicationSettings);
-  return async function* (system: string, user: string, images?: File[]) {
+  return async function* (
+    system: string,
+    user: string,
+    images?: File[],
+    conversationHistory?: ConversationMessage[],
+  ) {
     const systemMessage = {
       role: "system",
       content: system,
@@ -61,9 +71,19 @@ export async function chatgpt(applicationSettings: ApplicationSettingUseCase<"d1
         image_url: { url: `data:${image.type};base64,${encodeBase64(await image.arrayBuffer())}` },
       });
     }
+
+    const historyMessages: (
+      | openAi.Chat.Completions.ChatCompletionUserMessageParam
+      | openAi.Chat.Completions.ChatCompletionAssistantMessageParam
+    )[] = (conversationHistory ?? []).map((msg) =>
+      msg.role === "user"
+        ? ({ role: "user", content: msg.content } satisfies openAi.Chat.Completions.ChatCompletionUserMessageParam)
+        : ({ role: "assistant", content: msg.content } satisfies openAi.Chat.Completions.ChatCompletionAssistantMessageParam),
+    );
+
     const stream = await client.chat.completions.create({
       model,
-      messages: [systemMessage, userMessage],
+      messages: [systemMessage, ...historyMessages, userMessage],
       stream: true,
     });
     for await (const chunk of stream) {

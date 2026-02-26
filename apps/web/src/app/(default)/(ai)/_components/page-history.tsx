@@ -69,10 +69,10 @@ export function PageHistory({ aiTypes }: Props) {
   useEffect(() => {
     fetch("/api/history")
       .then((res) => {
-        if (!res.ok) return [];
-        return res.json();
+        if (!res.ok) return [] as HistoryEntry[];
+        return res.json() as Promise<HistoryEntry[]>;
       })
-      .then((data: HistoryEntry[]) => {
+      .then((data) => {
         const filtered = data
           .filter((h) => aiTypes.includes(h.aiType))
           .sort((a, b) => b.createdAt - a.createdAt)

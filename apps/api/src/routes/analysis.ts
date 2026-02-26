@@ -7,6 +7,7 @@ import { validator } from "hono/validator";
 import { z } from "zod";
 import { upload } from "../libs/bucket";
 import {
+  type ConversationMessage,
   chatgpt,
   generateSeoFaqAnswer,
   generateSeoOutline,
@@ -194,6 +195,11 @@ export const analysisQuerySchema = z.object({
   ),
 });
 
+const conversationMessageSchema = z.object({
+  role: z.enum(["user", "assistant"]),
+  content: z.string(),
+});
+
 const formValidator = validator("form", async (value, c) => {
   const parsed = z.string().optional().safeParse(value.instruction);
   if (!parsed.success) {
@@ -201,10 +207,24 @@ const formValidator = validator("form", async (value, c) => {
   }
   const instruction = parsed.data;
 
+  const conversationHistoryRaw = z.string().optional().safeParse(value.conversationHistory);
+  let conversationHistory: ConversationMessage[] | undefined;
+  if (conversationHistoryRaw.success && conversationHistoryRaw.data) {
+    try {
+      const parsed = z.array(conversationMessageSchema).safeParse(JSON.parse(conversationHistoryRaw.data));
+      if (parsed.success) {
+        conversationHistory = parsed.data.slice(-20);
+      }
+    } catch {
+      // ignore invalid JSON
+    }
+  }
+
   const form = await c.req.formData();
   const images: File[] = [];
   form.forEach((v: unknown, key: string) => {
     if (key === "instruction") return;
+    if (key === "conversationHistory") return;
     if (!(v instanceof File)) return;
     const parsedImage = imageSchema.safeParse(v);
     if (!parsedImage.success) {
@@ -215,6 +235,7 @@ const formValidator = validator("form", async (value, c) => {
   return {
     instruction,
     images,
+    conversationHistory,
   };
 });
 
@@ -434,10 +455,12 @@ const analysisHandler = projectGuard.createHandlers(
 
       outputFromSeoFlow = output;
     } else {
+      const isConsultType = type === "improvement" || type === "improvement-no-image";
       chat = (await chatgpt(c.var.applicationSettingUseCase))(
         system,
         user,
         "images" in form ? form.images : undefined,
+        isConsultType ? form.conversationHistory : undefined,
       );
     }
 

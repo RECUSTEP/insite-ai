@@ -65,7 +65,7 @@ export default async function Page() {
           </Text>
         </Flex>
         <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
-        <ConsultChat />
+        <ConsultChat projectId={currentProjectId} />
       </Flex>
       <PageHistory aiTypes={["improvement", "improvement-no-image"]} />
     </Flex>
