@@ -7,6 +7,7 @@ import { css } from "styled-system/css";
 import { Flex, HStack } from "styled-system/jsx";
 import { ProjectSelector } from "../../_components/project-selector";
 import { HelpPopover } from "../_components/help-popover";
+import { PageHistory } from "../_components/page-history";
 import type { TabPanelProps } from "../_components/tab-panel";
 import { AccountAnalysisForm } from "./_components/account-analysis-form";
 import { CompetitorAnalysisForm } from "./_components/competitor-analysis-form";
@@ -68,45 +69,49 @@ export default async function Page() {
     <CompetitorAnalysisWrapper>
       <Flex
         gap={8}
-        direction="column"
+        direction={{ base: "column", xl: "row" }}
+        align={{ xl: "flex-start" }}
         className={css({
           animation: "fadeIn 0.4s ease",
         })}
       >
-        <HStack>
-          <Text
-            as="h1"
-            size="xl"
-            className={css({
-              fontWeight: 600,
-              color: "text.primary",
-            })}
-          >
-            分析AI
-          </Text>
-          <HelpPopover
-            contents={[
-              {
-                title: "市場分析",
-                id: "market",
-              },
-              {
-                title: "競合分析",
-                id: "competitor",
-              },
-              {
-                title: "自社アカウント分析",
-                id: "account",
-              },
-              {
-                title: "インサイト分析",
-                id: "insight",
-              },
-            ]}
-          />
-        </HStack>
-        <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
-        <TabPanel panels={tabs} />
+        <Flex direction="column" gap={8} flex="1" minW={0}>
+          <HStack>
+            <Text
+              as="h1"
+              size="xl"
+              className={css({
+                fontWeight: 600,
+                color: "text.primary",
+              })}
+            >
+              分析AI
+            </Text>
+            <HelpPopover
+              contents={[
+                {
+                  title: "市場分析",
+                  id: "market",
+                },
+                {
+                  title: "競合分析",
+                  id: "competitor",
+                },
+                {
+                  title: "自社アカウント分析",
+                  id: "account",
+                },
+                {
+                  title: "インサイト分析",
+                  id: "insight",
+                },
+              ]}
+            />
+          </HStack>
+          <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
+          <TabPanel panels={tabs} />
+        </Flex>
+        <PageHistory aiTypes={["market", "competitor", "account", "insight"]} />
       </Flex>
     </CompetitorAnalysisWrapper>
   );

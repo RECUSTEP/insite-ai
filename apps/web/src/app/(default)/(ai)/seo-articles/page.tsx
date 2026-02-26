@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { css } from "styled-system/css";
 import { Box, Flex, VStack } from "styled-system/jsx";
 import { ProjectSelector } from "../../_components/project-selector";
+import { PageHistory } from "../_components/page-history";
 import { SeoArticleForm } from "./_components/seo-article-form";
 import { SeoArticlesWrapper } from "./_components/seo-articles-wrapper";
 
@@ -113,23 +114,27 @@ export default async function Page() {
     <SeoArticlesWrapper>
       <Flex
         gap={8}
-        direction="column"
+        direction={{ base: "column", xl: "row" }}
+        align={{ xl: "flex-start" }}
         className={css({
           animation: "fadeIn 0.4s ease",
         })}
       >
-        <Text
-          as="h1"
-          size="xl"
-          className={css({
-            fontWeight: 600,
-            color: "text.primary",
-          })}
-        >
-          SEO・AIO記事
-        </Text>
-        <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
-        <SeoArticleForm />
+        <Flex direction="column" gap={8} flex="1" minW={0}>
+          <Text
+            as="h1"
+            size="xl"
+            className={css({
+              fontWeight: 600,
+              color: "text.primary",
+            })}
+          >
+            SEO・AIO記事
+          </Text>
+          <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
+          <SeoArticleForm />
+        </Flex>
+        <PageHistory aiTypes={["seo-article"]} />
       </Flex>
     </SeoArticlesWrapper>
   );

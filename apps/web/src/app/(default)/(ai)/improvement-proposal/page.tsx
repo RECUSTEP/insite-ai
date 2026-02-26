@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { css } from "styled-system/css";
 import { Flex } from "styled-system/jsx";
 import { ProjectSelector } from "../../_components/project-selector";
+import { PageHistory } from "../_components/page-history";
 import { ConsultChat } from "./_components/consult-chat";
 
 export const metadata: Metadata = {
@@ -48,21 +49,25 @@ export default async function Page() {
 
   return (
     <Flex
-      gap={4}
-      direction="column"
+      gap={8}
+      direction={{ base: "column", xl: "row" }}
+      align={{ xl: "flex-start" }}
       className={css({ animation: "fadeIn 0.4s ease" })}
     >
-      <Flex justify="space-between" align="center">
-        <Text
-          as="h1"
-          size="xl"
-          className={css({ fontWeight: 600, color: "text.primary" })}
-        >
-          AI店舗運営
-        </Text>
+      <Flex direction="column" gap={4} flex="1" minW={0}>
+        <Flex justify="space-between" align="center">
+          <Text
+            as="h1"
+            size="xl"
+            className={css({ fontWeight: 600, color: "text.primary" })}
+          >
+            AI店舗運営
+          </Text>
+        </Flex>
+        <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
+        <ConsultChat />
       </Flex>
-      <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
-      <ConsultChat />
+      <PageHistory aiTypes={["improvement", "improvement-no-image"]} />
     </Flex>
   );
 }

@@ -7,6 +7,7 @@ import { css } from "styled-system/css";
 import { Flex, HStack } from "styled-system/jsx";
 import { ProjectSelector } from "../../_components/project-selector";
 import { HelpPopover } from "../_components/help-popover";
+import { PageHistory } from "../_components/page-history";
 import type { TabPanelProps } from "../_components/tab-panel";
 import { ImageForm } from "./_components/image-form";
 import { NoImageForm } from "./_components/no-image-form";
@@ -94,37 +95,41 @@ export default async function Page() {
   return (
     <Flex
       gap={8}
-      direction="column"
+      direction={{ base: "column", xl: "row" }}
+      align={{ xl: "flex-start" }}
       className={css({
         animation: "fadeIn 0.4s ease",
       })}
     >
-      <HStack>
-        <Text
-          as="h1"
-          size="xl"
-          className={css({
-            fontWeight: 600,
-            color: "text.primary",
-          })}
-        >
-          ライティングAI（Google Map）
-        </Text>
-        <HelpPopover
-          contents={[
-            {
-              title: "画像あり",
-              id: "google-map",
-            },
-            {
-              title: "画像なし",
-              id: "google-map-no-image",
-            },
-          ]}
-        />
-      </HStack>
-      <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
-      <TabPanel panels={tabs} />
+      <Flex direction="column" gap={8} flex="1" minW={0}>
+        <HStack>
+          <Text
+            as="h1"
+            size="xl"
+            className={css({
+              fontWeight: 600,
+              color: "text.primary",
+            })}
+          >
+            ライティングAI（Google Map）
+          </Text>
+          <HelpPopover
+            contents={[
+              {
+                title: "画像あり",
+                id: "google-map",
+              },
+              {
+                title: "画像なし",
+                id: "google-map-no-image",
+              },
+            ]}
+          />
+        </HStack>
+        <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
+        <TabPanel panels={tabs} />
+      </Flex>
+      <PageHistory aiTypes={["google-map", "google-map-no-image"]} />
     </Flex>
   );
 }

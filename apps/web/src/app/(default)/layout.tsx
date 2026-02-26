@@ -31,7 +31,7 @@ export default async function Layout({
       <GlobalHeader />
       <main
         className={css({
-          maxW: "3xl",
+          maxW: "6xl",
           mx: "auto",
           px: 4,
           pt: 20,

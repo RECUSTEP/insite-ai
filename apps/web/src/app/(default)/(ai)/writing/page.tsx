@@ -7,6 +7,7 @@ import { css } from "styled-system/css";
 import { Flex, HStack } from "styled-system/jsx";
 import { ProjectSelector } from "../../_components/project-selector";
 import { HelpPopover } from "../_components/help-popover";
+import { PageHistory } from "../_components/page-history";
 import type { TabPanelProps } from "../_components/tab-panel";
 import { FeedPostForm } from "./_components/feed-post-form";
 import { ProfileForm } from "./_components/profile";
@@ -100,41 +101,45 @@ export default async function Page() {
   return (
     <Flex
       gap={8}
-      direction="column"
+      direction={{ base: "column", xl: "row" }}
+      align={{ xl: "flex-start" }}
       className={css({
         animation: "fadeIn 0.4s ease",
       })}
     >
-      <HStack>
-        <Text
-          as="h1"
-          size="xl"
-          className={css({
-            fontWeight: 600,
-            color: "text.primary",
-          })}
-        >
-          ライティングAI（Instagram）
-        </Text>
-        <HelpPopover
-          contents={[
-            {
-              title: "フィード投稿",
-              id: "feed-post",
-            },
-            {
-              title: "リール",
-              id: "reel-and-stories",
-            },
-            {
-              title: "プロフィール",
-              id: "profile",
-            },
-          ]}
-        />
-      </HStack>
-      <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
-      <TabPanel panels={tabs} />
+      <Flex direction="column" gap={8} flex="1" minW={0}>
+        <HStack>
+          <Text
+            as="h1"
+            size="xl"
+            className={css({
+              fontWeight: 600,
+              color: "text.primary",
+            })}
+          >
+            ライティングAI（Instagram）
+          </Text>
+          <HelpPopover
+            contents={[
+              {
+                title: "フィード投稿",
+                id: "feed-post",
+              },
+              {
+                title: "リール",
+                id: "reel-and-stories",
+              },
+              {
+                title: "プロフィール",
+                id: "profile",
+              },
+            ]}
+          />
+        </HStack>
+        <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
+        <TabPanel panels={tabs} />
+      </Flex>
+      <PageHistory aiTypes={["feed-post", "reel-and-stories", "profile", "writing", "writing-no-image"]} />
     </Flex>
   );
 }
