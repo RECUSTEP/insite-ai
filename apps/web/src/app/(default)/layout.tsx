@@ -2,18 +2,14 @@ import { createClient } from "@/lib/api";
 import { UiModeProvider } from "@/contexts/ui-mode-context";
 import { cookies } from "next/headers";
 import { css } from "styled-system/css";
-import { Box } from "styled-system/jsx";
-import { BottomNavigation } from "./_components/bottom-navigation";
+import { DockNavigation } from "./_components/dock-navigation";
 import { GlobalHeader } from "./_components/global-header";
-import { Header } from "./_components/header";
-import Sidebar from "./_components/sidebar";
 
 export default async function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // プロジェクト情報を取得してSEOアドオンの有効状態を確認
   const client = createClient();
   const projectRes = await client.project.$get(
     {},
@@ -32,33 +28,21 @@ export default async function Layout({
 
   return (
     <UiModeProvider>
-      <Header seoAddonEnabled={seoAddonEnabled} />
       <GlobalHeader />
-      <div
+      <main
         className={css({
+          maxW: "3xl",
           mx: "auto",
-          px: { base: 2, md: 0 },
-          display: "flex",
-          flexDirection: { base: "column", md: "row" },
-          pt: { base: 28, md: 16 }, // モバイル: header + global-header分、PC: global-headerのみ
+          px: 4,
+          pt: 20,
+          pb: 32,
+          w: "full",
+          minW: 0,
         })}
       >
-        <Box flexGrow="1" flexShrink="0">
-          <Sidebar seoAddonEnabled={seoAddonEnabled} />
-        </Box>
-        <main
-          className={css({
-            mt: { base: 0, md: 12 },
-            mb: { base: 20, md: 12 },
-            px: 4,
-            w: "full",
-            minW: 0,
-          })}
-        >
-          {children}
-        </main>
-      </div>
-      <BottomNavigation />
+        {children}
+      </main>
+      <DockNavigation seoAddonEnabled={seoAddonEnabled} />
     </UiModeProvider>
   );
 }

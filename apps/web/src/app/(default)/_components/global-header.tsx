@@ -6,6 +6,7 @@ import { BellIcon } from "lucide-react";
 import Link from "next/link";
 import { css } from "styled-system/css";
 import { Box, Flex } from "styled-system/jsx";
+import { Logout } from "./logout";
 
 export function GlobalHeader() {
   return (
@@ -28,7 +29,6 @@ export function GlobalHeader() {
         px={4}
         py={2.5}
       >
-        <ThemeToggle />
         <Link href="/announce">
           <Button
             size="sm"
@@ -46,6 +46,8 @@ export function GlobalHeader() {
             <Box display={{ base: "none", md: "inline" }} fontSize="sm">お知らせ</Box>
           </Button>
         </Link>
+        <ThemeToggle />
+        <Logout />
       </Flex>
     </Box>
   );
