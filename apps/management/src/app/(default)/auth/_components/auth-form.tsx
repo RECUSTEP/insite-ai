@@ -7,6 +7,7 @@ import { type SubmissionResult, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { authSchema } from "@repo/module/service";
 import { useFormState } from "react-dom";
+import { css } from "styled-system/css";
 import { stack } from "styled-system/patterns";
 import type { z } from "zod";
 
@@ -37,7 +38,27 @@ export function AuthForm({ defaultValue, isDisableIdField, action }: Props) {
       action={formAction}
       noValidate
     >
-      <input type="hidden" name="id" defaultValue={fields.id.initialValue} />
+      {/* hidden input は編集モード時のみ（disabled inputは値を送信しないため） */}
+      {isDisableIdField && (
+        <input type="hidden" name="id" defaultValue={fields.id.initialValue} />
+      )}
+      {form.errors && form.errors.length > 0 && (
+        <div
+          className={css({
+            p: 3,
+            borderRadius: "md",
+            bg: "red.50",
+            border: "1px solid",
+            borderColor: "red.200",
+            color: "red.700",
+            fontSize: "sm",
+          })}
+        >
+          {form.errors.map((error) => (
+            <p key={error}>{error}</p>
+          ))}
+        </div>
+      )}
       <div className={stack({ gap: 4 })}>
         <Field.Root className={stack({ gap: 1.5 })} invalid={!!fields.id.errors?.length}>
           <Field.Label>ID</Field.Label>
@@ -51,6 +72,20 @@ export function AuthForm({ defaultValue, isDisableIdField, action }: Props) {
             />
           </Field.Input>
           {fields.id.errors?.map((error) => (
+            <Field.ErrorText key={error}>{error}</Field.ErrorText>
+          ))}
+        </Field.Root>
+        <Field.Root className={stack({ gap: 1.5 })} invalid={!!fields.companyName.errors?.length}>
+          <Field.Label>会社名</Field.Label>
+          <Field.Input asChild>
+            <Input
+              key={fields.companyName.key}
+              name={fields.companyName.name}
+              defaultValue={fields.companyName.initialValue ?? ""}
+              placeholder="例: 株式会社〇〇"
+            />
+          </Field.Input>
+          {fields.companyName.errors?.map((error) => (
             <Field.ErrorText key={error}>{error}</Field.ErrorText>
           ))}
         </Field.Root>

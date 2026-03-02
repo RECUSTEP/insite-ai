@@ -26,6 +26,7 @@ type Auth = z.infer<typeof authSchema>;
 
 export type AuthWithProjects = {
   id: string;
+  companyName?: string | null;
   projects: Project[];
 };
 
@@ -107,6 +108,19 @@ function AuthNode({ auth }: { auth: AuthWithProjects }) {
           >
             {auth.id}
           </span>
+          {auth.companyName && (
+            <span
+              className={css({
+                fontSize: "sm",
+                color: "fg.muted",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              })}
+            >
+              {auth.companyName}
+            </span>
+          )}
           <span
             className={css({
               fontSize: "xs",

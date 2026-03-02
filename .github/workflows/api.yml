@@ -61,6 +61,7 @@ jobs:
             npx wrangler@4 d1 execute database --remote --command "ALTER TABLE project_info ADD COLUMN instagram_keyword1 text;" || echo "Column may already exist"
             npx wrangler@4 d1 execute database --remote --command "ALTER TABLE project_info ADD COLUMN instagram_keyword2 text;" || echo "Column may already exist"
             npx wrangler@4 d1 execute database --remote --command "ALTER TABLE project_info ADD COLUMN instagram_keyword3 text;" || echo "Column may already exist"
+            npx wrangler@4 d1 execute database --remote --command "ALTER TABLE auth ADD COLUMN company_name text;" || echo "Column may already exist"
           else
             npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE project ADD COLUMN auth_id TEXT;" || echo "Column may already exist"
             npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE analysis_history ADD COLUMN revision_parent_id TEXT;" || echo "Column may already exist"
@@ -72,6 +73,7 @@ jobs:
             npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE project_info ADD COLUMN instagram_keyword1 text;" || echo "Column may already exist"
             npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE project_info ADD COLUMN instagram_keyword2 text;" || echo "Column may already exist"
             npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE project_info ADD COLUMN instagram_keyword3 text;" || echo "Column may already exist"
+            npx wrangler@4 d1 execute database --remote --env preview --command "ALTER TABLE auth ADD COLUMN company_name text;" || echo "Column may already exist"
           fi
         env:
           CLOUDFLARE_API_TOKEN:   ${{ env.CLOUDFLARE_API_TOKEN }}
