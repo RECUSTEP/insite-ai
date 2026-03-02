@@ -201,7 +201,12 @@ const chatSessionsRelations = relations(chatSessions, ({ one }) => ({
   }),
 }));
 
+const authRelations = relations(auth, ({ many }) => ({
+  projects: many(projects),
+}));
+
 const projectRelations = relations(projects, ({ one, many }) => ({
+  auth: one(auth, { fields: [projects.authId], references: [auth.id] }),
   apiUsage: many(apiUsage),
   analysisHistory: many(analysisHistory),
   chatSessions: many(chatSessions),
@@ -251,6 +256,7 @@ export {
   applicationSettings,
   instructionGuide,
   announces,
+  authRelations,
   projectRelations,
   apiUsageRelations,
   analysisHistoryRelations,

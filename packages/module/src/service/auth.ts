@@ -6,6 +6,7 @@ import { Err, Ok, Result } from "ts-results";
 import { AuthUseCaseError, CommonUseCaseError } from "../error";
 import { z } from "zod";
 import { AuthSelect, authInsertSchema, authSelectSchema } from "../schema";
+import type { ProjectSelect } from "../schema";
 
 export const authSchema = z.object({
   id: z.string().min(1),
@@ -116,6 +117,39 @@ export class AuthUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(AuthUseCaseError.AuthCountFailed);
       }
       return Ok(result.count);
+    } catch {
+      return Err(CommonUseCaseError.UnknownError);
+    }
+  }
+
+  async getAuthWithProjects(input: {
+    limit: number;
+    offset: number;
+    searchText?: string;
+  }): Promise<Result<{ id: string; projects: ProjectSelect[] }[], string>> {
+    try {
+      const allAuth = await this.db.query.auth.findMany({
+        with: { projects: true },
+      });
+
+      let filtered = allAuth;
+      if (input.searchText) {
+        const s = input.searchText.toLowerCase();
+        filtered = allAuth.filter(
+          (a) =>
+            a.id.toLowerCase().includes(s) ||
+            a.projects.some(
+              (p) =>
+                p.name.toLowerCase().includes(s) ||
+                p.projectId.toLowerCase().includes(s) ||
+                p.managerName.toLowerCase().includes(s) ||
+                p.ownerName.toLowerCase().includes(s),
+            ),
+        );
+      }
+
+      const paginated = filtered.slice(input.offset, input.offset + input.limit);
+      return Ok(paginated as { id: string; projects: ProjectSelect[] }[]);
     } catch {
       return Err(CommonUseCaseError.UnknownError);
     }

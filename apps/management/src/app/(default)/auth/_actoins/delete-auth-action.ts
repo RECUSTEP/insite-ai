@@ -41,5 +41,5 @@ export async function deleteAuthAction(
     });
   }
 
-  redirect("/auth");
+  redirect("/");
 }

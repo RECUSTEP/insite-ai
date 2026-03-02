@@ -34,6 +34,25 @@ const getAuthListHandler = adminGuard.createHandlers(
   },
 );
 
+const getAuthWithProjectsSchema = z.object({
+  offset: z.coerce.number().int().nonnegative().default(0),
+  limit: z.coerce.number().int().nonnegative().default(20),
+  searchText: z.string().optional(),
+});
+const getAuthWithProjectsHandler = adminGuard.createHandlers(
+  zValidator("query", getAuthWithProjectsSchema),
+  async (c) => {
+    const { offset, limit, searchText } = c.req.valid("query");
+    const result = await c.var.authUseCase.getAuthWithProjects({ offset, limit, searchText });
+    if (!result.ok) {
+      return c.json({ error: CommonUseCaseError.UnknownError }, 400);
+    }
+    const authWithProjects = result.val;
+    const hasNext = authWithProjects.length === limit;
+    return c.json({ authWithProjects, hasNext });
+  },
+);
+
 const updateAuthHandler = adminGuard.createHandlers(
   zValidator("json", updateAuthSchema),
   async (c) => {
@@ -70,6 +89,7 @@ const deleteAuthHandler = adminGuard.createHandlers(
 export const route = adminGuard
   .createApp()
   .post("/", ...createAuthHandler)
+  .get("/with-projects", ...getAuthWithProjectsHandler)
   .get("/:authId", ...getAuthHandler)
   .patch("/:authId", ...updateAuthHandler)
   .get("/", ...getAuthListHandler)
