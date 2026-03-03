@@ -1,5 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
-import { AnalysisHistoryUseCaseError, CommonUseCaseError } from "@repo/module/error";
+import { AnalysisHistoryUseCaseError } from "@repo/module/error";
 import { z } from "zod";
 import { projectGuard } from "./_factory";
 
@@ -68,7 +68,8 @@ const getAnalysisHistoriesHandler = projectGuard.createHandlers(async (c) => {
   const historiesResult = await c.var.analysisHistoryUseCase.getAnalysisHistories({ projectId });
 
   if (!historiesResult.ok) {
-    return c.json({ error: CommonUseCaseError.UnknownError }, 400);
+    console.error("[GET /history] error:", historiesResult.val);
+    return c.json({ error: historiesResult.val }, 400);
   }
   return c.json(historiesResult.val.map((history) => analysisHistorySchema.parse(history)));
 });

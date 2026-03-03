@@ -1,5 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
-import { CommonUseCaseError, ProjectUseCaseError } from "@repo/module/error";
+import { ProjectUseCaseError } from "@repo/module/error";
 import { z } from "zod";
 import { adminGuard } from "./_factory";
 
@@ -116,7 +116,9 @@ const getProjectsHandler = adminGuard.createHandlers(
       searchText,
     });
     if (!result.ok || !count.ok) {
-      return c.json({ error: CommonUseCaseError.UnknownError }, 400);
+      const errVal = !result.ok ? result.val : count.val;
+      console.error("[GET /admin/projects] error:", errVal);
+      return c.json({ error: errVal }, 400);
     }
     const hasNext = count.val > offset + limit;
     return c.json({ projects: result.val, hasNext });

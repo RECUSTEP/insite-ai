@@ -60,8 +60,10 @@ class BaseSessionUseCase<
         return Err(SessionUseCaseError.SessionCreationFailed);
       }
       return Ok(result);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[SessionUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -85,8 +87,10 @@ class BaseSessionUseCase<
         return Err(SessionUseCaseError.SessionCreationFailed);
       }
       return Ok(null);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[SessionUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -128,8 +132,10 @@ class BaseSessionUseCase<
         session = result;
       }
       return Ok(session);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[SessionUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -148,8 +154,10 @@ class BaseSessionUseCase<
         return Err(SessionUseCaseError.SessionDeletionFailed);
       }
       return Ok(null);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[SessionUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 }

@@ -93,8 +93,10 @@ export class ProjectUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(ProjectUseCaseError.ProjectNotFound);
       }
       return Ok(result);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[ProjectUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -112,8 +114,10 @@ export class ProjectUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(ProjectUseCaseError.ProjectNotFound);
       }
       return Ok(result);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[ProjectUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -141,8 +145,10 @@ export class ProjectUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
             : undefined,
       });
       return Ok(result);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[ProjectUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -154,8 +160,10 @@ export class ProjectUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         where: eq(schemas.projects.authId, authId),
       });
       return Ok(result);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[ProjectUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -174,8 +182,10 @@ export class ProjectUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(ProjectUseCaseError.ProjectNotFound);
       }
       return Ok(null);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[ProjectUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -207,8 +217,10 @@ export class ProjectUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(ProjectUseCaseError.ProjectCountFailed);
       }
       return Ok(result.count);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[ProjectUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 }

@@ -28,27 +28,36 @@ export async function saveProjectInfoAction(
     return submission.reply();
   }
 
-  const client = createClient();
-  const response = await client.project_info.$put(
-    { json: setDefaultEmptyString(submission.value) },
-    {
-      headers: {
-        cookie: cookies().toString(),
+  try {
+    const client = createClient();
+    const response = await client.project_info.$put(
+      { json: setDefaultEmptyString(submission.value) },
+      {
+        headers: {
+          cookie: cookies().toString(),
+        },
       },
-    },
-  );
+    );
 
-  if (!response.ok) {
-    const data = (await response.json().catch(() => ({}))) as { error?: string };
-    const errorMsg = data.error ?? "プロジェクト情報の保存に失敗しました";
-    const displayMsg =
-      errorMsg === "UnknownError"
-        ? "プロジェクト情報の保存に失敗しました。しばらくしてから再度お試しください。"
-        : errorMsg.startsWith("UnknownError: ")
-          ? `保存に失敗しました: ${errorMsg.slice(14)}`
-          : errorMsg;
+    if (!response.ok) {
+      const data = (await response.json().catch(() => ({}))) as { error?: string };
+      const errorMsg = data.error ?? "プロジェクト情報の保存に失敗しました";
+      console.error("[saveProjectInfoAction] API error:", response.status, errorMsg);
+      const displayMsg =
+        errorMsg === "UnknownError"
+          ? "プロジェクト情報の保存に失敗しました。しばらくしてから再度お試しください。"
+          : errorMsg.startsWith("UnknownError: ")
+            ? `保存に失敗しました: ${errorMsg.slice(14)}`
+            : errorMsg;
+      return submission.reply({
+        formErrors: [displayMsg],
+      });
+    }
+  } catch (e) {
+    console.error("[saveProjectInfoAction] Unexpected error:", e);
+    const msg = e instanceof Error ? e.message : String(e);
     return submission.reply({
-      formErrors: [displayMsg],
+      formErrors: [`予期しないエラーが発生しました: ${msg}`],
     });
   }
 

@@ -73,8 +73,10 @@ export class AnalysisHistoryUseCase<T extends "d1" | "libsql"> extends UseCase<T
         return Err(CommonUseCaseError.UnknownError);
       }
       return Ok(result);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[AnalysisHistoryUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -94,8 +96,10 @@ export class AnalysisHistoryUseCase<T extends "d1" | "libsql"> extends UseCase<T
         return Err(AnalysisHistoryUseCaseError.AnalysisHistoryNotFound);
       }
       return Ok(result);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[AnalysisHistoryUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -113,8 +117,10 @@ export class AnalysisHistoryUseCase<T extends "d1" | "libsql"> extends UseCase<T
         orderBy: [desc(schemas.analysisHistory.createdAt)],
       });
       return Ok(result);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[AnalysisHistoryUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -131,8 +137,10 @@ export class AnalysisHistoryUseCase<T extends "d1" | "libsql"> extends UseCase<T
         return Err(CommonUseCaseError.UnknownError);
       }
       return Ok(result.count);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[AnalysisHistoryUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 }

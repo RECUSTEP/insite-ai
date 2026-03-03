@@ -1,5 +1,4 @@
 import { zValidator } from "@hono/zod-validator";
-import { CommonUseCaseError } from "@repo/module/error";
 import { adminGuard } from "./_factory";
 import { z } from "zod";
 import { authSchema, updateAuthSchema } from "@repo/module/service";
@@ -11,7 +10,8 @@ const getAuthHandler = adminGuard.createHandlers(zValidator("param", getAuthSche
   const { authId } = c.req.valid("param");
   const result = await c.var.authUseCase.getAuth(authId);
   if (!result.ok) {
-    return c.json({ error: CommonUseCaseError.UnknownError }, 400);
+    console.error(`[GET /admin/auth/${authId}] error:`, result.val);
+    return c.json({ error: result.val }, 400);
   }
   return c.json({ auth: result.val });
 });
@@ -27,7 +27,9 @@ const getAuthListHandler = adminGuard.createHandlers(
     const result = await c.var.authUseCase.getAuthList({ offset, limit });
     const count = await c.var.authUseCase.count();
     if (!result.ok || !count.ok) {
-      return c.json({ error: CommonUseCaseError.UnknownError }, 400);
+      const errVal = !result.ok ? result.val : count.val;
+      console.error("[GET /admin/auth] error:", errVal);
+      return c.json({ error: errVal }, 400);
     }
     const hasNext = count.val > offset + limit;
     return c.json({ auth: result.val, hasNext });
@@ -45,7 +47,8 @@ const getAuthWithProjectsHandler = adminGuard.createHandlers(
     const { offset, limit, searchText } = c.req.valid("query");
     const result = await c.var.authUseCase.getAuthWithProjects({ offset, limit, searchText });
     if (!result.ok) {
-      return c.json({ error: CommonUseCaseError.UnknownError }, 400);
+      console.error("[GET /admin/auth/with-projects] error:", result.val);
+      return c.json({ error: result.val }, 400);
     }
     const authWithProjects = result.val;
     const hasNext = authWithProjects.length === limit;

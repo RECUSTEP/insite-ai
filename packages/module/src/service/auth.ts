@@ -42,8 +42,10 @@ export class AuthUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(AuthUseCaseError.AuthNotFound);
       }
       return Ok(result);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[AuthUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -59,8 +61,10 @@ export class AuthUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         offset,
       });
       return Ok(result);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[AuthUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -80,8 +84,10 @@ export class AuthUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(AuthUseCaseError.AuthNotFound);
       }
       return Ok(result);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[AuthUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -104,8 +110,10 @@ export class AuthUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(AuthUseCaseError.AuthCreationFailed);
       }
       return Ok(result);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[AuthUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -117,8 +125,10 @@ export class AuthUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(AuthUseCaseError.AuthCountFailed);
       }
       return Ok(result.count);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[AuthUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -150,8 +160,10 @@ export class AuthUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
 
       const paginated = filtered.slice(input.offset, input.offset + input.limit);
       return Ok(paginated as { id: string; projects: ProjectSelect[] }[]);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[AuthUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -170,8 +182,10 @@ export class AuthUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(AuthUseCaseError.AuthNotFound);
       }
       return Ok(null);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[AuthUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 }

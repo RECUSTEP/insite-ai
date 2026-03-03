@@ -83,8 +83,10 @@ export class ProjectInfoUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(ProjectInfoUseCaseError.ProjectInfoNotFound);
       }
       return Ok(result);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[ProjectInfoUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 }

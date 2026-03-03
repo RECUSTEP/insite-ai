@@ -45,8 +45,10 @@ export class AnnounceUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(CommonUseCaseError.UnknownError);
       }
       return Ok(result[0]);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[AnnounceUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -70,8 +72,10 @@ export class AnnounceUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         return Err(AnnounceUseCaseError.AnnounceNotFound);
       }
       return Ok(result[0]);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[AnnounceUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 
@@ -79,8 +83,10 @@ export class AnnounceUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
     try {
       await this.db.delete(schemas.announces).where(eq(schemas.announces.id, id));
       return Ok(true);
-    } catch {
-      return Err(CommonUseCaseError.UnknownError);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[AnnounceUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
 }
