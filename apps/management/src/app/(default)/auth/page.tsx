@@ -69,7 +69,7 @@ type PaginationButtonProps = {
 
 function PaginationButton({ direction, page, hasNext, children }: PaginationButtonProps) {
   const disabled = direction === "prev" ? page === 1 : !hasNext;
-  const href = direction === "prev" ? `/?page=${page - 1}` : `/?page=${page + 1}`;
+  const href = direction === "prev" ? `/auth?page=${page - 1}` : `/auth?page=${page + 1}`;
   const content = (
     <>
       {direction === "prev" && <ArrowLeftIcon />}

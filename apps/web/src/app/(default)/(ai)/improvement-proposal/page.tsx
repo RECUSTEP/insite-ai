@@ -3,8 +3,9 @@ import { createClient } from "@/lib/api";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { css } from "styled-system/css";
-import { Flex } from "styled-system/jsx";
+import { Flex, HStack } from "styled-system/jsx";
 import { ProjectSelector } from "../../_components/project-selector";
+import { HelpPopover } from "../_components/help-popover";
 import { ConsultingPageClient } from "./_components/consulting-page-client";
 
 export const metadata: Metadata = {
@@ -49,7 +50,7 @@ export default async function Page() {
   return (
     <div className={css({ animation: "fadeIn 0.4s ease" })}>
       <ConsultingPageClient projectId={currentProjectId}>
-        <Flex justify="space-between" align="center">
+        <HStack>
           <Text
             as="h1"
             size="xl"
@@ -57,7 +58,13 @@ export default async function Page() {
           >
             AIコンサルティング
           </Text>
-        </Flex>
+          <HelpPopover
+            contents={[
+              { title: "AIコンサルタント（画像あり）", id: "improvement" },
+              { title: "AI相談（画像なし）", id: "improvement-no-image" },
+            ]}
+          />
+        </HStack>
         <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
       </ConsultingPageClient>
     </div>

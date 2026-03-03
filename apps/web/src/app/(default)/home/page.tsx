@@ -44,8 +44,8 @@ const features: Array<{
   },
   {
     id: "google-map",
-    title: "口コミ返信",
-    description: "Google MAPの口コミ作成",
+    title: "Google Map AI",
+    description: "口コミ返信・最新情報を自動生成",
     icon: MessageCircleReplyIcon,
     color: "#27AE60",
     path: "/google-map",
