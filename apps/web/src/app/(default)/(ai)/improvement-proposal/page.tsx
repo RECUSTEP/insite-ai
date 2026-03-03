@@ -50,7 +50,7 @@ export default async function Page() {
   return (
     <div className={css({ animation: "fadeIn 0.4s ease" })}>
       <ConsultingPageClient projectId={currentProjectId}>
-        <HStack justify="space-between" align="center">
+        <HStack justify="space-between" alignItems="center">
           <Text
             as="h1"
             size="xl"
