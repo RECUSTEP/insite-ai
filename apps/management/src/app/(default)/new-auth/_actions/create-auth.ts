@@ -22,8 +22,15 @@ export async function createAuthAction(
 
   const client = createClient();
 
+  // companyName が空文字列の場合は undefined にして DB カラムへの不要な挿入を避ける
+  const { companyName, ...restValue } = submission.value;
+  const payload = {
+    ...restValue,
+    ...(companyName && companyName.trim() !== "" ? { companyName: companyName.trim() } : {}),
+  };
+
   const response = await client.admin.auth.$post(
-    { json: submission.value },
+    { json: payload },
     { headers: { cookie: cookies().toString() } },
   );
 

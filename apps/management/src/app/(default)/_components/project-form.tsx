@@ -27,7 +27,9 @@ export function ProjectForm({ defaultValue, action }: Props) {
     defaultValue,
     lastResult,
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: projectSchema });
+      // seoAddonEnabled は "true"/"false" 文字列で送られるため z.boolean() でバリデートできない
+      // サーバー側で変換するのでクライアント検証から除外する
+      return parseWithZod(formData, { schema: projectSchema.omit({ seoAddonEnabled: true }) });
     },
     shouldValidate: "onSubmit",
     shouldRevalidate: "onInput",
@@ -41,7 +43,10 @@ export function ProjectForm({ defaultValue, action }: Props) {
       action={formAction}
       noValidate
     >
-      <input type="hidden" name="id" defaultValue={fields.id.initialValue} />
+      {/* 編集時のみ id を送信（新規作成時は undefined なので送らない） */}
+      {fields.id.initialValue && (
+        <input type="hidden" name="id" defaultValue={fields.id.initialValue} />
+      )}
       <input type="hidden" name="seoAddonEnabled" value={seoAddonEnabled ? "true" : "false"} />
       <div className={stack({ gap: 4 })}>
         <Field.Root className={stack({ gap: 1.5 })} invalid={!!fields.name.errors?.length}>
