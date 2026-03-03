@@ -44,8 +44,8 @@ const features: Array<{
   },
   {
     id: "google-map",
-    title: "Google Map AI",
-    description: "口コミ返信・最新情報を自動生成",
+    title: "MEO投稿",
+    description: "Google Mapの投稿文を自動生成",
     icon: MessageCircleReplyIcon,
     color: "#27AE60",
     path: "/google-map",

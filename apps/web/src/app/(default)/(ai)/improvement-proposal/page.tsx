@@ -50,7 +50,7 @@ export default async function Page() {
   return (
     <div className={css({ animation: "fadeIn 0.4s ease" })}>
       <ConsultingPageClient projectId={currentProjectId}>
-        <HStack>
+        <HStack justify="space-between" align="center">
           <Text
             as="h1"
             size="xl"
@@ -60,8 +60,8 @@ export default async function Page() {
           </Text>
           <HelpPopover
             contents={[
-              { title: "AIコンサルタント（画像あり）", id: "improvement" },
-              { title: "AI相談（画像なし）", id: "improvement-no-image" },
+              { title: "AIコンサルティング（画像あり）", id: "improvement" },
+              { title: "AIコンサルティング（テキストのみ）", id: "improvement-no-image" },
             ]}
           />
         </HStack>
