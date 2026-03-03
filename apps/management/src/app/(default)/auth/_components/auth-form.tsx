@@ -75,20 +75,6 @@ export function AuthForm({ defaultValue, isDisableIdField, action }: Props) {
             <Field.ErrorText key={error}>{error}</Field.ErrorText>
           ))}
         </Field.Root>
-        <Field.Root className={stack({ gap: 1.5 })} invalid={!!fields.companyName.errors?.length}>
-          <Field.Label>会社名</Field.Label>
-          <Field.Input asChild>
-            <Input
-              key={fields.companyName.key}
-              name={fields.companyName.name}
-              defaultValue={fields.companyName.initialValue ?? ""}
-              placeholder="例: 株式会社〇〇"
-            />
-          </Field.Input>
-          {fields.companyName.errors?.map((error) => (
-            <Field.ErrorText key={error}>{error}</Field.ErrorText>
-          ))}
-        </Field.Root>
         <Field.Root className={stack({ gap: 1.5 })} invalid={!!fields.password.errors?.length}>
           <Field.Label>パスワード</Field.Label>
           <Field.Input asChild>

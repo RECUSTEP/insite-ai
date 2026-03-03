@@ -11,7 +11,6 @@ import type { ProjectSelect } from "../schema";
 export const authSchema = z.object({
   id: z.string().min(1),
   password: z.string().min(1),
-  companyName: z.string().optional().nullable(),
 });
 export type Auth = z.infer<typeof authSchema>;
 
