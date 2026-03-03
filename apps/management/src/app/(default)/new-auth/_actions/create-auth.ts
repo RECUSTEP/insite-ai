@@ -20,28 +20,38 @@ export async function createAuthAction(
     return submission.reply();
   }
 
-  const client = createClient();
+  try {
+    const client = createClient();
 
-  const response = await client.admin.auth.$post(
-    { json: submission.value },
-    { headers: { cookie: cookies().toString() } },
-  );
+    const response = await client.admin.auth.$post(
+      { json: submission.value },
+      { headers: { cookie: cookies().toString() } },
+    );
 
-  if (!response.ok) {
-    const data = await response.json();
-    if (
-      response.status === 400 &&
-      "error" in data &&
-      data.error === AuthUseCaseError.AuthAlreadyExists
-    ) {
+    if (!response.ok) {
+      const data = (await response.json().catch(() => ({}))) as { error?: string };
+      console.error("[createAuthAction] API error:", response.status, data);
+      if (
+        response.status === 400 &&
+        "error" in data &&
+        data.error === AuthUseCaseError.AuthAlreadyExists
+      ) {
+        return submission.reply({
+          fieldErrors: {
+            id: ["このIDは既に使用されています"],
+          },
+        });
+      }
+      const errorMsg = ("error" in data && data.error) ? String(data.error) : "";
       return submission.reply({
-        fieldErrors: {
-          id: ["このIDは既に使用されています"],
-        },
+        formErrors: [errorMsg ? `認証情報の作成に失敗しました: ${errorMsg}` : "認証情報の作成に失敗しました"],
       });
     }
+  } catch (e) {
+    console.error("[createAuthAction] Unexpected error:", e);
+    const msg = e instanceof Error ? e.message : String(e);
     return submission.reply({
-      formErrors: ["認証情報の作成に失敗しました"],
+      formErrors: [`予期しないエラーが発生しました: ${msg}`],
     });
   }
 

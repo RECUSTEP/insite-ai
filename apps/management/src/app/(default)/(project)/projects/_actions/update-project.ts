@@ -12,30 +12,40 @@ export async function updateProjectAction(
   _: SubmissionResult,
   formData: FormData,
 ): Promise<SubmissionResult> {
-  // Convert "true"/"false" string to boolean
-  const seoAddonEnabledValue = formData.get("seoAddonEnabled");
-  if (seoAddonEnabledValue === "true" || seoAddonEnabledValue === "false") {
-    formData.set("seoAddonEnabled", seoAddonEnabledValue === "true" ? "1" : "0");
-  }
+  // seoAddonEnabled は "true"/"false" 文字列で来るため、手動で boolean に変換してから除去
+  const seoAddonEnabledRaw = formData.get("seoAddonEnabled");
+  const seoAddonEnabled = seoAddonEnabledRaw === "true";
+  formData.delete("seoAddonEnabled");
 
   const submission = parseWithZod(formData, {
-    schema: projectSchema,
+    schema: projectSchema.omit({ seoAddonEnabled: true }),
   });
 
   if (submission.status !== "success") {
     return submission.reply();
   }
 
-  const client = createClient();
+  try {
+    const client = createClient();
 
-  const response = await client.admin.projects[":projectId"].$patch(
-    { param: { projectId }, json: submission.value },
-    { headers: { cookie: cookies().toString() } },
-  );
+    const response = await client.admin.projects[":projectId"].$patch(
+      { param: { projectId }, json: { ...submission.value, seoAddonEnabled } },
+      { headers: { cookie: cookies().toString() } },
+    );
 
-  if (!response.ok) {
+    if (!response.ok) {
+      const data = (await response.json().catch(() => ({}))) as { error?: string };
+      const errorMsg = data.error ?? "プロジェクトの編集に失敗しました";
+      console.error("[updateProjectAction] API error:", response.status, errorMsg);
+      return submission.reply({
+        formErrors: [`プロジェクトの編集に失敗しました: ${errorMsg}`],
+      });
+    }
+  } catch (e) {
+    console.error("[updateProjectAction] Unexpected error:", e);
+    const msg = e instanceof Error ? e.message : String(e);
     return submission.reply({
-      formErrors: ["プロジェクトの編集に失敗しました"],
+      formErrors: [`予期しないエラーが発生しました: ${msg}`],
     });
   }
 
