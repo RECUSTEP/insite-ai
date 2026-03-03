@@ -32,13 +32,15 @@ const fieldConfigs: FieldConfig[] = [
   { label: "競合分析", key: "competitor", section: "分析AI" },
   { label: "自社アカウント分析", key: "account", section: "分析AI" },
   { label: "インサイト", key: "insight", section: "分析AI" },
-  { label: "AIコンサルタント", key: "improvement", section: "AI店舗運営" },
-  { label: "AI相談", key: "improvement-no-image", section: "AI店舗運営" },
+  { label: "AIコンサルタント", key: "improvement", section: "AIコンサルティング" },
+  { label: "AI相談", key: "improvement-no-image", section: "AIコンサルティング" },
   { label: "フィード投稿", key: "feed-post", section: "ライティングAI（Instagram）" },
   { label: "リール", key: "reel-and-stories", section: "ライティングAI（Instagram）" },
   { label: "プロフィール", key: "profile", section: "ライティングAI（Instagram）" },
   { label: "画像あり", key: "google-map", section: "ライティングAI（Google Map）" },
   { label: "画像なし", key: "google-map-no-image", section: "ライティングAI（Google Map）" },
+  { label: "画像あり", key: "threads", section: "ライティングAI（Threads）" },
+  { label: "画像なし", key: "threads-no-image", section: "ライティングAI（Threads）" },
 ];
 
 export function SavePromptForm({ defaultValue }: Props) {
