@@ -23,8 +23,13 @@ export async function createAuthAction(
   try {
     const client = createClient();
 
+    const payload = { ...submission.value };
+    if (payload.companyName === "" || payload.companyName == null) {
+      delete payload.companyName;
+    }
+
     const response = await client.admin.auth.$post(
-      { json: submission.value },
+      { json: payload },
       { headers: { cookie: cookies().toString() } },
     );
 

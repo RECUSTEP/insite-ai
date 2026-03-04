@@ -11,6 +11,7 @@ import type { ProjectSelect } from "../schema";
 export const authSchema = z.object({
   id: z.string().min(1),
   password: z.string().min(1),
+  companyName: z.string().optional().nullable(),
 });
 export type Auth = z.infer<typeof authSchema>;
 
@@ -148,6 +149,7 @@ export class AuthUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         filtered = allAuth.filter(
           (a) =>
             a.id.toLowerCase().includes(s) ||
+            (a.companyName?.toLowerCase().includes(s) ?? false) ||
             a.projects.some(
               (p) =>
                 p.name.toLowerCase().includes(s) ||

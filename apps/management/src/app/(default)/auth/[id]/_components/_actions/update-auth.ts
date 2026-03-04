@@ -21,12 +21,17 @@ export async function updateAuthAction(
 
   const client = createClient();
 
+  const payload = { ...submission.value };
+  if (payload.companyName === "" || payload.companyName == null) {
+    payload.companyName = null;
+  }
+
   const response = await client.admin.auth[":authId"].$patch(
     {
       param: {
         authId: submission.value.id,
       },
-      json: submission.value,
+      json: payload,
     },
     { headers: { cookie: cookies().toString() } },
   );

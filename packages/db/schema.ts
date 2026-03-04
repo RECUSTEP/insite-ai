@@ -5,6 +5,7 @@ import { nanoid } from "nanoid";
 const auth = sqliteTable("auth", {
   id: text("id").notNull().primaryKey(),
   password: text("password").notNull(),
+  companyName: text("company_name"),
 });
 
 const projects = sqliteTable(

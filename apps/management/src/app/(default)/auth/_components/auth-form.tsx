@@ -9,6 +9,7 @@ import { authSchema } from "@repo/module/service";
 import { useFormState } from "react-dom";
 import { css } from "styled-system/css";
 import { stack } from "styled-system/patterns";
+import { HStack } from "styled-system/jsx";
 import type { z } from "zod";
 
 type Schema = z.infer<typeof authSchema>;
@@ -60,21 +61,37 @@ export function AuthForm({ defaultValue, isDisableIdField, action }: Props) {
         </div>
       )}
       <div className={stack({ gap: 4 })}>
-        <Field.Root className={stack({ gap: 1.5 })} invalid={!!fields.id.errors?.length}>
-          <Field.Label>ID</Field.Label>
-          <Field.Input asChild>
-            <Input
-              key={fields.id.key}
-              name={fields.id.name}
-              defaultValue={fields.id.initialValue}
-              disabled={isDisableIdField}
-              readOnly={isDisableIdField}
-            />
-          </Field.Input>
-          {fields.id.errors?.map((error) => (
-            <Field.ErrorText key={error}>{error}</Field.ErrorText>
-          ))}
-        </Field.Root>
+        <HStack gap={4} alignItems="flex-end" flexWrap="wrap">
+          <Field.Root className={stack({ gap: 1.5, flex: 1, minW: "140px" })} invalid={!!fields.id.errors?.length}>
+            <Field.Label>ID</Field.Label>
+            <Field.Input asChild>
+              <Input
+                key={fields.id.key}
+                name={fields.id.name}
+                defaultValue={fields.id.initialValue}
+                disabled={isDisableIdField}
+                readOnly={isDisableIdField}
+              />
+            </Field.Input>
+            {fields.id.errors?.map((error) => (
+              <Field.ErrorText key={error}>{error}</Field.ErrorText>
+            ))}
+          </Field.Root>
+          <Field.Root className={stack({ gap: 1.5, flex: 1, minW: "140px" })} invalid={!!fields.companyName?.errors?.length}>
+            <Field.Label>会社名</Field.Label>
+            <Field.Input asChild>
+              <Input
+                key={fields.companyName?.key ?? "companyName"}
+                name="companyName"
+                defaultValue={fields.companyName?.initialValue ?? ""}
+                placeholder="（任意）"
+              />
+            </Field.Input>
+            {fields.companyName?.errors?.map((error) => (
+              <Field.ErrorText key={error}>{error}</Field.ErrorText>
+            ))}
+          </Field.Root>
+        </HStack>
         <Field.Root className={stack({ gap: 1.5 })} invalid={!!fields.password.errors?.length}>
           <Field.Label>パスワード</Field.Label>
           <Field.Input asChild>
