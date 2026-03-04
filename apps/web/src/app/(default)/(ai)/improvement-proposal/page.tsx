@@ -3,10 +3,10 @@ import { createClient } from "@/lib/api";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { css } from "styled-system/css";
-import { Flex, HStack } from "styled-system/jsx";
+import { HStack } from "styled-system/jsx";
 import { ProjectSelector } from "../../_components/project-selector";
-import { HelpPopover } from "../_components/help-popover";
 import { ConsultingPageClient } from "./_components/consulting-page-client";
+import { TitleHelp } from "./_components/title-help";
 
 export const metadata: Metadata = {
   title: "AIコンサルティング",
@@ -51,21 +51,18 @@ export default async function Page() {
     <div className={css({ animation: "fadeIn 0.4s ease" })}>
       <ConsultingPageClient projectId={currentProjectId}>
         <HStack justify="space-between" alignItems="center">
-          <Text
-            as="h1"
-            size="xl"
-            className={css({ fontWeight: 600, color: "text.primary" })}
-          >
-            AIコンサルティング
-          </Text>
-          <HelpPopover
-            contents={[
-              { title: "AIコンサルティング（画像あり）", id: "improvement" },
-              { title: "AIコンサルティング（テキストのみ）", id: "improvement-no-image" },
-            ]}
-          />
+          <HStack gap={1} alignItems="center">
+            <Text
+              as="h1"
+              size="xl"
+              className={css({ fontWeight: 600, color: "text.primary" })}
+            >
+              AIコンサルティング
+            </Text>
+            <TitleHelp />
+          </HStack>
+          <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
         </HStack>
-        <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
       </ConsultingPageClient>
     </div>
   );
