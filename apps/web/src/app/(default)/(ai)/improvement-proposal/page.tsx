@@ -3,7 +3,7 @@ import { createClient } from "@/lib/api";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { css } from "styled-system/css";
-import { HStack } from "styled-system/jsx";
+import { Flex, HStack } from "styled-system/jsx";
 import { ProjectSelector } from "../../_components/project-selector";
 import { ConsultingPageClient } from "./_components/consulting-page-client";
 import { TitleHelp } from "./_components/title-help";
@@ -50,7 +50,7 @@ export default async function Page() {
   return (
     <div className={css({ animation: "fadeIn 0.4s ease" })}>
       <ConsultingPageClient projectId={currentProjectId}>
-        <HStack justify="space-between" alignItems="center">
+        <Flex direction="column" gap={8}>
           <HStack gap={1} alignItems="center">
             <Text
               as="h1"
@@ -62,7 +62,7 @@ export default async function Page() {
             <TitleHelp />
           </HStack>
           <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
-        </HStack>
+        </Flex>
       </ConsultingPageClient>
     </div>
   );

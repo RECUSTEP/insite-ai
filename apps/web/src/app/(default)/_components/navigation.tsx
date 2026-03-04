@@ -5,9 +5,9 @@ import {
   FileTextIcon,
   HistoryIcon,
   HomeIcon,
+  Instagram,
   LockIcon,
   MapPinIcon,
-  NotebookPenIcon,
   SettingsIcon,
   TrendingUpIcon,
   UserRoundSearchIcon,
@@ -34,8 +34,8 @@ const navigationBefore = [
     path: "/improvement-proposal",
   },
   {
-    icon: <NotebookPenIcon size="16" />,
-    label: "ライティングAI（Instagram）",
+    icon: <Instagram size="16" />,
+    label: "Instagram",
     path: "/writing",
   },
   {

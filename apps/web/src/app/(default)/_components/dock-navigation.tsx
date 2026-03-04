@@ -6,8 +6,8 @@ import {
   FileTextIcon,
   HistoryIcon,
   HomeIcon,
+  Instagram,
   MapPinIcon,
-  NotebookPenIcon,
   SettingsIcon,
   TrendingUpIcon,
   UserRoundSearchIcon,
@@ -33,7 +33,7 @@ export function DockNavigation({ seoAddonEnabled }: Props) {
     { icon: <HomeIcon />, label: 'ホーム', path: '/home' },
     { icon: <UserRoundSearchIcon />, label: '分析AI', path: '/competitor-analysis' },
     { icon: <TrendingUpIcon />, label: 'AIコンサルティング', path: '/improvement-proposal' },
-    { icon: <NotebookPenIcon />, label: 'ライティング(IG)', path: '/writing' },
+    { icon: <Instagram />, label: 'Instagram', path: '/writing' },
     { icon: <AtSignIcon />, label: 'Threads', path: '/threads' },
     { icon: <MapPinIcon />, label: 'Google Map', path: '/google-map' },
     ...(seoAddonEnabled

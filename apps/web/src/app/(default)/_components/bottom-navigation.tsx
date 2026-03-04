@@ -1,6 +1,6 @@
 "use client";
 
-import { HistoryIcon, HomeIcon, NotebookPenIcon, TrendingUpIcon } from "lucide-react";
+import { HistoryIcon, HomeIcon, Instagram, TrendingUpIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { css } from "styled-system/css";
@@ -18,8 +18,8 @@ const navItems = [
     path: "/competitor-analysis",
   },
   {
-    icon: NotebookPenIcon,
-    label: "ライティング",
+    icon: Instagram,
+    label: "Instagram",
     path: "/writing",
   },
   {
