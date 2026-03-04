@@ -13,14 +13,15 @@ export function GlobalHeader() {
     <Box
       style={{ viewTransitionName: "global-header" }}
       className={css({
-        position: "fixed",
-        top: { base: 12, md: 0 },
+        position: "sticky",
+        top: 0,
         left: 0,
         right: 0,
         zIndex: 40,
         bg: "bg.base",
         borderBottom: "1px solid",
         borderColor: { base: "#E4E4E7", _dark: "#27272A" },
+        pt: "env(safe-area-inset-top)",
       })}
     >
       <Flex

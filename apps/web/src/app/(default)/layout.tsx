@@ -34,7 +34,7 @@ export default async function Layout({
           maxW: "6xl",
           mx: "auto",
           px: 4,
-          pt: 20,
+          pt: 4,
           pb: 32,
           w: "full",
           minW: 0,
