@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: "お知らせ",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function Page() {
   const client = createClient();
   const response = await client.announces.$get();
