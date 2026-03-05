@@ -8,8 +8,8 @@ import { encodeBase64 } from "hono/utils/encode";
 import openAi from "openai";
 
 export function replacePlaceholders(template: string, values: Record<string, string>) {
-  return template.replace(/\$\{(\w+)\}/g, (match, key) => {
-    return key in values ? values[key] ?? "" : match;
+  return template.replace(/\$\{(\w+)\}/g, (_match, key) => {
+    return key in values ? values[key] ?? "" : "";
   });
 }
 
@@ -77,8 +77,14 @@ export async function chatgpt(applicationSettings: ApplicationSettingUseCase<"d1
       | openAi.Chat.Completions.ChatCompletionAssistantMessageParam
     )[] = (conversationHistory ?? []).map((msg) =>
       msg.role === "user"
-        ? ({ role: "user", content: msg.content } satisfies openAi.Chat.Completions.ChatCompletionUserMessageParam)
-        : ({ role: "assistant", content: msg.content } satisfies openAi.Chat.Completions.ChatCompletionAssistantMessageParam),
+        ? ({
+            role: "user",
+            content: msg.content,
+          } satisfies openAi.Chat.Completions.ChatCompletionUserMessageParam)
+        : ({
+            role: "assistant",
+            content: msg.content,
+          } satisfies openAi.Chat.Completions.ChatCompletionAssistantMessageParam),
     );
 
     const stream = await client.chat.completions.create({
@@ -102,34 +108,37 @@ export function getPrompt(
       throw new Error("Prompt not found");
     }
     const projectInfo = await projectInfoUseCase.getProjectInfo({ projectId });
-    const values = {
+    const raw = {
       ...(projectInfo.ok ? omit(projectInfo.val, ["id"]) : {}),
       instruction: instruction ?? "",
     };
-    const isString = (v: unknown): v is string => typeof v === "string";
-    const system = replacePlaceholders(prompt.val.system, filterObject(values, isString));
-    const user = replacePlaceholders(prompt.val.user, filterObject(values, isString));
+    const toStr = (v: unknown): string =>
+      v === null || v === undefined ? "" : typeof v === "string" ? v : String(v);
+    const values = Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, toStr(v)])) as Record<
+      string,
+      string
+    >;
+    // User画面のInstagram設定（テンプレート文章・キーワード1〜3）を確実に含める
+    values.instagramTemplate ??= "";
+    values.instagramKeyword1 ??= "";
+    values.instagramKeyword2 ??= "";
+    values.instagramKeyword3 ??= "";
+    const system = replacePlaceholders(prompt.val.system, values);
+    const user = replacePlaceholders(prompt.val.user, values);
     return { system, user };
   };
 }
 
-function filterObject<T extends Record<string, unknown>, U>(
-  obj: T,
-  predicate: (value: unknown) => value is U,
-) {
-  return Object.fromEntries(Object.entries(obj).filter(([, value]) => predicate(value))) as Record<
-    string,
-    U
-  >;
-}
-
 /** コード内デフォルト（DB に seo-article プロンプトが無い場合に使用） */
-export function getSeoArticleDefaultPrompt(perspective: "third-party" | "representative" = "representative") {
-  const perspectiveGuidance = perspective === "representative"
-    ? `- 一人称視点で執筆する（「私たち」「当社」「私の経験では」など、状況に応じて自然な表現を使う）
+export function getSeoArticleDefaultPrompt(
+  perspective: "third-party" | "representative" = "representative",
+) {
+  const perspectiveGuidance =
+    perspective === "representative"
+      ? `- 一人称視点で執筆する（「私たち」「当社」「私の経験では」など、状況に応じて自然な表現を使う）
 - 実体験や独自の見解を強調し、サービス提供者としての信頼性を高める
 - 読者に語りかけるような、親しみやすい文体を心がける`
-    : `- 客観的な第三者視点で執筆する
+      : `- 客観的な第三者視点で執筆する
 - 一般的な事実や統計データを中心に構成する
 - 中立的で公平な論調を保つ`;
 
