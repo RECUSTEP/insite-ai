@@ -41,7 +41,7 @@ export default async function Page({
   }
   const { auth, hasNext } = await response.json();
   return (
-    <Container py={10}>
+    <Container py={10} maxW="6xl">
       <Flex mb={10} justify="flex-end">
         <Button asChild>
           <Link href="/new-auth">新しい認証を作成</Link>
