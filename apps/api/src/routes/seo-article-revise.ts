@@ -171,6 +171,7 @@ const handler = projectGuard.createHandlers(
     c.executionCtx.waitUntil(
       c.var.apiUsageUseCase.createApiUsage({
         projectId,
+        feature: "seo-article-revise",
       }),
     );
 

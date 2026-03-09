@@ -1,5 +1,5 @@
 import * as schemas from "@repo/db/schema";
-import { and, between, count, eq, gte, lte, sql } from "drizzle-orm";
+import { and, between, count, desc, eq, gte, lte, sql } from "drizzle-orm";
 import { Err, Ok, type Result } from "ts-results";
 import type { z } from "zod";
 import type { Database } from "../core/db";
@@ -8,9 +8,11 @@ import { ApiUsageUseCaseError, CommonUseCaseError } from "../error";
 import { type ApiUsageSelect, apiUsageInsertSchema, apiUsageSelectSchema } from "../schema";
 
 export type DailyUsageItem = { date: string; count: number };
+export type UsageByFeatureItem = { feature: string; count: number };
 
 export const createApiUsageSchema = apiUsageInsertSchema.omit({ id: true }).partial({
   usedAt: true,
+  feature: true,
 });
 export type CreateApiUsageInput = z.infer<typeof createApiUsageSchema>;
 
@@ -36,6 +38,7 @@ export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         .values({
           projectId: apiUsage.projectId,
           usedAt: apiUsage.usedAt ?? Date.now(),
+          feature: apiUsage.feature ?? null,
         })
         .returning();
       if (!result) {
@@ -146,6 +149,35 @@ export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         .where(and(gte(schemas.apiUsage.usedAt, startAt), lte(schemas.apiUsage.usedAt, endAt)));
       return Ok(result?.count ?? 0);
     } catch {
+      return Err(CommonUseCaseError.UnknownError);
+    }
+  }
+
+  /** 指定期間の機能別API使用回数。feature が null のレコードは "不明" として集計 */
+  async getUsageByFeature(
+    startAt: number,
+    endAt: number,
+  ): Promise<Result<UsageByFeatureItem[], string>> {
+    try {
+      const db = this.db as Database<"d1">;
+      const rows = await db
+        .select({
+          feature: schemas.apiUsage.feature,
+          count: count(schemas.apiUsage.id).as("count"),
+        })
+        .from(schemas.apiUsage)
+        .where(and(gte(schemas.apiUsage.usedAt, startAt), lte(schemas.apiUsage.usedAt, endAt)))
+        .groupBy(schemas.apiUsage.feature)
+        .orderBy(desc(count(schemas.apiUsage.id)));
+
+      const result: UsageByFeatureItem[] = rows.map((row) => ({
+        feature: row.feature ?? "不明",
+        count: Number(row.count) ?? 0,
+      }));
+
+      return Ok(result);
+    } catch (e) {
+      console.error("[ApiUsageUseCase.getUsageByFeature]", e);
       return Err(CommonUseCaseError.UnknownError);
     }
   }

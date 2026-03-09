@@ -38,6 +38,7 @@ const apiUsage = sqliteTable(
       .notNull()
       .references(() => projects.projectId, { onDelete: "cascade" }),
     usedAt: integer("used_at").notNull(),
+    feature: text("feature"),
   },
   (table) => ({
     projectIdIdx: index("api_usage_project_id_idx").on(table.projectId),

@@ -506,6 +506,7 @@ const analysisHandler = projectGuard.createHandlers(
     c.executionCtx.waitUntil(
       c.var.apiUsageUseCase.createApiUsage({
         projectId,
+        feature: type,
       }),
     );
 

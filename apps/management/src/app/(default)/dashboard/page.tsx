@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { Container, Grid, VStack } from "styled-system/jsx";
 import { DashboardChart } from "./_components/dashboard-chart";
 import { StatCard } from "./_components/stat-card";
+import { UsageByFeatureChart } from "./_components/usage-by-feature-chart";
 
 export default async function DashboardPage() {
   const client = createClient();
@@ -20,7 +21,8 @@ export default async function DashboardPage() {
     throw new Error("Failed to fetch dashboard stats");
   }
 
-  const { dailyUsage, totalProjects, totalAuth, monthlyUsage } = await response.json();
+  const { dailyUsage, totalProjects, totalAuth, monthlyUsage, usageByFeature } =
+    await response.json();
 
   return (
     <Container py={10} maxW="6xl">
@@ -44,6 +46,13 @@ export default async function DashboardPage() {
             直近30日間のAPI使用量
           </Text>
           <DashboardChart data={dailyUsage} />
+        </VStack>
+
+        <VStack gap={2} alignItems="stretch">
+          <Text as="h2" size="lg">
+            今月の機能別API使用量
+          </Text>
+          <UsageByFeatureChart data={usageByFeature ?? []} />
         </VStack>
       </VStack>
     </Container>
