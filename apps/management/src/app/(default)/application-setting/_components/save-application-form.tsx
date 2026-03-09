@@ -50,10 +50,15 @@ export function SaveApplicationSettingForm({ defaultValue }: Props) {
             <Input
               key={fields.openAiApiKey.key}
               name={fields.openAiApiKey.name}
+              type="password"
+              autoComplete="off"
               defaultValue={fields.openAiApiKey.initialValue}
               placeholder="sk-..."
             />
           </Field.Input>
+          <Field.HelperText>
+            既存のキーを維持する場合は変更しないでください。入力すると上書きされます。
+          </Field.HelperText>
           {fields.openAiApiKey.errors?.map((error) => (
             <Field.ErrorText key={error}>{error}</Field.ErrorText>
           ))}

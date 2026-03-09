@@ -1,4 +1,5 @@
-import { Header } from "./_components/header";
+import { Flex } from "styled-system/jsx";
+import { Sidebar } from "./_components/sidebar";
 
 export default function RootLayout({
   children,
@@ -8,10 +9,12 @@ export default function RootLayout({
   modal: React.ReactNode;
 }>) {
   return (
-    <>
-      <Header />
-      {children}
-      {modal}
-    </>
+    <Flex minH="100vh">
+      <Sidebar />
+      <Flex direction="column" flex="1" minW={0}>
+        {children}
+        {modal}
+      </Flex>
+    </Flex>
   );
 }
