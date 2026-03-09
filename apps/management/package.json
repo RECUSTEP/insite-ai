@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "api": "workspace:*",
+    "recharts": "^2.15.0",
     "@ark-ui/react": "^3.6.2",
     "@conform-to/react": "^1.1.5",
     "@conform-to/zod": "^1.1.5",

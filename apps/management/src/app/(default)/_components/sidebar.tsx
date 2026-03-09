@@ -6,6 +6,7 @@ import { css } from "styled-system/css";
 import { VStack } from "styled-system/jsx";
 
 const navigation = [
+  { path: "/dashboard", label: "ダッシュボード" },
   { path: "/", label: "プロジェクト管理" },
   { path: "/auth", label: "アカウント管理" },
   { path: "/application-setting", label: "アプリケーション設定" },

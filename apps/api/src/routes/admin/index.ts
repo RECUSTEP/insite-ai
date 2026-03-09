@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { route as applicationSettingsRoute } from "./application-settings";
+import { route as dashboardStatsRoute } from "./dashboard-stats";
 import { route as helpsRoute } from "./helps";
 import { route as loginRoute } from "./login";
 import { route as projectsRoute } from "./projects";
@@ -11,6 +12,7 @@ import { route as announcesRoute } from "./announces";
 
 export const route = new Hono()
   .route("/application-settings", applicationSettingsRoute)
+  .route("/dashboard-stats", dashboardStatsRoute)
   .route("/helps", helpsRoute)
   .route("/login", loginRoute)
   .route("/projects", projectsRoute)
