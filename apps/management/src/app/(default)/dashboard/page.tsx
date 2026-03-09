@@ -21,8 +21,12 @@ export default async function DashboardPage() {
     throw new Error("Failed to fetch dashboard stats");
   }
 
-  const { dailyUsage, totalProjects, totalAuth, monthlyUsage, usageByFeature } =
-    await response.json();
+  const data = await response.json();
+  const dailyUsage = Array.isArray(data.dailyUsage) ? data.dailyUsage : [];
+  const totalProjects = Number(data.totalProjects) || 0;
+  const totalAuth = Number(data.totalAuth) || 0;
+  const monthlyUsage = Number(data.monthlyUsage) || 0;
+  const usageByFeature = Array.isArray(data.usageByFeature) ? data.usageByFeature : [];
 
   return (
     <Container py={10} maxW="6xl">

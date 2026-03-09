@@ -17,13 +17,7 @@ const getDashboardStatsHandler = adminGuard.createHandlers(async (c) => {
       c.var.apiUsageUseCase.getUsageByFeature(startOfMonth, endOfMonth),
     ]);
 
-  if (
-    !dailyResult.ok ||
-    !projectsResult.ok ||
-    !authResult.ok ||
-    !monthlyResult.ok ||
-    !usageByFeatureResult.ok
-  ) {
+  if (!dailyResult.ok || !projectsResult.ok || !authResult.ok || !monthlyResult.ok) {
     const err =
       !dailyResult.ok
         ? dailyResult.val
@@ -31,11 +25,15 @@ const getDashboardStatsHandler = adminGuard.createHandlers(async (c) => {
           ? projectsResult.val
           : !authResult.ok
             ? authResult.val
-            : !monthlyResult.ok
-              ? monthlyResult.val
-              : usageByFeatureResult.val;
+            : monthlyResult.val;
     console.error("[GET /admin/dashboard-stats] error:", err);
     return c.json({ error: err }, 400);
+  }
+
+  // usageByFeature は feature カラム未適用時などで失敗する可能性があるため、失敗時は空配列
+  const usageByFeature = usageByFeatureResult.ok ? usageByFeatureResult.val : [];
+  if (!usageByFeatureResult.ok) {
+    console.warn("[GET /admin/dashboard-stats] usageByFeature failed:", usageByFeatureResult.val);
   }
 
   return c.json({
@@ -43,7 +41,7 @@ const getDashboardStatsHandler = adminGuard.createHandlers(async (c) => {
     totalProjects: projectsResult.val,
     totalAuth: authResult.val,
     monthlyUsage: monthlyResult.val,
-    usageByFeature: usageByFeatureResult.val,
+    usageByFeature,
   });
 });
 
