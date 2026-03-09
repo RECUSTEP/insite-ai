@@ -11,7 +11,7 @@ export default function RootLayout({
   return (
     <Flex minH="100vh">
       <Sidebar />
-      <Flex direction="column" flex="1" minW={0} w="full">
+      <Flex direction="column" flex="1" minW={0} w="full" px={6}>
         {children}
         {modal}
       </Flex>

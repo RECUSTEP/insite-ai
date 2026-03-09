@@ -21,7 +21,7 @@ export default async function Page() {
   const defaultValue = await response.json();
 
   return (
-    <VStack maxW="6xl" w="full" mx="auto" py="8" gap="8" alignItems="stretch">
+    <VStack w="full" maxW="full" py="6" gap="8" alignItems="stretch">
       <Text as="h1" size="xl">
         生成指示ガイド設定
       </Text>

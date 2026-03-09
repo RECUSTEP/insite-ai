@@ -61,7 +61,7 @@ export default async function Home({
   }
 
   return (
-    <Container py={10} maxW="6xl">
+    <Container py={6} w="full" maxW="full">
       {fetchError && (
         <div
           style={{

@@ -28,7 +28,7 @@ export default async function Page() {
   }
 
   return (
-    <VStack maxW="6xl" w="full" mx="auto" py="8" gap="8" alignItems="stretch">
+    <VStack w="full" maxW="full" py="6" gap="8" alignItems="stretch">
       <Text as="h1" size="xl">
         お知らせ管理
       </Text>

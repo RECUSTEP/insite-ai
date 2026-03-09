@@ -46,7 +46,7 @@ export default async function DashboardPage() {
 
   if (!data) {
     return (
-      <Container py={10} maxW="6xl">
+      <Container py={6} w="full" maxW="full">
         <VStack gap={4} alignItems="stretch">
           <Text as="h1" size="xl">
             ダッシュボード
@@ -85,7 +85,7 @@ export default async function DashboardPage() {
   }[];
 
   return (
-    <Container py={10} maxW="6xl">
+    <Container py={6} w="full" maxW="full">
       <VStack gap={8} alignItems="stretch">
         <Text as="h1" size="xl">
           ダッシュボード
