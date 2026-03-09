@@ -119,10 +119,15 @@ export const imageSchema = z
     message: `${acceptExtensions.join(", ")}形式の画像を選択してください`,
   });
 
+const toneStyleSchema = z
+  .enum(["formal-serious", "pop", "standard", "strict", "gentle"])
+  .optional();
+
 const instagramWritingAiSchema = z
   .object({
     images: z.array(imageSchema),
     instruction: z.string({ message: "指示を入力してください" }),
+    toneStyle: toneStyleSchema,
   })
   .refine((data) => data.images.length > 0 || data.instruction.length > 0, {
     message: "画像か指示のどちらかを入力してください",
@@ -131,22 +136,28 @@ const instagramWritingAiSchema = z
 export const analysisSchemaByType = {
   market: z.object({
     images: z.array(imageSchema),
+    toneStyle: toneStyleSchema,
   }),
   competitor: z.object({
     images: z.array(imageSchema),
+    toneStyle: toneStyleSchema,
   }),
   account: z.object({
     images: z.array(imageSchema),
+    toneStyle: toneStyleSchema,
   }),
   insight: z.object({
     images: z.array(imageSchema),
+    toneStyle: toneStyleSchema,
   }),
   improvement: z.object({
     images: z.array(imageSchema),
     instruction: z.string({ message: "指示を入力してください" }),
+    toneStyle: toneStyleSchema,
   }),
   "improvement-no-image": z.object({
     instruction: z.string({ message: "指示を入力してください" }),
+    toneStyle: toneStyleSchema,
   }),
   "feed-post": instagramWritingAiSchema,
   "reel-and-stories": instagramWritingAiSchema,
@@ -154,13 +165,16 @@ export const analysisSchemaByType = {
   "google-map": z.object({
     images: z.array(imageSchema),
     instruction: z.string({ message: "指示を入力してください" }),
+    toneStyle: toneStyleSchema,
   }),
   "google-map-no-image": z.object({
     instruction: z.string({ message: "指示を入力してください" }),
+    toneStyle: toneStyleSchema,
   }),
   threads: instagramWritingAiSchema,
   "threads-no-image": z.object({
     instruction: z.string({ message: "指示を入力してください" }),
+    toneStyle: toneStyleSchema,
   }),
   "seo-article": z.object({
     instruction: z
@@ -200,6 +214,16 @@ const conversationMessageSchema = z.object({
   content: z.string(),
 });
 
+const TONE_STYLE_PROMPTS: Record<string, string> = {
+  "formal-serious":
+    "以下のトーン・文体で出力してください：やや堅めで真面目な表現。丁寧語を多用し、信頼感を重視する。",
+  pop: "以下のトーン・文体で出力してください：ポップで親しみやすい表現。絵文字やカジュアルな言い回しを適度に使い、明るい印象にする。",
+  standard:
+    "以下のトーン・文体で出力してください：標準的なビジネス表現。バランスの取れた丁寧さと親しみやすさを両立する。",
+  strict: "以下のトーン・文体で出力してください：厳しめで率直な表現。核心を突く、簡潔な言い回しを心がける。",
+  gentle: "以下のトーン・文体で出力してください：優しく温かみのある表現。柔らかい言葉遣いで、相手を安心させる。",
+};
+
 const formValidator = validator("form", async (value, c) => {
   const parsed = z.string().optional().safeParse(value.instruction);
   if (!parsed.success) {
@@ -225,6 +249,7 @@ const formValidator = validator("form", async (value, c) => {
   form.forEach((v: unknown, key: string) => {
     if (key === "instruction") return;
     if (key === "conversationHistory") return;
+    if (key === "toneStyle") return;
     if (!(v instanceof File)) return;
     const parsedImage = imageSchema.safeParse(v);
     if (!parsedImage.success) {
@@ -232,10 +257,14 @@ const formValidator = validator("form", async (value, c) => {
     }
     images.push(parsedImage.data);
   });
+  const toneStyleRaw = form.get("toneStyle");
+  const toneStyle =
+    typeof toneStyleRaw === "string" && toneStyleRaw.length > 0 ? toneStyleRaw : undefined;
   return {
     instruction,
     images,
     conversationHistory,
+    toneStyle,
   };
 });
 
@@ -322,6 +351,10 @@ const analysisHandler = projectGuard.createHandlers(
       );
       system = got.system;
       user = got.user;
+    }
+
+    if (type !== "seo-article" && "toneStyle" in form && form.toneStyle && TONE_STYLE_PROMPTS[form.toneStyle]) {
+      system += "\n\n" + TONE_STYLE_PROMPTS[form.toneStyle];
     }
 
     let outputFromSeoFlow: string | null = null;

@@ -3,6 +3,7 @@
 import { toaster } from "@/app/_components/toast";
 import { MarkdownRenderer } from "@/components/markdown";
 import { Button } from "@/components/ui/button";
+import { Field } from "@/components/ui/field";
 import { PROJECT_TAG } from "@/lib/tags";
 import { fileUpload } from "@repo/configuration";
 import { ImageIcon, PaperclipIcon, PlusIcon, SendIcon, XIcon } from "lucide-react";
@@ -10,6 +11,10 @@ import { useEffect, useRef, useState } from "react";
 import { css } from "styled-system/css";
 import { Box, Flex, Stack } from "styled-system/jsx";
 import { revalidateTagAction } from "../../../_action/revalidate";
+import {
+  ToneStyleSelect,
+  type ToneStyleValue,
+} from "../../_components/tone-style-select";
 
 const { acceptMimeTypes, maxFileSize } = fileUpload;
 
@@ -73,6 +78,7 @@ export function ConsultChat({ projectId, selectedSessionId, onSessionCreated }: 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [sessionLoading, setSessionLoading] = useState(false);
+  const [toneStyle, setToneStyle] = useState<ToneStyleValue>("standard");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -174,6 +180,7 @@ export function ConsultChat({ projectId, selectedSessionId, onSessionCreated }: 
       const type = image ? "improvement" : "improvement-no-image";
       const form = new FormData();
       form.append("instruction", trimmed);
+      form.append("toneStyle", toneStyle);
       if (image) form.append("images", image);
 
       // Build conversation history (exclude loading messages and welcome, limit to last 20)
@@ -423,6 +430,12 @@ export function ConsultChat({ projectId, selectedSessionId, onSessionCreated }: 
         })}
       >
         <Stack gap={2} maxW="640px" mx="auto">
+          {/* Tone style selector */}
+          <Field.Root>
+            <Field.Label>出力のトーン</Field.Label>
+            <ToneStyleSelect value={toneStyle} onChange={setToneStyle} />
+          </Field.Root>
+
           {/* Image preview */}
           {imagePreview && (
             <Flex align="center" gap={2}>

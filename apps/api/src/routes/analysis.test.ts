@@ -77,7 +77,7 @@ describe("analysis", () => {
     it("ログインしていないとアクセスできない", async () => {
       const res = await testClient(app).index.$post({
         query: { type: "market" },
-        form: { instruction: "", images: [] },
+        form: { instruction: "", images: [], conversationHistory: "[]", toneStyle: "" },
       });
       expect(res.status).toBe(401);
     });
@@ -103,6 +103,8 @@ describe("analysis", () => {
         form: {
           instruction: "",
           images: [new File(["test"], "test.png", { type: "image/png" })],
+          conversationHistory: "[]",
+          toneStyle: "",
         },
       },
       {
@@ -135,6 +137,8 @@ describe("analysis", () => {
         form: {
           instruction: "",
           images: [new File(["test"], "test.png", { type: "image/png" })],
+          conversationHistory: "[]",
+          toneStyle: "",
         },
       },
       {
@@ -172,6 +176,8 @@ describe("analysis", () => {
         form: {
           instruction: "",
           images: [new File(["test"], "test.png", { type: "image/png" })],
+          conversationHistory: "[]",
+          toneStyle: "",
         },
       },
       {
@@ -204,6 +210,8 @@ describe("analysis", () => {
         form: {
           instruction: "",
           images: [new File(["test"], "test.png", { type: "image/png" })],
+          conversationHistory: "[]",
+          toneStyle: "",
         },
       },
       {

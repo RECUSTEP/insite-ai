@@ -24,6 +24,7 @@ import type { z } from "zod";
 import { revalidateTagAction } from "../../_action/revalidate";
 import { SectionTitle } from "../../_components/section-title";
 import { FileUpload as BaseFileUpload } from "./file-upload";
+import { ToneStyleSelect } from "./tone-style-select";
 
 const cardCss = css({
   bg: "bg.card",
@@ -175,6 +176,14 @@ export function Form({ children, ...props }: FormProps) {
 
   return (
     <form onSubmit={handleSubmit} className={`${cardCss} ${props.className ?? ""}`} {...props}>
+      {option.type !== "seo-article" && (
+        <Stack gap={2} mb={4}>
+          <Field.Root>
+            <Field.Label>出力のトーン</Field.Label>
+            <ToneStyleSelect />
+          </Field.Root>
+        </Stack>
+      )}
       {children}
     </form>
   );
