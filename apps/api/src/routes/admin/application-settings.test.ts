@@ -36,6 +36,9 @@ describe("helps", () => {
   const settings = {
     openAiApiKey: "test",
     chatGptModel: "test",
+    metaInsightEnabled: "false" as const,
+    metaSocialChatEnabled: "false" as const,
+    metaAccountLinkEnabled: "false" as const,
   };
 
   describe("PUT /", () => {
@@ -70,6 +73,9 @@ describe("helps", () => {
       const updated = {
         openAiApiKey: "updated",
         chatGptModel: "updated",
+        metaInsightEnabled: "true" as const,
+        metaSocialChatEnabled: "true" as const,
+        metaAccountLinkEnabled: "false" as const,
       };
       const res = await testClient(app).index.$put(
         {

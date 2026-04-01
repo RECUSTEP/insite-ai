@@ -14,6 +14,7 @@ import { CompetitorAnalysisForm } from "./_components/competitor-analysis-form";
 import { CompetitorAnalysisWrapper } from "./_components/competitor-analysis-wrapper";
 import { InsightAnalysisForm } from "./_components/insight-analysis-form";
 import { MarketAnalysisForm } from "./_components/market-analysis-form";
+import { MetaInsightPanel } from "./_components/meta-insight-panel";
 
 export const metadata: Metadata = {
   title: "分析AI",
@@ -53,17 +54,41 @@ export default async function Page() {
 
   let currentProjectId = "";
   let projects: { projectId: string; name: string }[] = [];
+  let metaInsightEnabled = false;
+  let metaSocialChatEnabled = false;
+  let metaAccountLinkEnabled = false;
   if (projectRes.ok && projectsRes.ok) {
-    currentProjectId = (await projectRes.json()).projectId;
+    const projectJson = await projectRes.json();
+    currentProjectId = projectJson.projectId;
+    metaInsightEnabled = projectJson.metaInsightEnabled ?? false;
+    metaSocialChatEnabled = projectJson.metaSocialChatEnabled ?? false;
+    metaAccountLinkEnabled = projectJson.metaAccountLinkEnabled ?? false;
     projects = await projectsRes.json();
   }
 
-  const tabs = [
+  const baseTabs = [
     { label: "市場分析", id: "market", content: <MarketAnalysisForm /> },
     { label: "競合分析", id: "competitor", content: <CompetitorAnalysisForm /> },
     { label: "自社アカウント分析", id: "account", content: <AccountAnalysisForm /> },
     { label: "インサイト分析", id: "insight", content: <InsightAnalysisForm /> },
   ] as TabPanelProps["panels"];
+
+  const metaTab = metaInsightEnabled
+    ? ([
+        {
+          label: "Meta インサイト",
+          id: "meta-insight",
+          content: (
+            <MetaInsightPanel
+              metaSocialChatEnabled={metaSocialChatEnabled}
+              metaAccountLinkEnabled={metaAccountLinkEnabled}
+            />
+          ),
+        },
+      ] as TabPanelProps["panels"])
+    : [];
+
+  const tabs = [...baseTabs, ...metaTab] as TabPanelProps["panels"];
 
   return (
     <CompetitorAnalysisWrapper>
@@ -105,6 +130,9 @@ export default async function Page() {
                   title: "インサイト分析",
                   id: "insight",
                 },
+                ...(metaInsightEnabled
+                  ? [{ title: "Meta インサイト（Instagram・Threads）", id: "meta-insight" }]
+                  : []),
               ]}
             />
           </HStack>

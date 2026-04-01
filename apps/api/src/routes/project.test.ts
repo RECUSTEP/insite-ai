@@ -63,6 +63,9 @@ describe("project", () => {
         name: project.name,
         apiUsageLimit: project.apiUsageLimit,
         apiUsageCount: 0,
+        metaInsightEnabled: false,
+        metaSocialChatEnabled: false,
+        metaAccountLinkEnabled: false,
       });
     });
   });

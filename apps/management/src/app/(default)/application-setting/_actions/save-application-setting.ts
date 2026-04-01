@@ -8,12 +8,20 @@ import { cookies } from "next/headers";
 import type { z } from "zod";
 
 function setDefaultEmptyString(value: z.infer<typeof applicationSettingSchema>) {
-  const result = { ...value };
-  for (const key in applicationSettingSchema.shape) {
-    // @ts-ignore
-    result[key] = result[key] ?? "";
-  }
-  return result;
+  const {
+    openAiApiKey,
+    chatGptModel,
+    metaInsightEnabled,
+    metaSocialChatEnabled,
+    metaAccountLinkEnabled,
+  } = value;
+  return {
+    openAiApiKey: openAiApiKey ?? "",
+    chatGptModel: chatGptModel ?? "",
+    metaInsightEnabled: metaInsightEnabled === "true" ? "true" : "false",
+    metaSocialChatEnabled: metaSocialChatEnabled === "true" ? "true" : "false",
+    metaAccountLinkEnabled: metaAccountLinkEnabled === "true" ? "true" : "false",
+  };
 }
 
 export async function saveApplicationSettingAction(

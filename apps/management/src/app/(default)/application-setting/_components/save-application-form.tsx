@@ -1,6 +1,7 @@
 "use client";
 
 import { SubmitButton } from "@/components/submit-button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
@@ -8,6 +9,7 @@ import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { applicationSettingSchema } from "api/schema";
 import { CheckCircleIcon } from "lucide-react";
+import { useState } from "react";
 import { useFormState } from "react-dom";
 import { css } from "styled-system/css";
 import { Box, HStack } from "styled-system/jsx";
@@ -22,6 +24,15 @@ type Props = {
 
 export function SaveApplicationSettingForm({ defaultValue }: Props) {
   const [lastResult, formAction] = useFormState(saveApplicationSettingAction, {});
+  const [metaInsight, setMetaInsight] = useState(
+    defaultValue?.metaInsightEnabled === "true",
+  );
+  const [metaSocialChat, setMetaSocialChat] = useState(
+    defaultValue?.metaSocialChatEnabled === "true",
+  );
+  const [metaAccountLink, setMetaAccountLink] = useState(
+    defaultValue?.metaAccountLinkEnabled === "true",
+  );
   const [form, fields] = useForm({
     defaultValue,
     lastResult,
@@ -40,6 +51,17 @@ export function SaveApplicationSettingForm({ defaultValue }: Props) {
       action={formAction}
       noValidate
     >
+      <input type="hidden" name="metaInsightEnabled" value={metaInsight ? "true" : "false"} />
+      <input
+        type="hidden"
+        name="metaSocialChatEnabled"
+        value={metaSocialChat ? "true" : "false"}
+      />
+      <input
+        type="hidden"
+        name="metaAccountLinkEnabled"
+        value={metaAccountLink ? "true" : "false"}
+      />
       <section className={stack({ gap: 6 })}>
         <Text as="h2" size="lg">
           ChatGPT設定
@@ -78,6 +100,38 @@ export function SaveApplicationSettingForm({ defaultValue }: Props) {
           ))}
         </Field.Root>
       </section>
+
+      <section className={stack({ gap: 4 })}>
+        <Text as="h2" size="lg">
+          Meta / Instagram・Threads 連携
+        </Text>
+        <Text size="sm" className={css({ color: "text.secondary" })}>
+          ユーザー画面の分析AI（Meta インサイト・チャット・連携）の表示と API の利用可否を制御します。OAuth
+          実装後に連携フローを接続してください。
+        </Text>
+        <Field.Root className={stack({ gap: 1.5 })}>
+          <Checkbox checked={metaInsight} onCheckedChange={(d) => setMetaInsight(d.checked === true)}>
+            Instagram・Threads インサイト分析タブを有効化
+          </Checkbox>
+        </Field.Root>
+        <Field.Root className={stack({ gap: 1.5 })}>
+          <Checkbox
+            checked={metaSocialChat}
+            onCheckedChange={(d) => setMetaSocialChat(d.checked === true)}
+          >
+            Meta 連携チャットを有効化
+          </Checkbox>
+        </Field.Root>
+        <Field.Root className={stack({ gap: 1.5 })}>
+          <Checkbox
+            checked={metaAccountLink}
+            onCheckedChange={(d) => setMetaAccountLink(d.checked === true)}
+          >
+            アカウント連携（OAuth）を有効化
+          </Checkbox>
+        </Field.Root>
+      </section>
+
       <Box
         data-invalid={form.errors?.length ? "" : undefined}
         className={css({

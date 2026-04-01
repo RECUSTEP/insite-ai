@@ -1,7 +1,7 @@
-import { projectGuard } from "./_factory";
 import { zValidator } from "@hono/zod-validator";
-import { projects } from "@repo/db/schema";
 import { z } from "zod";
+import { metaFeatureFlagsFromSettings } from "../libs/meta-feature-flags";
+import { projectGuard } from "./_factory";
 
 const getProjectHandler = projectGuard.createHandlers(async (c) => {
   const { projectId } = c.var.session;
@@ -19,12 +19,21 @@ const getProjectHandler = projectGuard.createHandlers(async (c) => {
   if (!apiUsageResult.ok) {
     return c.json({ error: apiUsageResult.val }, 400);
   }
+  const appSettingsResult = await c.var.applicationSettingUseCase.getApplicationSetting();
+  const metaFeatures = appSettingsResult.ok
+    ? metaFeatureFlagsFromSettings(appSettingsResult.val)
+    : {
+        metaInsightEnabled: false,
+        metaSocialChatEnabled: false,
+        metaAccountLinkEnabled: false,
+      };
   return c.json({
     projectId: projectResult.val.projectId,
     name: projectResult.val.name,
     apiUsageLimit: projectResult.val.apiUsageLimit,
     apiUsageCount: apiUsageResult.val,
     seoAddonEnabled: projectResult.val.seoAddonEnabled ?? false,
+    ...metaFeatures,
   });
 });
 
