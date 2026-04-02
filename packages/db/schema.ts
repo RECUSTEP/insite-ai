@@ -21,9 +21,7 @@ const projects = sqliteTable(
     projectId: text("project_id").unique().notNull(),
     projectPass: text("project_pass").notNull(),
     apiUsageLimit: integer("api_usage_limit").notNull(),
-    seoAddonEnabled: integer("seo_addon_enabled", { mode: "boolean" })
-      .notNull()
-      .default(false),
+    seoAddonEnabled: integer("seo_addon_enabled", { mode: "boolean" }).notNull().default(false),
   },
   (table) => ({
     projectIdIdx: uniqueIndex("project_project_id_idx").on(table.projectId),
@@ -65,7 +63,9 @@ const analysisHistory = sqliteTable(
   },
   (table) => ({
     projectIdIdx: index("analysis_history_project_id_idx").on(table.projectId),
-    revisionParentIdIdx: index("analysis_history_revision_parent_id_idx").on(table.revisionParentId),
+    revisionParentIdIdx: index("analysis_history_revision_parent_id_idx").on(
+      table.revisionParentId,
+    ),
   }),
 );
 
@@ -105,8 +105,7 @@ const sessions = sqliteTable(
     authId: text("auth_id")
       .notNull()
       .references(() => auth.id, { onDelete: "cascade" }),
-    projectId: text("project_id")
-      .references(() => projects.projectId, { onDelete: "cascade" }),
+    projectId: text("project_id").references(() => projects.projectId, { onDelete: "cascade" }),
     expiresAt: integer("expires_at").notNull(),
   },
   (table) => ({
@@ -188,6 +187,31 @@ const chatSessions = sqliteTable(
   }),
 );
 
+const instagramAccounts = sqliteTable(
+  "instagram_account",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    projectId: text("project_id")
+      .notNull()
+      .unique()
+      .references(() => projects.projectId, { onDelete: "cascade" }),
+    // Instagram ビジネスアカウント情報
+    instagramUserId: text("instagram_user_id").notNull(),
+    instagramUsername: text("instagram_username"),
+    // Facebook ページ情報（Instagram API に必要）
+    facebookPageId: text("facebook_page_id").notNull(),
+    // トークン管理
+    accessToken: text("access_token").notNull(),
+    tokenExpiresAt: integer("token_expires_at"), // null = 無期限（長期トークン）
+    // メタデータ
+    connectedAt: integer("connected_at").notNull(),
+    updatedAt: integer("updated_at").notNull(),
+  },
+  (table) => ({
+    projectIdIdx: uniqueIndex("instagram_account_project_id_idx").on(table.projectId),
+  }),
+);
+
 const announces = sqliteTable("announce", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
@@ -195,6 +219,13 @@ const announces = sqliteTable("announce", {
   createdAt: integer("created_at").notNull(),
   updatedAt: integer("updated_at").notNull(),
 });
+
+const instagramAccountRelations = relations(instagramAccounts, ({ one }) => ({
+  project: one(projects, {
+    fields: [instagramAccounts.projectId],
+    references: [projects.projectId],
+  }),
+}));
 
 const chatSessionsRelations = relations(chatSessions, ({ one }) => ({
   project: one(projects, {
@@ -213,6 +244,7 @@ const projectRelations = relations(projects, ({ one, many }) => ({
   analysisHistory: many(analysisHistory),
   chatSessions: many(chatSessions),
   projectInfo: one(projectInfo),
+  instagramAccount: one(instagramAccounts),
   sessions: many(sessions),
 }));
 
@@ -257,6 +289,7 @@ export {
   prompts,
   applicationSettings,
   instructionGuide,
+  instagramAccounts,
   announces,
   authRelations,
   projectRelations,
@@ -264,5 +297,6 @@ export {
   analysisHistoryRelations,
   chatSessionsRelations,
   projectInfoRelations,
+  instagramAccountRelations,
   sessionRelations,
 };

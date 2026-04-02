@@ -24,7 +24,10 @@ const handler = projectGuard.createHandlers(
     const { projectId } = c.var.session;
     if (!projectId) {
       return c.json(
-        { error: "プロジェクトが選択されていません。プロジェクトを作成するか、プロジェクトを選択してください。" },
+        {
+          error:
+            "プロジェクトが選択されていません。プロジェクトを作成するか、プロジェクトを選択してください。",
+        },
         400,
       );
     }
@@ -55,10 +58,10 @@ const handler = projectGuard.createHandlers(
     // プロジェクトのSEOアドオンフラグをチェック
     if (!project.val.seoAddonEnabled) {
       return c.json(
-        { 
-          error: "SEO/AIO記事生成機能は有効化されていません。管理者にお問い合わせください。" 
-        }, 
-        403
+        {
+          error: "SEO/AIO記事生成機能は有効化されていません。管理者にお問い合わせください。",
+        },
+        403,
       );
     }
 

@@ -1,11 +1,11 @@
 import * as schemas from "@repo/db/schema";
+import { count, eq } from "drizzle-orm";
+import { Err, Ok, type Result } from "ts-results";
+import { z } from "zod";
 import type { Database } from "../core/db";
 import { UseCase } from "../core/usecase";
-import { count, eq } from "drizzle-orm";
-import { Err, Ok, Result } from "ts-results";
 import { AuthUseCaseError, CommonUseCaseError } from "../error";
-import { z } from "zod";
-import { AuthSelect, authInsertSchema, authSelectSchema } from "../schema";
+import { type AuthSelect, authInsertSchema, authSelectSchema } from "../schema";
 import type { ProjectSelect } from "../schema";
 
 export const authSchema = z.object({

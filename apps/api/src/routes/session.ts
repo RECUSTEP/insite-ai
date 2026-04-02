@@ -1,6 +1,6 @@
+import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { projectGuard } from "./_factory";
-import { zValidator } from "@hono/zod-validator";
 
 const sessionHandler = projectGuard.createHandlers((c) => {
   return c.json(c.var.session);

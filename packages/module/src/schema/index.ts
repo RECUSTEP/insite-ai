@@ -78,3 +78,9 @@ export const chatSessionInsertSchema = createInsertSchema(schemas.chatSessions);
 
 export type ChatSessionSelect = typeof schemas.chatSessions.$inferSelect;
 export const chatSessionSelectSchema = createSelectSchema(schemas.chatSessions);
+
+export type InstagramAccountInsert = typeof schemas.instagramAccounts.$inferInsert;
+export const instagramAccountInsertSchema = createInsertSchema(schemas.instagramAccounts);
+
+export type InstagramAccountSelect = typeof schemas.instagramAccounts.$inferSelect;
+export const instagramAccountSelectSchema = createSelectSchema(schemas.instagramAccounts);

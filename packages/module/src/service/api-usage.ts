@@ -82,7 +82,7 @@ export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
   }
 
   /** 指定日数分の日別API使用回数を取得（JST）。ダッシュボード用 */
-  async getDailyUsageStats(days: number = 30): Promise<Result<DailyUsageItem[], string>> {
+  async getDailyUsageStats(days = 30): Promise<Result<DailyUsageItem[], string>> {
     if (days < 1 || days > 365) {
       return Err(CommonUseCaseError.InvalidInput);
     }
@@ -91,15 +91,16 @@ export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
       const now = new Date(Date.now() + tz);
       const startDate = new Date(now);
       startDate.setUTCDate(startDate.getUTCDate() - days);
-      const startOfRange = Date.UTC(
-        startDate.getUTCFullYear(),
-        startDate.getUTCMonth(),
-        startDate.getUTCDate(),
-        0,
-        0,
-        0,
-        0,
-      ) - tz;
+      const startOfRange =
+        Date.UTC(
+          startDate.getUTCFullYear(),
+          startDate.getUTCMonth(),
+          startDate.getUTCDate(),
+          0,
+          0,
+          0,
+          0,
+        ) - tz;
       const endOfRange = Date.now();
 
       const db = this.db as Database<"d1">;
@@ -111,7 +112,9 @@ export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
           count: count(schemas.apiUsage.id).as("count"),
         })
         .from(schemas.apiUsage)
-        .where(and(gte(schemas.apiUsage.usedAt, startOfRange), lte(schemas.apiUsage.usedAt, endOfRange)))
+        .where(
+          and(gte(schemas.apiUsage.usedAt, startOfRange), lte(schemas.apiUsage.usedAt, endOfRange)),
+        )
         .groupBy(sql`date(${schemas.apiUsage.usedAt}/1000, 'unixepoch', '+9 hours')`)
         .orderBy(sql`date(${schemas.apiUsage.usedAt}/1000, 'unixepoch', '+9 hours')`);
 

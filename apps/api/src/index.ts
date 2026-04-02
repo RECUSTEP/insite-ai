@@ -10,7 +10,7 @@ const app = new Hono<Env>()
     const method = c.req.method;
     const path = c.req.path;
     const message = err instanceof Error ? err.message : String(err);
-    const stack = err instanceof Error ? (err.stack ?? "") : "";
+    const stack = err instanceof Error ? err.stack ?? "" : "";
     console.error(`[API ERROR] ${method} ${path} — ${message}`);
     if (stack) console.error(stack);
     return c.json(

@@ -1,15 +1,21 @@
 import * as schemas from "@repo/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { Err, Ok, type Result } from "ts-results";
-import { z } from "zod";
+import type { z } from "zod";
 import { UseCase } from "../core/usecase";
-import { CommonUseCaseError, AnnounceUseCaseError } from "../error";
-import { AnnounceSelect, announceInsertSchema, announceSelectSchema } from "../schema";
+import { AnnounceUseCaseError, CommonUseCaseError } from "../error";
+import { type AnnounceSelect, announceInsertSchema } from "../schema";
 
-export const createAnnounceSchema = announceInsertSchema.omit({ id: true, createdAt: true, updatedAt: true });
+export const createAnnounceSchema = announceInsertSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 export type CreateAnnounceInput = z.infer<typeof createAnnounceSchema>;
 
-export const updateAnnounceSchema = announceInsertSchema.omit({ createdAt: true, updatedAt: true }).required({ id: true });
+export const updateAnnounceSchema = announceInsertSchema
+  .omit({ createdAt: true, updatedAt: true })
+  .required({ id: true });
 export type UpdateAnnounceInput = z.infer<typeof updateAnnounceSchema>;
 
 export class AnnounceUseCase<T extends "d1" | "libsql"> extends UseCase<T> {

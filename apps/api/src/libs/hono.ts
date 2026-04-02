@@ -8,6 +8,7 @@ import {
   AuthUseCase,
   ChatSessionUseCase,
   HelpUseCase,
+  InstagramAccountUseCase,
   InstructionGuideUseCase,
   ProjectInfoUseCase,
   ProjectUseCase,
@@ -39,6 +40,7 @@ export const initApp = <E extends Env>(app: Hono<E>) => {
     const instructionGuideUsecase = new InstructionGuideUseCase<"d1">(db);
     const announceUsecase = new AnnounceUseCase<"d1">(db);
     const chatSessionUseCase = new ChatSessionUseCase<"d1">(db);
+    const instagramAccountUseCase = new InstagramAccountUseCase<"d1">(db);
     c.set("authUseCase", authUseCase);
     c.set("projectUseCase", projectUseCase);
     c.set("apiUsageUseCase", apiUsageUseCase);
@@ -52,6 +54,7 @@ export const initApp = <E extends Env>(app: Hono<E>) => {
     c.set("instructionGuideUsecase", instructionGuideUsecase);
     c.set("announceUsecase", announceUsecase);
     c.set("chatSessionUseCase", chatSessionUseCase);
+    c.set("instagramAccountUseCase", instagramAccountUseCase);
     await next();
   });
 };

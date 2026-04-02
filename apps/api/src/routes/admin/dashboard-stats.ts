@@ -3,10 +3,8 @@ import { adminGuard } from "./_factory";
 const getDashboardStatsHandler = adminGuard.createHandlers(async (c) => {
   const tz = 9 * 60 * 60 * 1000;
   const now = new Date(Date.now() + tz);
-  const startOfMonth =
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0) - tz;
-  const endOfMonth =
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999) - tz;
+  const startOfMonth = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0) - tz;
+  const endOfMonth = Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999) - tz;
 
   const [dailyResult, projectsResult, authResult, monthlyResult, usageByFeatureResult] =
     await Promise.all([
@@ -18,14 +16,13 @@ const getDashboardStatsHandler = adminGuard.createHandlers(async (c) => {
     ]);
 
   if (!dailyResult.ok || !projectsResult.ok || !authResult.ok || !monthlyResult.ok) {
-    const err =
-      !dailyResult.ok
-        ? dailyResult.val
-        : !projectsResult.ok
-          ? projectsResult.val
-          : !authResult.ok
-            ? authResult.val
-            : monthlyResult.val;
+    const err = dailyResult.ok
+      ? projectsResult.ok
+        ? authResult.ok
+          ? monthlyResult.val
+          : authResult.val
+        : projectsResult.val
+      : dailyResult.val;
     console.error("[GET /admin/dashboard-stats] error:", err);
     return c.json({ error: err }, 400);
   }
@@ -45,6 +42,4 @@ const getDashboardStatsHandler = adminGuard.createHandlers(async (c) => {
   });
 });
 
-export const route = adminGuard
-  .createApp()
-  .get("/", ...getDashboardStatsHandler);
+export const route = adminGuard.createApp().get("/", ...getDashboardStatsHandler);

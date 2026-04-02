@@ -1,11 +1,11 @@
 import * as schemas from "@repo/db/schema";
-import { sql, inArray } from "drizzle-orm";
+import { inArray, sql } from "drizzle-orm";
 import { Err, Ok, type Result } from "ts-results";
 import { z } from "zod";
 import { UseCase } from "../core/usecase";
 import { CommonUseCaseError, InstructionGuideUseCaseError } from "../error";
 import {
-  InstructionGuideSelect,
+  type InstructionGuideSelect,
   instructionGuideInsertSchema,
   instructionGuideSelectSchema,
 } from "../schema";
