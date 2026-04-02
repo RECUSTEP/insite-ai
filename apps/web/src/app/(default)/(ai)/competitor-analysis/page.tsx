@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import { css } from "styled-system/css";
 import { Flex, HStack } from "styled-system/jsx";
 import { ProjectSelector } from "../../_components/project-selector";
-import { HelpPopover } from "../_components/help-popover";
+import { HelpPopover, type Props as HelpPopoverProps } from "../_components/help-popover";
 import { PageHistory } from "../_components/page-history";
 import type { TabPanelProps } from "../_components/tab-panel";
 import { AccountAnalysisForm } from "./_components/account-analysis-form";
@@ -113,27 +113,22 @@ export default async function Page() {
               分析AI
             </Text>
             <HelpPopover
-              contents={[
-                {
-                  title: "市場分析",
-                  id: "market",
-                },
-                {
-                  title: "競合分析",
-                  id: "competitor",
-                },
-                {
-                  title: "自社アカウント分析",
-                  id: "account",
-                },
-                {
-                  title: "インサイト分析",
-                  id: "insight",
-                },
-                ...(metaInsightEnabled
-                  ? [{ title: "Meta インサイト（Instagram・Threads）", id: "meta-insight" }]
-                  : []),
-              ]}
+              contents={
+                [
+                  { title: "市場分析", id: "market" },
+                  { title: "競合分析", id: "competitor" },
+                  { title: "自社アカウント分析", id: "account" },
+                  { title: "インサイト分析", id: "insight" },
+                  ...(metaInsightEnabled
+                    ? [
+                        {
+                          title: "Meta インサイト（Instagram・Threads）",
+                          id: "meta-insight",
+                        } satisfies HelpPopoverProps["contents"][number],
+                      ]
+                    : []),
+                ] satisfies HelpPopoverProps["contents"]
+              }
             />
           </HStack>
           <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
