@@ -90,6 +90,19 @@ export default async function Page() {
 
   const tabs = [...baseTabs, ...metaTab] as TabPanelProps["panels"];
 
+  const helpPopoverContents: HelpPopoverProps["contents"] = [
+    { title: "市場分析", id: "market" },
+    { title: "競合分析", id: "competitor" },
+    { title: "自社アカウント分析", id: "account" },
+    { title: "インサイト分析", id: "insight" },
+  ];
+  if (metaInsightEnabled) {
+    helpPopoverContents.push({
+      title: "Meta インサイト（Instagram・Threads）",
+      id: "meta-insight",
+    });
+  }
+
   return (
     <CompetitorAnalysisWrapper>
       <Flex
@@ -112,24 +125,7 @@ export default async function Page() {
             >
               分析AI
             </Text>
-            <HelpPopover
-              contents={
-                [
-                  { title: "市場分析", id: "market" },
-                  { title: "競合分析", id: "competitor" },
-                  { title: "自社アカウント分析", id: "account" },
-                  { title: "インサイト分析", id: "insight" },
-                  ...(metaInsightEnabled
-                    ? [
-                        {
-                          title: "Meta インサイト（Instagram・Threads）",
-                          id: "meta-insight",
-                        } satisfies HelpPopoverProps["contents"][number],
-                      ]
-                    : []),
-                ] satisfies HelpPopoverProps["contents"]
-              }
-            />
+            <HelpPopover contents={helpPopoverContents} />
           </HStack>
           <ProjectSelector projects={projects} selectedProjectId={currentProjectId} />
           <TabPanel panels={tabs} />
