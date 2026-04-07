@@ -71,7 +71,7 @@ export function MetaInsightPanel({ metaAccountLinkEnabled }: Props) {
   async function fetchAccountStatus() {
     try {
       const res = await fetch("/api/meta/account");
-      const data = await res.json();
+      const data = (await res.json()) as AccountInfo;
       setAccount(data);
       if (data.connected) {
         await Promise.all([fetchProfile(), fetchMedia()]);
@@ -86,14 +86,14 @@ export function MetaInsightPanel({ metaAccountLinkEnabled }: Props) {
   async function fetchProfile() {
     const res = await fetch("/api/meta-insights/profile");
     if (res.ok) {
-      setProfile(await res.json());
+      setProfile((await res.json()) as ProfileData);
     }
   }
 
   async function fetchMedia() {
     const res = await fetch("/api/meta-insights/media?limit=10");
     if (res.ok) {
-      const data = await res.json();
+      const data = (await res.json()) as { media?: MediaItem[] };
       setMedia(data.media ?? []);
     }
   }
@@ -102,7 +102,7 @@ export function MetaInsightPanel({ metaAccountLinkEnabled }: Props) {
     setConnecting(true);
     try {
       const res = await fetch("/api/meta/auth");
-      const data = await res.json();
+      const data = (await res.json()) as { authUrl?: string };
       if (data.authUrl) {
         window.location.href = data.authUrl;
       } else {
