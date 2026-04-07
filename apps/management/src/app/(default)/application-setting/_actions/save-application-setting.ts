@@ -18,9 +18,9 @@ function setDefaultEmptyString(value: z.infer<typeof applicationSettingSchema>) 
   return {
     openAiApiKey: openAiApiKey ?? "",
     chatGptModel: chatGptModel ?? "",
-    metaInsightEnabled: metaInsightEnabled === "true" ? "true" : "false",
-    metaSocialChatEnabled: metaSocialChatEnabled === "true" ? "true" : "false",
-    metaAccountLinkEnabled: metaAccountLinkEnabled === "true" ? "true" : "false",
+    metaInsightEnabled: (metaInsightEnabled === "true" ? "true" : "false") as "true" | "false",
+    metaSocialChatEnabled: (metaSocialChatEnabled === "true" ? "true" : "false") as "true" | "false",
+    metaAccountLinkEnabled: (metaAccountLinkEnabled === "true" ? "true" : "false") as "true" | "false",
   };
 }
 
