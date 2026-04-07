@@ -20,20 +20,25 @@ const getProjectHandler = projectGuard.createHandlers(async (c) => {
     return c.json({ error: apiUsageResult.val }, 400);
   }
   const appSettingsResult = await c.var.applicationSettingUseCase.getApplicationSetting();
-  const metaFeatures = appSettingsResult.ok
+  const globalMetaFlags = appSettingsResult.ok
     ? metaFeatureFlagsFromSettings(appSettingsResult.val)
     : {
         metaInsightEnabled: false,
         metaSocialChatEnabled: false,
         metaAccountLinkEnabled: false,
       };
+  // プロジェクト単位のフラグ: グローバルON かつ プロジェクトON の場合のみ有効
+  const metaInsightEnabled =
+    globalMetaFlags.metaInsightEnabled && (projectResult.val.metaInsightEnabled ?? false);
   return c.json({
     projectId: projectResult.val.projectId,
     name: projectResult.val.name,
     apiUsageLimit: projectResult.val.apiUsageLimit,
     apiUsageCount: apiUsageResult.val,
     seoAddonEnabled: projectResult.val.seoAddonEnabled ?? false,
-    ...metaFeatures,
+    metaInsightEnabled,
+    metaSocialChatEnabled: globalMetaFlags.metaSocialChatEnabled,
+    metaAccountLinkEnabled: globalMetaFlags.metaAccountLinkEnabled,
   });
 });
 

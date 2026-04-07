@@ -22,6 +22,7 @@ const projects = sqliteTable(
     projectPass: text("project_pass").notNull(),
     apiUsageLimit: integer("api_usage_limit").notNull(),
     seoAddonEnabled: integer("seo_addon_enabled", { mode: "boolean" }).notNull().default(false),
+    metaInsightEnabled: integer("meta_insight_enabled", { mode: "boolean" }).notNull().default(false),
   },
   (table) => ({
     projectIdIdx: uniqueIndex("project_project_id_idx").on(table.projectId),

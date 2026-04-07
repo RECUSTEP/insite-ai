@@ -2,31 +2,31 @@
 
 import { useState } from "react";
 import { css } from "styled-system/css";
-import { toggleSeoAddonAction } from "../_actions/toggle-seo-addon";
+import { toggleMetaInsightAction } from "../_actions/toggle-meta-insight";
 
-interface SeoAddonToggleProps {
+interface MetaInsightToggleProps {
   projectId: string;
   initialEnabled: boolean;
 }
 
-export function SeoAddonToggle({ projectId, initialEnabled }: SeoAddonToggleProps) {
+export function MetaInsightToggle({ projectId, initialEnabled }: MetaInsightToggleProps) {
   const [enabled, setEnabled] = useState(initialEnabled);
   const [loading, setLoading] = useState(false);
 
   const handleToggle = async () => {
     const newState = !enabled;
     const confirmed = window.confirm(
-      `SEO/AIOアドオンを${newState ? "有効化" : "無効化"}しますか？`
+      `Meta インサイトを${newState ? "有効化" : "無効化"}しますか？`
     );
-    
+
     if (!confirmed) return;
 
     setLoading(true);
     try {
-      const result = await toggleSeoAddonAction(projectId, newState);
+      const result = await toggleMetaInsightAction(projectId, newState);
       if (result.success) {
         setEnabled(newState);
-        alert(`SEO/AIOアドオンを${newState ? "有効化" : "無効化"}しました`);
+        alert(`Meta インサイトを${newState ? "有効化" : "無効化"}しました`);
       } else {
         alert(`エラー: ${result.error || "更新に失敗しました"}`);
       }
@@ -57,12 +57,12 @@ export function SeoAddonToggle({ projectId, initialEnabled }: SeoAddonToggleProp
         opacity: loading ? 0.6 : 1,
         ...(enabled
           ? {
-              bg: "blue.50",
-              color: "blue.700",
-              borderColor: "blue.200",
+              bg: "purple.50",
+              color: "purple.700",
+              borderColor: "purple.200",
               _hover: {
-                bg: "blue.100",
-                borderColor: "blue.300",
+                bg: "purple.100",
+                borderColor: "purple.300",
               },
             }
           : {
@@ -79,7 +79,7 @@ export function SeoAddonToggle({ projectId, initialEnabled }: SeoAddonToggleProp
         },
       })}
     >
-      {loading ? "更新中..." : `SEO ${enabled ? "ON" : "OFF"}`}
+      {loading ? "更新中..." : `Meta ${enabled ? "ON" : "OFF"}`}
     </button>
   );
 }
