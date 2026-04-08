@@ -24,6 +24,7 @@ export type Bindings = {
   META_APP_SECRET: string;
   META_REDIRECT_URI: string;
   META_CONFIG_ID: string;
+  META_CALLBACK_FRONTEND_URL: string;
 };
 
 export type Variables = {

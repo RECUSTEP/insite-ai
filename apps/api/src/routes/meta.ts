@@ -134,19 +134,23 @@ async function findInstagramAccount(pages: PagesResponse["data"]) {
 // GET /meta/callback — OAuth コールバック処理
 // ============================================================
 const callbackHandler = projectGuard.createHandlers(async (c) => {
+  const frontendUrl = c.env.META_CALLBACK_FRONTEND_URL;
+  const redirectTo = (params: string) =>
+    frontendUrl
+      ? c.redirect(`${frontendUrl}/competitor-analysis?${params}`)
+      : c.json({ error: params }, 400);
+
   const code = c.req.query("code");
   const stateParam = c.req.query("state");
   const errorParam = c.req.query("error");
 
   if (errorParam) {
-    return c.json(
-      { error: `OAuth エラー: ${c.req.query("error_description") || errorParam}` },
-      400,
-    );
+    const msg = c.req.query("error_description") || errorParam;
+    return redirectTo(`meta_error=${encodeURIComponent(msg)}`);
   }
 
   if (!code || !stateParam) {
-    return c.json({ error: "code または state パラメータがありません" }, 400);
+    return redirectTo("meta_error=code+%E3%81%BE%E3%81%9F%E3%81%AF+state+%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF%E3%81%8C%E3%81%82%E3%82%8A%E3%81%BE%E3%81%9B%E3%82%93");
   }
 
   let projectId: string;
@@ -154,7 +158,7 @@ const callbackHandler = projectGuard.createHandlers(async (c) => {
     const state = JSON.parse(atob(stateParam));
     projectId = state.projectId;
   } catch {
-    return c.json({ error: "不正な state パラメータです" }, 400);
+    return redirectTo("meta_error=%E4%B8%8D%E6%AD%A3%E3%81%AA+state+%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF%E3%81%A7%E3%81%99");
   }
 
   const appId = c.env.META_APP_ID;
@@ -166,14 +170,14 @@ const callbackHandler = projectGuard.createHandlers(async (c) => {
     const tokenData = await exchangeCodeForToken(appId, appSecret, redirectUri, code);
     if (!tokenData.access_token) {
       console.error("Token exchange failed:", tokenData);
-      return c.json({ error: "アクセストークンの取得に失敗しました" }, 400);
+      return redirectTo(`meta_error=${encodeURIComponent("アクセストークンの取得に失敗しました")}`);
     }
 
     // Step 2: 短期 → 長期アクセストークン
     const longTokenData = await exchangeForLongLivedToken(appId, appSecret, tokenData.access_token);
     if (!longTokenData.access_token) {
       console.error("Long-lived token exchange failed:", longTokenData);
-      return c.json({ error: "長期トークンの取得に失敗しました" }, 400);
+      return redirectTo(`meta_error=${encodeURIComponent("長期トークンの取得に失敗しました")}`);
     }
 
     const accessToken = longTokenData.access_token;
@@ -186,22 +190,13 @@ const callbackHandler = projectGuard.createHandlers(async (c) => {
     const pagesData = (await pagesRes.json()) as PagesResponse;
 
     if (!pagesData.data || pagesData.data.length === 0) {
-      return c.json(
-        { error: "Facebook ページが見つかりません。ビジネスアカウントに紐づくページが必要です" },
-        400,
-      );
+      return redirectTo(`meta_error=${encodeURIComponent("Facebook ページが見つかりません。ビジネスアカウントに紐づくページが必要です")}`);
     }
 
     // Step 4: Instagram ビジネスアカウントを探す
     const igAccount = await findInstagramAccount(pagesData.data);
     if (!igAccount) {
-      return c.json(
-        {
-          error:
-            "Instagram ビジネスアカウントが見つかりません。Facebook ページに Instagram ビジネスアカウントを紐づけてください",
-        },
-        400,
-      );
+      return redirectTo(`meta_error=${encodeURIComponent("Instagram ビジネスアカウントが見つかりません。Facebook ページに Instagram ビジネスアカウントを紐づけてください")}`);
     }
 
     // Step 5: DB に保存
@@ -215,20 +210,22 @@ const callbackHandler = projectGuard.createHandlers(async (c) => {
     });
 
     if (!result.ok) {
-      return c.json({ error: "アカウント情報の保存に失敗しました" }, 500);
+      return redirectTo(`meta_error=${encodeURIComponent("アカウント情報の保存に失敗しました")}`);
     }
 
-    return c.json({
-      ok: true,
-      account: {
-        instagramUserId: igAccount.instagramUserId,
-        instagramUsername: igAccount.instagramUsername,
-        facebookPageId: igAccount.facebookPageId,
-      },
-    });
+    return frontendUrl
+      ? c.redirect(`${frontendUrl}/competitor-analysis?meta_connected=true`)
+      : c.json({
+          ok: true,
+          account: {
+            instagramUserId: igAccount.instagramUserId,
+            instagramUsername: igAccount.instagramUsername,
+            facebookPageId: igAccount.facebookPageId,
+          },
+        });
   } catch (e) {
     console.error("Meta OAuth error:", e);
-    return c.json({ error: "OAuth 処理中にエラーが発生しました" }, 500);
+    return redirectTo(`meta_error=${encodeURIComponent("OAuth 処理中にエラーが発生しました")}`);
   }
 });
 

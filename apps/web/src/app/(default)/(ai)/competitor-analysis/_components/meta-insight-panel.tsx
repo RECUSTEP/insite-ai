@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { css } from "styled-system/css";
 import { Box, HStack, VStack } from "styled-system/jsx";
 
@@ -56,12 +57,21 @@ const statStyle = css({
 });
 
 export function MetaInsightPanel({ metaAccountLinkEnabled }: Props) {
+  const searchParams = useSearchParams();
   const [account, setAccount] = useState<AccountInfo | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // OAuth コールバックからのリダイレクト処理
+  useEffect(() => {
+    const metaError = searchParams.get("meta_error");
+    if (metaError) {
+      setError(decodeURIComponent(metaError));
+    }
+  }, [searchParams]);
 
   // アカウント接続状態を確認
   useEffect(() => {
