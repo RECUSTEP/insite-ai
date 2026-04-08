@@ -23,6 +23,7 @@ export type Bindings = {
   META_APP_ID: string;
   META_APP_SECRET: string;
   META_REDIRECT_URI: string;
+  META_CONFIG_ID: string;
 };
 
 export type Variables = {
