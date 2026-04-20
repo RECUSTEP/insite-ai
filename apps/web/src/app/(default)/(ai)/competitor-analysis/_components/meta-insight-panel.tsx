@@ -1,24 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { css } from "styled-system/css";
 import { Box, HStack, VStack } from "styled-system/jsx";
 
+// NOTE: API 未接続のため、UI プレビュー用のモックデータで表示している
 type Props = {
   metaSocialChatEnabled: boolean;
   metaAccountLinkEnabled: boolean;
-};
-
-type AccountInfo = {
-  connected: boolean;
-  account?: {
-    instagramUserId: string;
-    instagramUsername: string;
-    connectedAt: number;
-  };
 };
 
 type ProfileData = {
@@ -41,6 +30,64 @@ type MediaItem = {
   permalink: string;
 };
 
+const MOCK_PROFILE: ProfileData = {
+  username: "insiteai_demo",
+  name: "InsiteAI デモアカウント",
+  biography: "デモ用のビジネスアカウントです。",
+  followersCount: 12480,
+  followsCount: 312,
+  mediaCount: 87,
+  profilePictureUrl: "",
+};
+
+const MOCK_MEDIA: MediaItem[] = [
+  {
+    id: "demo-1",
+    caption: "新商品ラインが入荷しました！春の装いを先取り 🌸 #新作 #春コーデ",
+    media_type: "IMAGE",
+    timestamp: "2026-04-18T09:30:00+0900",
+    like_count: 428,
+    comments_count: 37,
+    permalink: "#",
+  },
+  {
+    id: "demo-2",
+    caption: "週末限定キャンペーン開催中。店舗スタッフがおすすめアイテムをご紹介します。",
+    media_type: "VIDEO",
+    timestamp: "2026-04-15T18:00:00+0900",
+    like_count: 612,
+    comments_count: 54,
+    permalink: "#",
+  },
+  {
+    id: "demo-3",
+    caption: "お客様の声をご紹介。ご愛用ありがとうございます！",
+    media_type: "CAROUSEL_ALBUM",
+    timestamp: "2026-04-12T12:15:00+0900",
+    like_count: 289,
+    comments_count: 21,
+    permalink: "#",
+  },
+  {
+    id: "demo-4",
+    caption: "裏側大公開！スタッフの1日に密着しました。",
+    media_type: "VIDEO",
+    timestamp: "2026-04-09T20:45:00+0900",
+    like_count: 873,
+    comments_count: 92,
+    permalink: "#",
+  },
+  {
+    id: "demo-5",
+    caption: "今月のベストセラーTOP5を発表します。",
+    media_type: "IMAGE",
+    timestamp: "2026-04-05T10:00:00+0900",
+    like_count: 501,
+    comments_count: 43,
+    permalink: "#",
+  },
+];
+
 const cardStyle = css({
   rounded: "lg",
   border: "1px solid",
@@ -56,221 +103,93 @@ const statStyle = css({
   flex: 1,
 });
 
-export function MetaInsightPanel({ metaAccountLinkEnabled }: Props) {
-  const searchParams = useSearchParams();
-  const [account, setAccount] = useState<AccountInfo | null>(null);
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [media, setMedia] = useState<MediaItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [connecting, setConnecting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export function MetaInsightPanel(_props: Props) {
+  const profile = MOCK_PROFILE;
+  const media = MOCK_MEDIA;
 
-  // OAuth コールバックからのリダイレクト処理
-  useEffect(() => {
-    const metaError = searchParams.get("meta_error");
-    if (metaError) {
-      setError(decodeURIComponent(metaError));
-    }
-  }, [searchParams]);
-
-  // アカウント接続状態を確認
-  useEffect(() => {
-    fetchAccountStatus();
-  }, []);
-
-  async function fetchAccountStatus() {
-    try {
-      const res = await fetch("/api/meta/account");
-      const data = (await res.json()) as AccountInfo;
-      setAccount(data);
-      if (data.connected) {
-        await Promise.all([fetchProfile(), fetchMedia()]);
-      }
-    } catch {
-      setError("アカウント情報の取得に失敗しました");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function fetchProfile() {
-    const res = await fetch("/api/meta-insights/profile");
-    if (res.ok) {
-      setProfile((await res.json()) as ProfileData);
-    }
-  }
-
-  async function fetchMedia() {
-    const res = await fetch("/api/meta-insights/media?limit=10");
-    if (res.ok) {
-      const data = (await res.json()) as { media?: MediaItem[] };
-      setMedia(data.media ?? []);
-    }
-  }
-
-  async function handleConnect() {
-    setConnecting(true);
-    try {
-      const res = await fetch("/api/meta/auth");
-      const data = (await res.json()) as { authUrl?: string };
-      if (data.authUrl) {
-        window.location.href = data.authUrl;
-      } else {
-        setError("認証URLの取得に失敗しました");
-        setConnecting(false);
-      }
-    } catch {
-      setError("接続に失敗しました");
-      setConnecting(false);
-    }
-  }
-
-  async function handleDisconnect() {
-    if (!confirm("Instagram アカウントの連携を解除しますか？")) return;
-    const res = await fetch("/api/meta/account", { method: "DELETE" });
-    if (res.ok) {
-      setAccount({ connected: false });
-      setProfile(null);
-      setMedia([]);
-    }
-  }
-
-  if (loading) {
-    return (
-      <Text size="sm" className={css({ color: "text.secondary" })}>
-        読み込み中...
-      </Text>
-    );
-  }
-
-  // 未接続状態
-  if (!account?.connected) {
-    return (
-      <VStack gap={6} alignItems="stretch">
-        <Box className={cardStyle}>
-          <Text size="sm" fontWeight={600} className={css({ mb: 3 })}>
-            Instagram アカウント連携
-          </Text>
-          <Text size="sm" className={css({ color: "text.secondary", mb: 4 })}>
-            Instagram ビジネスアカウントを連携すると、投稿のインサイト・プロフィール分析・フォロワー推移を確認できます。
-          </Text>
-          {metaAccountLinkEnabled ? (
-            <Button onClick={handleConnect} loading={connecting} size="sm">
-              Instagram を連携する
-            </Button>
-          ) : (
-            <Text size="sm" className={css({ color: "text.secondary" })}>
-              管理画面で「アカウント連携（OAuth）」を有効にしてください。
-            </Text>
-          )}
-          {error && (
-            <Text size="sm" className={css({ color: "red.500", mt: 2 })}>
-              {error}
-            </Text>
-          )}
-        </Box>
-      </VStack>
-    );
-  }
-
-  // 接続済み
   return (
     <VStack gap={6} alignItems="stretch">
-      {/* アカウント情報 */}
       <Box className={cardStyle}>
         <HStack justify="space-between" className={css({ mb: 3 })}>
           <Text size="sm" fontWeight={600}>
-            接続済みアカウント
+            接続済みアカウント（デモ表示）
           </Text>
-          <Button onClick={handleDisconnect} size="xs" variant="ghost">
-            連携解除
-          </Button>
         </HStack>
-        {profile ? (
-          <VStack gap={3} alignItems="stretch">
-            <Text size="sm" fontWeight={500}>
-              @{profile.username} {profile.name && `(${profile.name})`}
-            </Text>
-            {/* フォロワー等の統計 */}
-            <HStack gap={3}>
-              <Box className={statStyle}>
-                <Text size="lg" fontWeight={700}>
-                  {profile.followersCount?.toLocaleString()}
-                </Text>
-                <Text size="xs" className={css({ color: "text.secondary" })}>
-                  フォロワー
-                </Text>
-              </Box>
-              <Box className={statStyle}>
-                <Text size="lg" fontWeight={700}>
-                  {profile.followsCount?.toLocaleString()}
-                </Text>
-                <Text size="xs" className={css({ color: "text.secondary" })}>
-                  フォロー中
-                </Text>
-              </Box>
-              <Box className={statStyle}>
-                <Text size="lg" fontWeight={700}>
-                  {profile.mediaCount?.toLocaleString()}
-                </Text>
-                <Text size="xs" className={css({ color: "text.secondary" })}>
-                  投稿数
-                </Text>
-              </Box>
-            </HStack>
-          </VStack>
-        ) : (
-          <Text size="sm" className={css({ color: "text.secondary" })}>
-            @{account.account?.instagramUsername ?? "---"}
+        <VStack gap={3} alignItems="stretch">
+          <Text size="sm" fontWeight={500}>
+            @{profile.username} ({profile.name})
           </Text>
-        )}
+          <HStack gap={3}>
+            <Box className={statStyle}>
+              <Text size="lg" fontWeight={700}>
+                {profile.followersCount.toLocaleString()}
+              </Text>
+              <Text size="xs" className={css({ color: "text.secondary" })}>
+                フォロワー
+              </Text>
+            </Box>
+            <Box className={statStyle}>
+              <Text size="lg" fontWeight={700}>
+                {profile.followsCount.toLocaleString()}
+              </Text>
+              <Text size="xs" className={css({ color: "text.secondary" })}>
+                フォロー中
+              </Text>
+            </Box>
+            <Box className={statStyle}>
+              <Text size="lg" fontWeight={700}>
+                {profile.mediaCount.toLocaleString()}
+              </Text>
+              <Text size="xs" className={css({ color: "text.secondary" })}>
+                投稿数
+              </Text>
+            </Box>
+          </HStack>
+        </VStack>
       </Box>
 
-      {/* 最新投稿一覧 */}
-      {media.length > 0 && (
-        <Box className={cardStyle}>
-          <Text size="sm" fontWeight={600} className={css({ mb: 3 })}>
-            最新投稿
-          </Text>
-          <VStack gap={2} alignItems="stretch">
-            {media.map((item) => (
-              <HStack
-                key={item.id}
-                justify="space-between"
-                className={css({
-                  p: 2,
-                  rounded: "md",
-                  bg: { base: "#FAFAFA", _dark: "#1C1C1E" },
-                })}
-              >
-                <Box flex={1} minW={0}>
-                  <Text
-                    size="sm"
-                    className={css({
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    })}
-                  >
-                    {item.caption?.slice(0, 60) || "(キャプションなし)"}
-                  </Text>
-                  <Text size="xs" className={css({ color: "text.secondary" })}>
-                    {new Date(item.timestamp).toLocaleDateString("ja-JP")}
-                  </Text>
-                </Box>
-                <HStack gap={3} flexShrink={0}>
-                  <Text size="xs" className={css({ color: "text.secondary" })}>
-                    ♥ {item.like_count ?? 0}
-                  </Text>
-                  <Text size="xs" className={css({ color: "text.secondary" })}>
-                    💬 {item.comments_count ?? 0}
-                  </Text>
-                </HStack>
+      <Box className={cardStyle}>
+        <Text size="sm" fontWeight={600} className={css({ mb: 3 })}>
+          最新投稿
+        </Text>
+        <VStack gap={2} alignItems="stretch">
+          {media.map((item) => (
+            <HStack
+              key={item.id}
+              justify="space-between"
+              className={css({
+                p: 2,
+                rounded: "md",
+                bg: { base: "#FAFAFA", _dark: "#1C1C1E" },
+              })}
+            >
+              <Box flex={1} minW={0}>
+                <Text
+                  size="sm"
+                  className={css({
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  })}
+                >
+                  {item.caption?.slice(0, 60) || "(キャプションなし)"}
+                </Text>
+                <Text size="xs" className={css({ color: "text.secondary" })}>
+                  {new Date(item.timestamp).toLocaleDateString("ja-JP")}
+                </Text>
+              </Box>
+              <HStack gap={3} flexShrink={0}>
+                <Text size="xs" className={css({ color: "text.secondary" })}>
+                  ♥ {item.like_count ?? 0}
+                </Text>
+                <Text size="xs" className={css({ color: "text.secondary" })}>
+                  💬 {item.comments_count ?? 0}
+                </Text>
               </HStack>
-            ))}
-          </VStack>
-        </Box>
-      )}
+            </HStack>
+          ))}
+        </VStack>
+      </Box>
     </VStack>
   );
 }
