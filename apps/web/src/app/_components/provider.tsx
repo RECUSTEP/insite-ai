@@ -1,5 +1,6 @@
 "use client";
 
+import { LegalDocuments } from "./legal-documents";
 import { ToastProvider } from "./toast";
 
 type ProviderProps = Readonly<{
@@ -11,6 +12,7 @@ export function Provider({ children }: ProviderProps) {
     <>
       <ToastProvider />
       {children}
+      <LegalDocuments />
     </>
   );
 }
