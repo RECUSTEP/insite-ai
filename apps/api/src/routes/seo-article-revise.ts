@@ -171,12 +171,12 @@ const handler = projectGuard.createHandlers(
       return c.json({ error: "履歴保存に失敗しました" }, 500);
     }
 
-    c.executionCtx.waitUntil(
-      c.var.apiUsageUseCase.createApiUsage({
-        projectId,
-        feature: "seo-article-revise",
-      }),
-    );
+    // レスポンスを返す前に await して使用量を確定させる
+    // （waitUntil だと revalidate 時点でまだ反映されていない可能性がある）
+    await c.var.apiUsageUseCase.createApiUsage({
+      projectId,
+      feature: "seo-article-revise",
+    });
 
     return c.json({
       output: revisedOutput,

@@ -514,13 +514,6 @@ const analysisHandler = projectGuard.createHandlers(
       image = await upload(c, projectId, form.images[0]);
     }
 
-    c.executionCtx.waitUntil(
-      c.var.apiUsageUseCase.createApiUsage({
-        projectId,
-        feature: type,
-      }),
-    );
-
     return streamText(c, async (stream) => {
       let output = "";
       if (type === "seo-article") {
@@ -532,6 +525,15 @@ const analysisHandler = projectGuard.createHandlers(
           output += text;
         }
       }
+
+      // API 使用量はストリーム完了前にコミットする必要がある。
+      // 以前は waitUntil で fire-and-forget していたため、クライアントが
+      // ストリーム終了直後にキャッシュをリバリデートしてもインクリメント前の
+      // データが返り「使用量が増えない」バグになっていた。
+      await c.var.apiUsageUseCase.createApiUsage({
+        projectId,
+        feature: type,
+      });
 
       await c.var.analysisHistoryUseCase.createAnalysisHistory({
         projectId,
