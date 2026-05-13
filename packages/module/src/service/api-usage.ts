@@ -9,6 +9,13 @@ import { type ApiUsageSelect, apiUsageInsertSchema, apiUsageSelectSchema } from 
 
 export type DailyUsageItem = { date: string; count: number };
 export type UsageByFeatureItem = { feature: string; count: number };
+export type UsageByAccountItem = {
+  authId: string;
+  companyName: string | null;
+  totalCount: number;
+  projectCount: number;
+  apiUsageLimitTotal: number;
+};
 
 export const createApiUsageSchema = apiUsageInsertSchema.omit({ id: true }).partial({
   usedAt: true,
@@ -152,6 +159,86 @@ export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         .where(and(gte(schemas.apiUsage.usedAt, startAt), lte(schemas.apiUsage.usedAt, endAt)));
       return Ok(result?.count ?? 0);
     } catch {
+      return Err(CommonUseCaseError.UnknownError);
+    }
+  }
+
+  /**
+   * 指定期間のアカウント（auth）別 API 使用回数。
+   * プロジェクト単位ではなくアカウント単位で集約する。
+   * 使用量ゼロのアカウントも含めるため、auth を起点に LEFT JOIN する。
+   */
+  async getUsageByAccount(
+    startAt: number,
+    endAt: number,
+  ): Promise<Result<UsageByAccountItem[], string>> {
+    try {
+      const db = this.db as Database<"d1">;
+      const rows = await db
+        .select({
+          authId: schemas.auth.id,
+          companyName: schemas.auth.companyName,
+          projectId: schemas.projects.projectId,
+          apiUsageLimit: schemas.projects.apiUsageLimit,
+          usedAt: schemas.apiUsage.usedAt,
+        })
+        .from(schemas.auth)
+        .leftJoin(schemas.projects, eq(schemas.projects.authId, schemas.auth.id))
+        .leftJoin(
+          schemas.apiUsage,
+          and(
+            eq(schemas.apiUsage.projectId, schemas.projects.projectId),
+            gte(schemas.apiUsage.usedAt, startAt),
+            lte(schemas.apiUsage.usedAt, endAt),
+          ),
+        );
+
+      const map = new Map<
+        string,
+        {
+          authId: string;
+          companyName: string | null;
+          totalCount: number;
+          projectIds: Set<string>;
+          apiUsageLimitByProject: Map<string, number>;
+        }
+      >();
+      for (const row of rows) {
+        const entry = map.get(row.authId) ?? {
+          authId: row.authId,
+          companyName: row.companyName ?? null,
+          totalCount: 0,
+          projectIds: new Set<string>(),
+          apiUsageLimitByProject: new Map<string, number>(),
+        };
+        if (row.projectId) {
+          entry.projectIds.add(row.projectId);
+          if (typeof row.apiUsageLimit === "number") {
+            entry.apiUsageLimitByProject.set(row.projectId, row.apiUsageLimit);
+          }
+        }
+        if (row.usedAt !== null && row.usedAt !== undefined) {
+          entry.totalCount += 1;
+        }
+        map.set(row.authId, entry);
+      }
+
+      const result: UsageByAccountItem[] = Array.from(map.values())
+        .map((v) => ({
+          authId: v.authId,
+          companyName: v.companyName,
+          totalCount: v.totalCount,
+          projectCount: v.projectIds.size,
+          apiUsageLimitTotal: Array.from(v.apiUsageLimitByProject.values()).reduce(
+            (a, b) => a + b,
+            0,
+          ),
+        }))
+        .sort((a, b) => b.totalCount - a.totalCount);
+
+      return Ok(result);
+    } catch (e) {
+      console.error("[ApiUsageUseCase.getUsageByAccount]", e);
       return Err(CommonUseCaseError.UnknownError);
     }
   }

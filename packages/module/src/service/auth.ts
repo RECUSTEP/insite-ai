@@ -1,5 +1,5 @@
 import * as schemas from "@repo/db/schema";
-import { count, eq } from "drizzle-orm";
+import { count, countDistinct, eq, gte } from "drizzle-orm";
 import { Err, Ok, type Result } from "ts-results";
 import { z } from "zod";
 import type { Database } from "../core/db";
@@ -129,6 +129,26 @@ export class AuthUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       console.error("[AuthUseCase]", msg, e);
+      return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
+    }
+  }
+
+  /**
+   * アクティブな（有効なセッションを持つ）アカウント数を返す。
+   * セッションは createSession / validateSession で expiresAt が更新されるため、
+   * これがログインベースの「直近で利用しているアカウント数」の近似となる。
+   */
+  async countActive(now: number = Date.now()): Promise<Result<number, string>> {
+    try {
+      const db = this.db as Database<"d1">;
+      const [result] = await db
+        .select({ count: countDistinct(schemas.sessions.authId) })
+        .from(schemas.sessions)
+        .where(gte(schemas.sessions.expiresAt, now));
+      return Ok(result?.count ?? 0);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[AuthUseCase.countActive]", msg, e);
       return Err(`${CommonUseCaseError.UnknownError}: ${msg}`);
     }
   }
