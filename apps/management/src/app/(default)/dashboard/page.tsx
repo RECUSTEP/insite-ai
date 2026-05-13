@@ -6,6 +6,7 @@ import { Box, Container, Grid, HStack, VStack } from "styled-system/jsx";
 import { ActiveAccountsCard } from "./_components/active-accounts-card";
 import { DashboardChart } from "./_components/dashboard-chart";
 import { DashboardSideNav } from "./_components/dashboard-side-nav";
+import { MonthlyUsageChart } from "./_components/monthly-usage-chart";
 import { StatCard } from "./_components/stat-card";
 import { UsageByAccountTable } from "./_components/usage-by-account-table";
 import { UsageByFeatureChart } from "./_components/usage-by-feature-chart";
@@ -25,6 +26,7 @@ export default async function DashboardPage() {
     totalAuth?: number;
     activeAuth?: number;
     monthlyUsage?: number;
+    monthlyUsageStats?: unknown[];
     usageByFeature?: unknown[];
     usageByAccount?: unknown[];
   } | null = null;
@@ -100,6 +102,9 @@ export default async function DashboardPage() {
   const usageByAccount = (Array.isArray(data.usageByAccount)
     ? data.usageByAccount
     : []) as UsageByAccountRow[];
+  const monthlyUsageStats = (Array.isArray(data.monthlyUsageStats)
+    ? data.monthlyUsageStats
+    : []) as { month: string; count: number }[];
 
   const now = new Date();
   const monthLabel = `${now.getFullYear()}年${now.getMonth() + 1}月`;
@@ -162,6 +167,7 @@ export default async function DashboardPage() {
             <DashboardSideNav
               items={[
                 { href: "#trend", label: "30日間の推移" },
+                { href: "#monthly", label: "月別推移（折れ線＋棒）" },
                 { href: "#active", label: "アクティブ率" },
                 { href: "#by-account", label: "アカウント別使用量" },
                 { href: "#by-feature", label: "機能別使用量" },
@@ -178,6 +184,14 @@ export default async function DashboardPage() {
           <VStack gap={6} alignItems="stretch">
             <Section id="trend" title="直近30日間のAPI使用量" subtitle="日別の推移">
               <DashboardChart data={dailyUsage} />
+            </Section>
+
+            <Section
+              id="monthly"
+              title="月別API使用量（折れ線＋棒）"
+              subtitle="直近12ヶ月の推移をパターン比較"
+            >
+              <MonthlyUsageChart data={monthlyUsageStats} />
             </Section>
 
             <Section id="active" title="アクティブアカウント率" subtitle="ログイン中セッション基準">

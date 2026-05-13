@@ -14,6 +14,7 @@ const getDashboardStatsHandler = adminGuard.createHandlers(async (c) => {
     usageByFeatureResult,
     usageByAccountResult,
     activeAuthResult,
+    monthlyStatsResult,
   ] = await Promise.all([
     c.var.apiUsageUseCase.getDailyUsageStats(30),
     c.var.projectUseCase.countProjects({}),
@@ -22,6 +23,7 @@ const getDashboardStatsHandler = adminGuard.createHandlers(async (c) => {
     c.var.apiUsageUseCase.getUsageByFeature(startOfMonth, endOfMonth),
     c.var.apiUsageUseCase.getUsageByAccount(startOfMonth, endOfMonth),
     c.var.authUseCase.countActive(Date.now()),
+    c.var.apiUsageUseCase.getMonthlyUsageStats(12),
   ]);
 
   if (!dailyResult.ok || !projectsResult.ok || !authResult.ok || !monthlyResult.ok) {
@@ -49,6 +51,10 @@ const getDashboardStatsHandler = adminGuard.createHandlers(async (c) => {
   if (!activeAuthResult.ok) {
     console.warn("[GET /admin/dashboard-stats] activeAuth failed:", activeAuthResult.val);
   }
+  const monthlyUsageStats = monthlyStatsResult.ok ? monthlyStatsResult.val : [];
+  if (!monthlyStatsResult.ok) {
+    console.warn("[GET /admin/dashboard-stats] monthlyUsageStats failed:", monthlyStatsResult.val);
+  }
 
   return c.json({
     dailyUsage: dailyResult.val,
@@ -56,6 +62,7 @@ const getDashboardStatsHandler = adminGuard.createHandlers(async (c) => {
     totalAuth: authResult.val,
     activeAuth,
     monthlyUsage: monthlyResult.val,
+    monthlyUsageStats,
     usageByFeature,
     usageByAccount,
   });

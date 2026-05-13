@@ -8,6 +8,7 @@ import { ApiUsageUseCaseError, CommonUseCaseError } from "../error";
 import { type ApiUsageSelect, apiUsageInsertSchema, apiUsageSelectSchema } from "../schema";
 
 export type DailyUsageItem = { date: string; count: number };
+export type MonthlyUsageItem = { month: string; count: number };
 export type UsageByFeatureItem = { feature: string; count: number };
 export type UsageByAccountItem = {
   authId: string;
@@ -145,6 +146,75 @@ export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
       return Ok(result);
     } catch (e) {
       console.error("[ApiUsageUseCase.getDailyUsageStats]", e);
+      return Err(CommonUseCaseError.UnknownError);
+    }
+  }
+
+  /**
+   * 直近 N ヶ月分の月別API使用回数を取得（JST）。
+   * 戻り値の month は "YYYY-MM" 形式。データが無い月も 0 件で埋める。
+   */
+  async getMonthlyUsageStats(months = 12): Promise<Result<MonthlyUsageItem[], string>> {
+    if (months < 1 || months > 36) {
+      return Err(CommonUseCaseError.InvalidInput);
+    }
+    try {
+      const tz = 9 * 60 * 60 * 1000;
+      const nowJst = new Date(Date.now() + tz);
+      // (months-1) ヶ月前の月初（JST）を起点に
+      const startJst = Date.UTC(
+        nowJst.getUTCFullYear(),
+        nowJst.getUTCMonth() - (months - 1),
+        1,
+        0,
+        0,
+        0,
+        0,
+      );
+      const startOfRange = startJst - tz;
+      const endOfRange = Date.now();
+
+      const db = this.db as Database<"d1">;
+      const rows = await db
+        .select({
+          month:
+            sql<string>`strftime('%Y-%m', ${schemas.apiUsage.usedAt}/1000, 'unixepoch', '+9 hours')`.as(
+              "month",
+            ),
+          count: count(schemas.apiUsage.id).as("count"),
+        })
+        .from(schemas.apiUsage)
+        .where(
+          and(gte(schemas.apiUsage.usedAt, startOfRange), lte(schemas.apiUsage.usedAt, endOfRange)),
+        )
+        .groupBy(
+          sql`strftime('%Y-%m', ${schemas.apiUsage.usedAt}/1000, 'unixepoch', '+9 hours')`,
+        )
+        .orderBy(
+          sql`strftime('%Y-%m', ${schemas.apiUsage.usedAt}/1000, 'unixepoch', '+9 hours')`,
+        );
+
+      const countByMonth = new Map<string, number>();
+      for (let i = 0; i < months; i++) {
+        const d = new Date(
+          Date.UTC(nowJst.getUTCFullYear(), nowJst.getUTCMonth() - (months - 1 - i), 1),
+        );
+        const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+        countByMonth.set(key, 0);
+      }
+      for (const row of rows) {
+        if (row.month && countByMonth.has(row.month)) {
+          countByMonth.set(row.month, Number(row.count) ?? 0);
+        }
+      }
+
+      const result: MonthlyUsageItem[] = Array.from(countByMonth.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([month, count]) => ({ month, count }));
+
+      return Ok(result);
+    } catch (e) {
+      console.error("[ApiUsageUseCase.getMonthlyUsageStats]", e);
       return Err(CommonUseCaseError.UnknownError);
     }
   }
