@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { initDb } from "../../test/utils";
 import { ApiUsageUseCaseError } from "../error";
 import { ApiUsageUseCase } from "./api-usage";
+import { AuthUseCase } from "./auth";
 import { ProjectUseCase } from "./project";
 
 describe("ApiUsageUseCase", () => {
@@ -11,10 +12,10 @@ describe("ApiUsageUseCase", () => {
 
   const defaultProject = {
     name: "test",
+    authId: "test-auth",
     managerName: "test",
     ownerName: "test",
     projectId: "test",
-    projectPass: "test",
     apiUsageLimit: 100,
   };
 
@@ -22,6 +23,8 @@ describe("ApiUsageUseCase", () => {
     vi.useFakeTimers();
     [client, db] = await initDb();
     usecase = new ApiUsageUseCase(db);
+    const authUseCase = new AuthUseCase(db);
+    await authUseCase.create({ id: defaultProject.authId, password: "test" });
     const projectUseCase = new ProjectUseCase(db);
     await projectUseCase.createProject(defaultProject);
   });

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { initDb } from "../../test/utils";
 import { CommonUseCaseError, SessionUseCaseError } from "../error";
+import { AuthUseCase } from "./auth";
 import { ProjectUseCase } from "./project";
 import { AdminSessionUseCase, SessionUseCase } from "./session";
 
@@ -86,13 +87,15 @@ describe("SessionUseCase", () => {
     vi.useFakeTimers();
     [client, db] = await initDb();
     usecase = new SessionUseCase(db, { sessionDuration: 1000 * 60 * 60 });
+    const authUseCase = new AuthUseCase(db);
+    await authUseCase.create({ id: "test-auth", password: "test" });
     projectUseCase = new ProjectUseCase(db);
     await projectUseCase.createProject({
       name: "test",
+      authId: "test-auth",
       managerName: "test",
       ownerName: "test",
       projectId: "test",
-      projectPass: "test",
       apiUsageLimit: 100,
     });
   });
@@ -103,27 +106,27 @@ describe("SessionUseCase", () => {
   });
 
   it("createSessionでセッションが作成できる", async () => {
-    const session = await usecase.createSession({ projectId: "test" });
+    const session = await usecase.createSession({ authId: "test-auth", projectId: "test" });
     expect(session.ok).toBe(true);
     expect(session.unwrap().id).toBeDefined();
     expect(session.unwrap().expiresAt).toBeGreaterThan(Date.now());
   });
 
   it("存在しないプロジェクトIDでcreateSessionするとエラー", async () => {
-    const session = await usecase.createSession({ projectId: "invalid" });
+    const session = await usecase.createSession({ authId: "test-auth", projectId: "invalid" });
     expect(session.ok).toBe(false);
     expect(session.val).toBe(CommonUseCaseError.UnknownError);
   });
 
   it("validateSessionでセッションが検証できる", async () => {
-    const session = await usecase.createSession({ projectId: "test" });
+    const session = await usecase.createSession({ authId: "test-auth", projectId: "test" });
     const result = await usecase.validateSession({ id: session.unwrap().id });
     expect(result.ok).toBe(true);
     expect(result.val).toMatchObject(session.unwrap());
   });
 
   it("validateSessionでセッションの期限が延長される", async () => {
-    const session = await usecase.createSession({ projectId: "test" });
+    const session = await usecase.createSession({ authId: "test-auth", projectId: "test" });
     vi.advanceTimersByTime(1000 * 60 * 60);
     const result = await usecase.validateSession({ id: session.unwrap().id });
     expect(result.ok).toBe(true);
@@ -138,7 +141,7 @@ describe("SessionUseCase", () => {
   });
 
   it("validateSessionでセッションが期限切れの場合はnull", async () => {
-    const session = await usecase.createSession({ projectId: "test" });
+    const session = await usecase.createSession({ authId: "test-auth", projectId: "test" });
     vi.advanceTimersByTime(1000 * 60 * 60 + 1);
     const result = await usecase.validateSession({ id: session.unwrap().id });
     expect(result.ok).toBe(true);
@@ -149,7 +152,7 @@ describe("SessionUseCase", () => {
   });
 
   it("セッション中にプロジェクトを削除するとセッションが削除される", async () => {
-    const session = await usecase.createSession({ projectId: "test" });
+    const session = await usecase.createSession({ authId: "test-auth", projectId: "test" });
     await projectUseCase.deleteProject({ projectId: "test" });
     const result = await usecase.validateSession({ id: session.unwrap().id });
     expect(result.ok).toBe(true);
@@ -157,7 +160,7 @@ describe("SessionUseCase", () => {
   });
 
   it("deleteSessionでセッションが削除できる", async () => {
-    const session = await usecase.createSession({ projectId: "test" });
+    const session = await usecase.createSession({ authId: "test-auth", projectId: "test" });
     const result = await usecase.deleteSession({ id: session.unwrap().id });
     expect(result.ok).toBe(true);
     const validate = await usecase.validateSession({ id: session.unwrap().id });

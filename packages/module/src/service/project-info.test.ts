@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { initDb } from "../../test/utils";
 import { ProjectInfoUseCaseError } from "../error";
 import type { ProjectInfoInsert, ProjectInsert } from "../schema";
+import { AuthUseCase } from "./auth";
 import { ProjectUseCase } from "./project";
 import { ProjectInfoUseCase } from "./project-info";
 
@@ -12,6 +13,7 @@ describe("ProjectInfoUseCase", () => {
 
   const defaultProject: ProjectInsert = {
     name: "test",
+    authId: "test-auth",
     managerName: "test",
     ownerName: "test",
     projectId: "test",
@@ -22,6 +24,8 @@ describe("ProjectInfoUseCase", () => {
   beforeEach(async () => {
     [client, db] = await initDb();
     usecase = new ProjectInfoUseCase(db);
+    const authUseCase = new AuthUseCase(db);
+    await authUseCase.create({ id: defaultProject.authId, password: "test" });
     const projectUseCase = new ProjectUseCase(db);
     await projectUseCase.createProject(defaultProject);
   });

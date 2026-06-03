@@ -3,6 +3,7 @@ import { initDb } from "../../test/utils";
 import { AnalysisHistoryUseCaseError } from "../error";
 import type { AnalysisHistoryInsert } from "../schema";
 import { AnalysisHistoryUseCase } from "./analysis-history";
+import { AuthUseCase } from "./auth";
 import { ProjectUseCase } from "./project";
 
 describe("AnalysisHistoryUseCase", () => {
@@ -23,10 +24,10 @@ describe("AnalysisHistoryUseCase", () => {
 
   const defaultProject = {
     name: "test",
+    authId: "test-auth",
     managerName: "test",
     ownerName: "test",
     projectId: "test",
-    projectPass: "test",
     apiUsageLimit: 100,
   };
 
@@ -46,6 +47,8 @@ describe("AnalysisHistoryUseCase", () => {
   } satisfies AnalysisHistoryInsert;
 
   it("createAnalysisHistoryで分析履歴が作成できる", async () => {
+    const authUseCase = new AuthUseCase(db);
+    await authUseCase.create({ id: defaultProject.authId, password: "test" });
     await projectUseCase.createProject(defaultProject);
     const result = await usecase.createAnalysisHistory(analysisHistory);
     expect(result.ok).toBe(true);
@@ -59,6 +62,8 @@ describe("AnalysisHistoryUseCase", () => {
   });
 
   it("getAnalysisHistoryで分析履歴が取得できる", async () => {
+    const authUseCase = new AuthUseCase(db);
+    await authUseCase.create({ id: defaultProject.authId, password: "test" });
     await projectUseCase.createProject(defaultProject);
     const created = await usecase.createAnalysisHistory(analysisHistory);
     const result = await usecase.getAnalysisHistory({ id: created.unwrap().id });
@@ -73,6 +78,8 @@ describe("AnalysisHistoryUseCase", () => {
   });
 
   it("getAnalysisHistoriesで分析履歴一覧が取得できる", async () => {
+    const authUseCase = new AuthUseCase(db);
+    await authUseCase.create({ id: defaultProject.authId, password: "test" });
     await projectUseCase.createProject(defaultProject);
     await usecase.createAnalysisHistory(analysisHistory);
     const result = await usecase.getAnalysisHistories({

@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { initDb } from "../../test/utils";
 import { ProjectUseCaseError } from "../error";
 import type { ProjectInsert } from "../schema";
+import { AuthUseCase } from "./auth";
 import { ProjectUseCase } from "./project";
 
 describe("ProjectUseCase", () => {
@@ -12,6 +13,8 @@ describe("ProjectUseCase", () => {
   beforeEach(async () => {
     [client, db] = await initDb();
     usecase = new ProjectUseCase(db);
+    const authUseCase = new AuthUseCase(db);
+    await authUseCase.create({ id: defaultProject.authId, password: "test" });
   });
 
   afterEach(() => {
@@ -20,6 +23,7 @@ describe("ProjectUseCase", () => {
 
   const defaultProject: ProjectInsert = {
     name: "test",
+    authId: "test-auth",
     managerName: "test",
     ownerName: "test",
     projectId: "test",
@@ -69,8 +73,13 @@ describe("ProjectUseCase", () => {
   it("getProjectsでプロジェクトリストが取得できる", async () => {
     const projects = Array.from({ length: 10 }, (_, i) => ({
       ...defaultProject,
+      authId: `${defaultProject.authId}-${i}`,
       projectId: `project-${i}`,
     }));
+    const authUseCase = new AuthUseCase(db);
+    await Promise.all(
+      projects.map((project) => authUseCase.create({ id: project.authId, password: "test" })),
+    );
     await Promise.all(projects.map((project) => usecase.createProject(project)));
     const result1 = await usecase.getProjects({ limit: 5, offset: 0 });
     const result2 = await usecase.getProjects({ limit: 5, offset: 5 });
@@ -115,10 +124,15 @@ describe("ProjectUseCase", () => {
   it("countProjectsでプロジェクト数が取得できる", async () => {
     const projects = Array.from({ length: 10 }, (_, i) => ({
       ...defaultProject,
+      authId: `${defaultProject.authId}-${i}`,
       projectId: `project-${i}`,
     }));
+    const authUseCase = new AuthUseCase(db);
+    await Promise.all(
+      projects.map((project) => authUseCase.create({ id: project.authId, password: "test" })),
+    );
     await Promise.all(projects.map((project) => usecase.createProject(project)));
-    const count = await usecase.countProjects();
+    const count = await usecase.countProjects({});
     expect(count.ok).toBe(true);
     expect(count.val).toBe(10);
   });
