@@ -43,6 +43,7 @@ export const projectSchema = z.object({
     })
     .min(1, ErrorMessages.AuthIdRequired),
   seoAddonEnabled: z.boolean().optional(),
+  metaInsightEnabled: z.boolean().optional(),
 });
 
 const createProjectHandler = adminGuard.createHandlers(
@@ -116,7 +117,7 @@ const getProjectsHandler = adminGuard.createHandlers(
       searchText,
     });
     if (!result.ok || !count.ok) {
-      const errVal = !result.ok ? result.val : count.val;
+      const errVal = result.ok ? count.val : result.val;
       console.error("[GET /admin/projects] error:", errVal);
       return c.json({ error: errVal }, 400);
     }

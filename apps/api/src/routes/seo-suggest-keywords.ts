@@ -1,6 +1,6 @@
 import { omit } from "es-toolkit";
-import { projectGuard } from "./_factory";
 import { chatgptOnce, replacePlaceholders } from "../libs/chatgpt";
+import { projectGuard } from "./_factory";
 
 const SYSTEM_PROMPT = `あなたはSEO・AIO向けのキーワード提案の専門家です。
 与えられた店舗・サービスの情報を基に、ブログ記事や口コミ投稿で効果的なキーワードを提案してください。`;
@@ -25,7 +25,10 @@ const handler = projectGuard.createHandlers(async (c) => {
   const { projectId } = c.var.session;
   if (!projectId) {
     return c.json(
-      { error: "プロジェクトが選択されていません。プロジェクトを作成するか、プロジェクトを選択してください。" },
+      {
+        error:
+          "プロジェクトが選択されていません。プロジェクトを作成するか、プロジェクトを選択してください。",
+      },
       400,
     );
   }
@@ -39,10 +42,10 @@ const handler = projectGuard.createHandlers(async (c) => {
   // プロジェクトのSEOアドオンフラグをチェック
   if (!project.val.seoAddonEnabled) {
     return c.json(
-      { 
-        error: "SEO/AIO記事生成機能は有効化されていません。管理者にお問い合わせください。" 
-      }, 
-      403
+      {
+        error: "SEO/AIO記事生成機能は有効化されていません。管理者にお問い合わせください。",
+      },
+      403,
     );
   }
 
@@ -53,9 +56,17 @@ const handler = projectGuard.createHandlers(async (c) => {
     ? omit(projectInfo.val, ["id", "projectId"])
     : {};
   const keys = [
-    "businessType", "concept", "strength", "targetAge", "targetGender",
-    "targetArea", "targetAttribute", "targetConcern", "existingCustomerAnalysis",
-    "address", "nearestStation",
+    "businessType",
+    "concept",
+    "strength",
+    "targetAge",
+    "targetGender",
+    "targetArea",
+    "targetAttribute",
+    "targetConcern",
+    "existingCustomerAnalysis",
+    "address",
+    "nearestStation",
   ];
   const values: Record<string, string> = Object.fromEntries(
     keys.map((k) => [

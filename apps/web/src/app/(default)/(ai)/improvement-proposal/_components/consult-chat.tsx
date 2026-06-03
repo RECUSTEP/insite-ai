@@ -202,14 +202,14 @@ export function ConsultChat({ projectId, selectedSessionId, onSessionCreated }: 
         throw new Error("エラーが発生しました。");
       }
 
-      revalidateTagAction(PROJECT_TAG);
-
       for await (const chunk of readStream(response.body)) {
         finalContent += chunk;
         setMessages((prev) =>
           prev.map((m) => (m.id === aiMsgId ? { ...m, content: finalContent, loading: false } : m))
         );
       }
+      // ストリーム完了後に再検証（createApiUsage 反映済み）
+      revalidateTagAction(PROJECT_TAG);
 
       // Persist to DB
       const aiMsgPersisted: Message = {

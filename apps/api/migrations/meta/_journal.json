@@ -78,6 +78,13 @@
       "when": 1740100000000,
       "tag": "0010_add_auth_company_name",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1775093563945,
+      "tag": "0011_brave_zarda",
+      "breakpoints": true
     }
   ]
 }

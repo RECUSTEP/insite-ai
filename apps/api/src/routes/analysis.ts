@@ -180,10 +180,7 @@ export const analysisSchemaByType = {
     instruction: z
       .string({ message: "キーワードを入力してください" })
       .min(1, "キーワードを入力してください"),
-    perspective: z
-      .enum(["third-party", "representative"])
-      .optional()
-      .default("representative"),
+    perspective: z.enum(["third-party", "representative"]).optional().default("representative"),
   }),
 } as const;
 
@@ -220,8 +217,10 @@ const TONE_STYLE_PROMPTS: Record<string, string> = {
   pop: "以下のトーン・文体で出力してください：ポップで親しみやすい表現。絵文字やカジュアルな言い回しを適度に使い、明るい印象にする。",
   standard:
     "以下のトーン・文体で出力してください：標準的なビジネス表現。バランスの取れた丁寧さと親しみやすさを両立する。",
-  strict: "以下のトーン・文体で出力してください：厳しめで率直な表現。核心を突く、簡潔な言い回しを心がける。",
-  gentle: "以下のトーン・文体で出力してください：優しく温かみのある表現。柔らかい言葉遣いで、相手を安心させる。",
+  strict:
+    "以下のトーン・文体で出力してください：厳しめで率直な表現。核心を突く、簡潔な言い回しを心がける。",
+  gentle:
+    "以下のトーン・文体で出力してください：優しく温かみのある表現。柔らかい言葉遣いで、相手を安心させる。",
 };
 
 const formValidator = validator("form", async (value, c) => {
@@ -235,7 +234,9 @@ const formValidator = validator("form", async (value, c) => {
   let conversationHistory: ConversationMessage[] | undefined;
   if (conversationHistoryRaw.success && conversationHistoryRaw.data) {
     try {
-      const parsed = z.array(conversationMessageSchema).safeParse(JSON.parse(conversationHistoryRaw.data));
+      const parsed = z
+        .array(conversationMessageSchema)
+        .safeParse(JSON.parse(conversationHistoryRaw.data));
       if (parsed.success) {
         conversationHistory = parsed.data.slice(-20);
       }
@@ -275,7 +276,10 @@ const analysisHandler = projectGuard.createHandlers(
     const { projectId } = c.var.session;
     if (!projectId) {
       return c.json(
-        { error: "プロジェクトが選択されていません。プロジェクトを作成するか、プロジェクトを選択してください。" },
+        {
+          error:
+            "プロジェクトが選択されていません。プロジェクトを作成するか、プロジェクトを選択してください。",
+        },
         400,
       );
     }
@@ -308,13 +312,13 @@ const analysisHandler = projectGuard.createHandlers(
       // プロジェクトのSEOアドオンフラグをチェック
       if (!project.val.seoAddonEnabled) {
         return c.json(
-          { 
-            error: "SEO/AIO記事生成機能は有効化されていません。管理者にお問い合わせください。" 
-          }, 
-          403
+          {
+            error: "SEO/AIO記事生成機能は有効化されていません。管理者にお問い合わせください。",
+          },
+          403,
         );
       }
-      
+
       const prompt = await c.var.promptUseCase.getPromptByAiType("seo-article");
       if (!prompt.ok && prompt.val === CommonUseCaseError.NotFound) {
         const projectInfo = await c.var.projectInfoUseCase.getProjectInfo({
@@ -328,9 +332,11 @@ const analysisHandler = projectGuard.createHandlers(
         const filtered = Object.fromEntries(
           Object.entries(values).filter(([, v]) => isString(v)),
         ) as Record<string, string>;
-        const perspective = "perspective" in form && (form.perspective === "third-party" || form.perspective === "representative") 
-          ? form.perspective 
-          : "representative" as const;
+        const perspective =
+          "perspective" in form &&
+          (form.perspective === "third-party" || form.perspective === "representative")
+            ? form.perspective
+            : ("representative" as const);
         const defaultPrompt = getSeoArticleDefaultPrompt(perspective);
         system = replacePlaceholders(defaultPrompt.system, filtered);
         user = replacePlaceholders(defaultPrompt.user, filtered);
@@ -353,7 +359,12 @@ const analysisHandler = projectGuard.createHandlers(
       user = got.user;
     }
 
-    if (type !== "seo-article" && "toneStyle" in form && form.toneStyle && TONE_STYLE_PROMPTS[form.toneStyle]) {
+    if (
+      type !== "seo-article" &&
+      "toneStyle" in form &&
+      form.toneStyle &&
+      TONE_STYLE_PROMPTS[form.toneStyle]
+    ) {
       system += "\n\n" + TONE_STYLE_PROMPTS[form.toneStyle];
     }
 
@@ -503,13 +514,6 @@ const analysisHandler = projectGuard.createHandlers(
       image = await upload(c, projectId, form.images[0]);
     }
 
-    c.executionCtx.waitUntil(
-      c.var.apiUsageUseCase.createApiUsage({
-        projectId,
-        feature: type,
-      }),
-    );
-
     return streamText(c, async (stream) => {
       let output = "";
       if (type === "seo-article") {
@@ -521,6 +525,15 @@ const analysisHandler = projectGuard.createHandlers(
           output += text;
         }
       }
+
+      // API 使用量はストリーム完了前にコミットする必要がある。
+      // 以前は waitUntil で fire-and-forget していたため、クライアントが
+      // ストリーム終了直後にキャッシュをリバリデートしてもインクリメント前の
+      // データが返り「使用量が増えない」バグになっていた。
+      await c.var.apiUsageUseCase.createApiUsage({
+        projectId,
+        feature: type,
+      });
 
       await c.var.analysisHistoryUseCase.createAnalysisHistory({
         projectId,

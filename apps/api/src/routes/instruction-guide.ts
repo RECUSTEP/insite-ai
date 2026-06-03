@@ -1,7 +1,7 @@
-import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
+import type { InstructionGuideSelect } from "@repo/module/schema";
+import { z } from "zod";
 import { projectGuard } from "./_factory";
-import { InstructionGuideSelect } from "@repo/module/schema";
 
 const formNameSchema = z.union([
   z.literal("improvement"),

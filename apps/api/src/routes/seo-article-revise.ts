@@ -24,7 +24,10 @@ const handler = projectGuard.createHandlers(
     const { projectId } = c.var.session;
     if (!projectId) {
       return c.json(
-        { error: "プロジェクトが選択されていません。プロジェクトを作成するか、プロジェクトを選択してください。" },
+        {
+          error:
+            "プロジェクトが選択されていません。プロジェクトを作成するか、プロジェクトを選択してください。",
+        },
         400,
       );
     }
@@ -55,10 +58,10 @@ const handler = projectGuard.createHandlers(
     // プロジェクトのSEOアドオンフラグをチェック
     if (!project.val.seoAddonEnabled) {
       return c.json(
-        { 
-          error: "SEO/AIO記事生成機能は有効化されていません。管理者にお問い合わせください。" 
-        }, 
-        403
+        {
+          error: "SEO/AIO記事生成機能は有効化されていません。管理者にお問い合わせください。",
+        },
+        403,
       );
     }
 
@@ -168,12 +171,12 @@ const handler = projectGuard.createHandlers(
       return c.json({ error: "履歴保存に失敗しました" }, 500);
     }
 
-    c.executionCtx.waitUntil(
-      c.var.apiUsageUseCase.createApiUsage({
-        projectId,
-        feature: "seo-article-revise",
-      }),
-    );
+    // レスポンスを返す前に await して使用量を確定させる
+    // （waitUntil だと revalidate 時点でまだ反映されていない可能性がある）
+    await c.var.apiUsageUseCase.createApiUsage({
+      projectId,
+      feature: "seo-article-revise",
+    });
 
     return c.json({
       output: revisedOutput,

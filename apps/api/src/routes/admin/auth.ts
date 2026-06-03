@@ -1,7 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
-import { adminGuard } from "./_factory";
-import { z } from "zod";
 import { authSchema, updateAuthSchema } from "@repo/module/service";
+import { z } from "zod";
+import { adminGuard } from "./_factory";
 
 const getAuthSchema = z.object({
   authId: z.string(),
@@ -27,7 +27,7 @@ const getAuthListHandler = adminGuard.createHandlers(
     const result = await c.var.authUseCase.getAuthList({ offset, limit });
     const count = await c.var.authUseCase.count();
     if (!result.ok || !count.ok) {
-      const errVal = !result.ok ? result.val : count.val;
+      const errVal = result.ok ? count.val : result.val;
       console.error("[GET /admin/auth] error:", errVal);
       return c.json({ error: errVal }, 400);
     }

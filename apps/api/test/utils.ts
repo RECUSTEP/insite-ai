@@ -1,5 +1,4 @@
 import { createClient } from "@libsql/client";
-import { eq } from "drizzle-orm";
 import * as schema from "@repo/db/schema";
 import type {
   AdminSessionInsert,
@@ -18,6 +17,7 @@ import {
   PromptUseCase,
   SessionUseCase,
 } from "@repo/module/service";
+import { eq } from "drizzle-orm";
 import type { LibSQLDatabase } from "drizzle-orm/libsql";
 import { drizzle } from "drizzle-orm/libsql";
 import { migrate } from "drizzle-orm/libsql/migrator";

@@ -8,7 +8,15 @@ import { ApiUsageUseCaseError, CommonUseCaseError } from "../error";
 import { type ApiUsageSelect, apiUsageInsertSchema, apiUsageSelectSchema } from "../schema";
 
 export type DailyUsageItem = { date: string; count: number };
+export type MonthlyUsageItem = { month: string; count: number };
 export type UsageByFeatureItem = { feature: string; count: number };
+export type UsageByAccountItem = {
+  authId: string;
+  companyName: string | null;
+  totalCount: number;
+  projectCount: number;
+  apiUsageLimitTotal: number;
+};
 
 export const createApiUsageSchema = apiUsageInsertSchema.omit({ id: true }).partial({
   usedAt: true,
@@ -82,7 +90,7 @@ export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
   }
 
   /** 指定日数分の日別API使用回数を取得（JST）。ダッシュボード用 */
-  async getDailyUsageStats(days: number = 30): Promise<Result<DailyUsageItem[], string>> {
+  async getDailyUsageStats(days = 30): Promise<Result<DailyUsageItem[], string>> {
     if (days < 1 || days > 365) {
       return Err(CommonUseCaseError.InvalidInput);
     }
@@ -91,15 +99,16 @@ export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
       const now = new Date(Date.now() + tz);
       const startDate = new Date(now);
       startDate.setUTCDate(startDate.getUTCDate() - days);
-      const startOfRange = Date.UTC(
-        startDate.getUTCFullYear(),
-        startDate.getUTCMonth(),
-        startDate.getUTCDate(),
-        0,
-        0,
-        0,
-        0,
-      ) - tz;
+      const startOfRange =
+        Date.UTC(
+          startDate.getUTCFullYear(),
+          startDate.getUTCMonth(),
+          startDate.getUTCDate(),
+          0,
+          0,
+          0,
+          0,
+        ) - tz;
       const endOfRange = Date.now();
 
       const db = this.db as Database<"d1">;
@@ -111,7 +120,9 @@ export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
           count: count(schemas.apiUsage.id).as("count"),
         })
         .from(schemas.apiUsage)
-        .where(and(gte(schemas.apiUsage.usedAt, startOfRange), lte(schemas.apiUsage.usedAt, endOfRange)))
+        .where(
+          and(gte(schemas.apiUsage.usedAt, startOfRange), lte(schemas.apiUsage.usedAt, endOfRange)),
+        )
         .groupBy(sql`date(${schemas.apiUsage.usedAt}/1000, 'unixepoch', '+9 hours')`)
         .orderBy(sql`date(${schemas.apiUsage.usedAt}/1000, 'unixepoch', '+9 hours')`);
 
@@ -139,6 +150,75 @@ export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
     }
   }
 
+  /**
+   * 直近 N ヶ月分の月別API使用回数を取得（JST）。
+   * 戻り値の month は "YYYY-MM" 形式。データが無い月も 0 件で埋める。
+   */
+  async getMonthlyUsageStats(months = 12): Promise<Result<MonthlyUsageItem[], string>> {
+    if (months < 1 || months > 36) {
+      return Err(CommonUseCaseError.InvalidInput);
+    }
+    try {
+      const tz = 9 * 60 * 60 * 1000;
+      const nowJst = new Date(Date.now() + tz);
+      // (months-1) ヶ月前の月初（JST）を起点に
+      const startJst = Date.UTC(
+        nowJst.getUTCFullYear(),
+        nowJst.getUTCMonth() - (months - 1),
+        1,
+        0,
+        0,
+        0,
+        0,
+      );
+      const startOfRange = startJst - tz;
+      const endOfRange = Date.now();
+
+      const db = this.db as Database<"d1">;
+      const rows = await db
+        .select({
+          month:
+            sql<string>`strftime('%Y-%m', ${schemas.apiUsage.usedAt}/1000, 'unixepoch', '+9 hours')`.as(
+              "month",
+            ),
+          count: count(schemas.apiUsage.id).as("count"),
+        })
+        .from(schemas.apiUsage)
+        .where(
+          and(gte(schemas.apiUsage.usedAt, startOfRange), lte(schemas.apiUsage.usedAt, endOfRange)),
+        )
+        .groupBy(
+          sql`strftime('%Y-%m', ${schemas.apiUsage.usedAt}/1000, 'unixepoch', '+9 hours')`,
+        )
+        .orderBy(
+          sql`strftime('%Y-%m', ${schemas.apiUsage.usedAt}/1000, 'unixepoch', '+9 hours')`,
+        );
+
+      const countByMonth = new Map<string, number>();
+      for (let i = 0; i < months; i++) {
+        const d = new Date(
+          Date.UTC(nowJst.getUTCFullYear(), nowJst.getUTCMonth() - (months - 1 - i), 1),
+        );
+        const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+        countByMonth.set(key, 0);
+      }
+      for (const row of rows) {
+        if (row.month && countByMonth.has(row.month)) {
+          countByMonth.set(row.month, Number(row.count) ?? 0);
+        }
+      }
+
+      const result: MonthlyUsageItem[] = Array.from(countByMonth.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([month, count]) => ({ month, count }));
+
+      return Ok(result);
+    } catch (e) {
+      console.error("[ApiUsageUseCase.getMonthlyUsageStats]", e);
+      return Err(CommonUseCaseError.UnknownError);
+    }
+  }
+
   /** 全体のAPI使用回数（指定期間） */
   async getTotalUsageCount(startAt: number, endAt: number): Promise<Result<number, string>> {
     try {
@@ -149,6 +229,86 @@ export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         .where(and(gte(schemas.apiUsage.usedAt, startAt), lte(schemas.apiUsage.usedAt, endAt)));
       return Ok(result?.count ?? 0);
     } catch {
+      return Err(CommonUseCaseError.UnknownError);
+    }
+  }
+
+  /**
+   * 指定期間のアカウント（auth）別 API 使用回数。
+   * プロジェクト単位ではなくアカウント単位で集約する。
+   * 使用量ゼロのアカウントも含めるため、auth を起点に LEFT JOIN する。
+   */
+  async getUsageByAccount(
+    startAt: number,
+    endAt: number,
+  ): Promise<Result<UsageByAccountItem[], string>> {
+    try {
+      const db = this.db as Database<"d1">;
+      const rows = await db
+        .select({
+          authId: schemas.auth.id,
+          companyName: schemas.auth.companyName,
+          projectId: schemas.projects.projectId,
+          apiUsageLimit: schemas.projects.apiUsageLimit,
+          usedAt: schemas.apiUsage.usedAt,
+        })
+        .from(schemas.auth)
+        .leftJoin(schemas.projects, eq(schemas.projects.authId, schemas.auth.id))
+        .leftJoin(
+          schemas.apiUsage,
+          and(
+            eq(schemas.apiUsage.projectId, schemas.projects.projectId),
+            gte(schemas.apiUsage.usedAt, startAt),
+            lte(schemas.apiUsage.usedAt, endAt),
+          ),
+        );
+
+      const map = new Map<
+        string,
+        {
+          authId: string;
+          companyName: string | null;
+          totalCount: number;
+          projectIds: Set<string>;
+          apiUsageLimitByProject: Map<string, number>;
+        }
+      >();
+      for (const row of rows) {
+        const entry = map.get(row.authId) ?? {
+          authId: row.authId,
+          companyName: row.companyName ?? null,
+          totalCount: 0,
+          projectIds: new Set<string>(),
+          apiUsageLimitByProject: new Map<string, number>(),
+        };
+        if (row.projectId) {
+          entry.projectIds.add(row.projectId);
+          if (typeof row.apiUsageLimit === "number") {
+            entry.apiUsageLimitByProject.set(row.projectId, row.apiUsageLimit);
+          }
+        }
+        if (row.usedAt !== null && row.usedAt !== undefined) {
+          entry.totalCount += 1;
+        }
+        map.set(row.authId, entry);
+      }
+
+      const result: UsageByAccountItem[] = Array.from(map.values())
+        .map((v) => ({
+          authId: v.authId,
+          companyName: v.companyName,
+          totalCount: v.totalCount,
+          projectCount: v.projectIds.size,
+          apiUsageLimitTotal: Array.from(v.apiUsageLimitByProject.values()).reduce(
+            (a, b) => a + b,
+            0,
+          ),
+        }))
+        .sort((a, b) => b.totalCount - a.totalCount);
+
+      return Ok(result);
+    } catch (e) {
+      console.error("[ApiUsageUseCase.getUsageByAccount]", e);
       return Err(CommonUseCaseError.UnknownError);
     }
   }

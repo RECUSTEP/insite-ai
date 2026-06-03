@@ -10,3 +10,4 @@ export * from "./application-setting";
 export * from "./instruction-guide";
 export * from "./announce";
 export * from "./chat-sessions";
+export * from "./instagram-account";

@@ -145,10 +145,12 @@ export function Form({ children, ...props }: FormProps) {
         }
         throw new AnalysisKnownError(await parseErrorMessage(response));
       }
-      revalidateTagAction(PROJECT_TAG);
       for await (const chunk of readStream(response.body)) {
         setOutput((prev) => prev + chunk);
       }
+      // ストリーム完了後（=API側で createApiUsage がコミット済み）に
+      // キャッシュを再検証してプロジェクト使用量を最新化する
+      revalidateTagAction(PROJECT_TAG);
     } catch (e) {
       const msg = e instanceof AnalysisKnownError ? e.message : "エラーが発生しました。";
       toaster.error({

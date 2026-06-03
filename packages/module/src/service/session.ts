@@ -1,7 +1,7 @@
 import * as schemas from "@repo/db/schema";
 import { eq } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
-import { Err, Ok, OkImpl, type Result } from "ts-results";
+import { Err, Ok, type Result } from "ts-results";
 import type { z } from "zod";
 import { generateId } from "../core/auth";
 import type { Database } from "../core/db";

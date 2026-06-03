@@ -19,6 +19,7 @@ import type { z } from "zod";
 import type { projectSchema } from "api/schema";
 import { DeleteAuth } from "../../auth/_components/delete-auth";
 import { DeleteProject } from "./delete-project";
+import { MetaInsightToggle } from "./meta-insight-toggle";
 import { SeoAddonToggle } from "./seo-addon-toggle";
 
 type Project = z.infer<typeof projectSchema>;
@@ -243,6 +244,10 @@ function ProjectRow({ project }: { project: Project }) {
           <SeoAddonToggle
             projectId={project.projectId}
             initialEnabled={project.seoAddonEnabled ?? false}
+          />
+          <MetaInsightToggle
+            projectId={project.projectId}
+            initialEnabled={project.metaInsightEnabled ?? false}
           />
         </HStack>
       </Box>

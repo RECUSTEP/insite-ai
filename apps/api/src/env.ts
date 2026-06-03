@@ -1,17 +1,18 @@
 import type {
   AdminSessionUseCase,
   AnalysisHistoryUseCase,
+  AnnounceUseCase,
   ApiUsageUseCase,
   ApplicationSettingUseCase,
+  AuthUseCase,
   ChatSessionUseCase,
   HelpUseCase,
+  InstagramAccountUseCase,
+  InstructionGuideUseCase,
   ProjectInfoUseCase,
   ProjectUseCase,
   PromptUseCase,
   SessionUseCase,
-  InstructionGuideUseCase,
-  AuthUseCase,
-  AnnounceUseCase,
 } from "@repo/module/service";
 
 export type Bindings = {
@@ -19,6 +20,11 @@ export type Bindings = {
   BUCKET: R2Bucket;
   ADMIN_USERNAME: string;
   ADMIN_PASSWORD: string;
+  META_APP_ID: string;
+  META_APP_SECRET: string;
+  META_REDIRECT_URI: string;
+  META_CONFIG_ID: string;
+  META_CALLBACK_FRONTEND_URL: string;
 };
 
 export type Variables = {
@@ -35,6 +41,7 @@ export type Variables = {
   instructionGuideUsecase: InstructionGuideUseCase<"d1">;
   announceUsecase: AnnounceUseCase<"d1">;
   chatSessionUseCase: ChatSessionUseCase<"d1">;
+  instagramAccountUseCase: InstagramAccountUseCase<"d1">;
 };
 
 export type Env = {

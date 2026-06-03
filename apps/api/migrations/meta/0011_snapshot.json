@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "1c141a75-1c9e-4d2c-8e4c-6d47f95753bf",
-  "prevId": "262c8623-34b4-4ce9-a68c-47f3478e5e71",
+  "id": "075620e7-a74e-4d5a-9d00-73956497b22a",
+  "prevId": "0008_insert_initial_announces",
   "tables": {
     "admin_session": {
       "name": "admin_session",
@@ -57,6 +57,21 @@
           "notNull": true,
           "autoincrement": false
         },
+        "revision_parent_id": {
+          "name": "revision_parent_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
         "input": {
           "name": "input",
           "type": "text",
@@ -84,6 +99,11 @@
           "name": "analysis_history_project_id_idx",
           "columns": ["project_id"],
           "isUnique": false
+        },
+        "analysis_history_revision_parent_id_idx": {
+          "name": "analysis_history_revision_parent_id_idx",
+          "columns": ["revision_parent_id"],
+          "isUnique": false
         }
       },
       "foreignKeys": {
@@ -97,6 +117,50 @@
           "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "announce": {
+      "name": "announce",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -122,6 +186,13 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "feature": {
+          "name": "feature",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         }
       },
@@ -208,10 +279,84 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "company_name": {
+          "name": "company_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "chat_sessions": {
+      "name": "chat_sessions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "project_id": {
+          "name": "project_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "messages": {
+          "name": "messages",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "chat_sessions_project_id_idx": {
+          "name": "chat_sessions_project_id_idx",
+          "columns": ["project_id"],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "chat_sessions_project_id_project_project_id_fk": {
+          "name": "chat_sessions_project_id_project_project_id_fk",
+          "tableFrom": "chat_sessions",
+          "tableTo": "project",
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["project_id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -253,6 +398,99 @@
         }
       },
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "instagram_account": {
+      "name": "instagram_account",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "project_id": {
+          "name": "project_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "instagram_user_id": {
+          "name": "instagram_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "instagram_username": {
+          "name": "instagram_username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "facebook_page_id": {
+          "name": "facebook_page_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "access_token": {
+          "name": "access_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "token_expires_at": {
+          "name": "token_expires_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "connected_at": {
+          "name": "connected_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "instagram_account_project_id_unique": {
+          "name": "instagram_account_project_id_unique",
+          "columns": ["project_id"],
+          "isUnique": true
+        },
+        "instagram_account_project_id_idx": {
+          "name": "instagram_account_project_id_idx",
+          "columns": ["project_id"],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "instagram_account_project_id_project_project_id_fk": {
+          "name": "instagram_account_project_id_project_project_id_fk",
+          "tableFrom": "instagram_account",
+          "tableTo": "project",
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["project_id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -385,6 +623,41 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "store_name": {
+          "name": "store_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "instagram_template": {
+          "name": "instagram_template",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "instagram_keyword1": {
+          "name": "instagram_keyword1",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "instagram_keyword2": {
+          "name": "instagram_keyword2",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "instagram_keyword3": {
+          "name": "instagram_keyword3",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -429,7 +702,7 @@
           "name": "auth_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "manager_name": {
@@ -466,6 +739,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "seo_addon_enabled": {
+          "name": "seo_addon_enabled",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
         }
       },
       "indexes": {
@@ -559,6 +840,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "project_id": {
+          "name": "project_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "expires_at": {
           "name": "expires_at",
           "type": "integer",
@@ -581,6 +869,15 @@
           "tableTo": "auth",
           "columnsFrom": ["auth_id"],
           "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "session_project_id_project_project_id_fk": {
+          "name": "session_project_id_project_project_id_fk",
+          "tableFrom": "session",
+          "tableTo": "project",
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["project_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
