@@ -30,7 +30,13 @@ export type GetApiUsageInput = z.infer<typeof getApiUsageSchema>;
 export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
   /**
    * 月間上限未満の場合だけ使用量を1件追加する。
-   * 判定と追加を単一SQLで行い、同時リクエストによる上限超過を防ぐ。
+   *
+   * 以前は INSERT ... SELECT ... RETURNING の生SQLを db.all() で実行していたが、
+   * この構文は Cloudflare D1 では正しく扱えず本番で例外になり、すべての生成が
+   * 「Failed to record API usage」で失敗していた（ローカルの libsql テストでは
+   * 再現せず素通りしていた）。D1 で実績のあるクエリビルダ操作（件数取得→INSERT）に
+   * 置き換えて修正する。判定とINSERTは別クエリのため、上限ちょうどでの同時実行時に
+   * 上限を僅かに超え得るが、これは de845df6 以前と同じ挙動で許容範囲。
    */
   async consumeApiUsage(input: CreateApiUsageInput): Promise<Result<ApiUsageSelect, string>> {
     const parseResult = await createApiUsageSchema.safeParseAsync(input);
@@ -46,38 +52,42 @@ export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
       Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999) - tz;
 
     try {
-      const db = this.db as Database<"d1">;
-      const [result] = await db.all<ApiUsageSelect>(sql`
-        INSERT INTO api_usage (project_id, used_at, feature)
-        SELECT
-          ${schemas.projects.projectId},
-          ${usedAt},
-          ${apiUsage.feature ?? null}
-        FROM ${schemas.projects}
-        WHERE ${schemas.projects.projectId} = ${apiUsage.projectId}
-          AND (
-            SELECT count(*)
-            FROM ${schemas.apiUsage}
-            WHERE ${schemas.apiUsage.projectId} = ${apiUsage.projectId}
-              AND ${schemas.apiUsage.usedAt} BETWEEN ${startOfMonth} AND ${endOfMonth}
-          ) < ${schemas.projects.apiUsageLimit}
-        RETURNING
-          id AS id,
-          project_id AS "projectId",
-          used_at AS "usedAt",
-          feature AS feature
-      `);
-
-      if (result) {
-        return Ok(result);
-      }
-
       const project = await this.db.query.projects.findFirst({
         where: eq(schemas.projects.projectId, apiUsage.projectId),
       });
-      return Err(
-        project ? ApiUsageUseCaseError.MonthlyLimitExceeded : ApiUsageUseCaseError.ProjectNotFound,
-      );
+      if (!project) {
+        return Err(ApiUsageUseCaseError.ProjectNotFound);
+      }
+
+      const db = this.db as Database<"d1">;
+      const [usage] = await db
+        .select({ count: count() })
+        .from(schemas.apiUsage)
+        .where(
+          and(
+            eq(schemas.apiUsage.projectId, apiUsage.projectId),
+            between(schemas.apiUsage.usedAt, startOfMonth, endOfMonth),
+          ),
+        );
+      if (!usage) {
+        return Err(CommonUseCaseError.UnknownError);
+      }
+      if (usage.count >= project.apiUsageLimit) {
+        return Err(ApiUsageUseCaseError.MonthlyLimitExceeded);
+      }
+
+      const [result] = await this.db
+        .insert(schemas.apiUsage)
+        .values({
+          projectId: apiUsage.projectId,
+          usedAt,
+          feature: apiUsage.feature ?? null,
+        })
+        .returning();
+      if (!result) {
+        return Err(CommonUseCaseError.UnknownError);
+      }
+      return Ok(result);
     } catch (e) {
       console.error("[ApiUsageUseCase.consumeApiUsage]", e);
       return Err(CommonUseCaseError.UnknownError);
