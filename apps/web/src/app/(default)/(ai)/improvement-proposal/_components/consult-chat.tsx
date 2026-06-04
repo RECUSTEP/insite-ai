@@ -199,7 +199,16 @@ export function ConsultChat({ projectId, selectedSessionId, onSessionCreated }: 
       });
 
       if (!response.ok || !response.body) {
-        throw new Error("エラーが発生しました。");
+        // バックエンドの実エラーを拾って表示する（原因切り分けのため）。
+        let detail = "";
+        try {
+          const data = (await response.json()) as { error?: unknown; message?: unknown };
+          if (typeof data.message === "string" && data.message) detail = data.message;
+          else if (typeof data.error === "string" && data.error) detail = data.error;
+        } catch {
+          // ignore (body が JSON でない場合)
+        }
+        throw new Error(detail || "エラーが発生しました。");
       }
 
       for await (const chunk of readStream(response.body)) {
@@ -430,9 +439,8 @@ export function ConsultChat({ projectId, selectedSessionId, onSessionCreated }: 
         })}
       >
         <Stack gap={2} maxW="640px" mx="auto">
-          {/* Tone style selector */}
+          {/* Tone style selector（ラベルは非表示、ドロップダウンのみ） */}
           <Field.Root>
-            <Field.Label>出力のトーン</Field.Label>
             <ToneStyleSelect value={toneStyle} onChange={setToneStyle} />
           </Field.Root>
 

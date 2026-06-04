@@ -529,7 +529,14 @@ const analysisHandler = projectGuard.createHandlers(
 
     let image: string | undefined;
     if ("images" in form && form.images[0] instanceof File) {
-      image = await upload(c, projectId, form.images[0]);
+      // 画像の R2 保存はあくまで履歴表示用。解析自体は base64 で直接 OpenAI に
+      // 渡すため、保存に失敗しても生成は止めない（失敗時は履歴の画像URLが空になるだけ）。
+      // 以前は upload() が throw すると画像付き相談・分析が全て 500 で失敗していた。
+      try {
+        image = await upload(c, projectId, form.images[0]);
+      } catch (e) {
+        console.error("[POST /analysis] image upload failed (continuing without stored image):", e);
+      }
     }
 
     return streamText(c, async (stream) => {

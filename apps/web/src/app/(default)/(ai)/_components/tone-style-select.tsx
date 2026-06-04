@@ -39,7 +39,7 @@ export function ToneStyleSelect(props: Props) {
         if (v) props.onChange?.(v);
       }}
     >
-      <Select.Label className={css({ srOnly: !isControlled })}>出力のトーン</Select.Label>
+      <Select.Label className={css({ srOnly: true })}>出力のトーン</Select.Label>
       <Select.Control>
         <Select.Trigger>
           <Select.ValueText />
