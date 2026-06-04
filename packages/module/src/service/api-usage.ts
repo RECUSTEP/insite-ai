@@ -69,28 +69,25 @@ export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
             between(schemas.apiUsage.usedAt, startOfMonth, endOfMonth),
           ),
         );
-      if (!usage) {
-        return Err(CommonUseCaseError.UnknownError);
-      }
-      if (usage.count >= project.apiUsageLimit) {
+      if ((usage?.count ?? 0) >= project.apiUsageLimit) {
         return Err(ApiUsageUseCaseError.MonthlyLimitExceeded);
       }
 
-      const [result] = await this.db
-        .insert(schemas.apiUsage)
-        .values({
-          projectId: apiUsage.projectId,
-          usedAt,
-          feature: apiUsage.feature ?? null,
-        })
-        .returning();
-      if (!result) {
-        return Err(CommonUseCaseError.UnknownError);
-      }
-      return Ok(result);
+      // Cloudflare D1 では INSERT ... RETURNING が行を返さない/例外になることがあり、
+      // 戻り値に依存すると「行は挿入されているのに UnknownError」になり、
+      // 「Failed to record API usage」で全生成が失敗していた。
+      // RETURNING を使わず素の INSERT で記録し、例外が無ければ成功とみなす。
+      const feature = apiUsage.feature ?? null;
+      await this.db.insert(schemas.apiUsage).values({
+        projectId: apiUsage.projectId,
+        usedAt,
+        feature,
+      });
+      return Ok({ id: 0, projectId: apiUsage.projectId, usedAt, feature });
     } catch (e) {
       console.error("[ApiUsageUseCase.consumeApiUsage]", e);
-      return Err(CommonUseCaseError.UnknownError);
+      // 原因切り分けのため例外メッセージも返す（route 側で表示される）。
+      return Err(`${CommonUseCaseError.UnknownError}: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 

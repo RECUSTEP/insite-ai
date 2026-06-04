@@ -383,7 +383,7 @@ const analysisHandler = projectGuard.createHandlers(
         return c.json({ error: "Monthly API usage limit exceeded" }, 403);
       }
       console.error("[POST /analysis] Failed to record API usage:", usageResult.val);
-      return c.json({ error: "Failed to record API usage" }, 500);
+      return c.json({ error: `Failed to record API usage: ${usageResult.val}` }, 500);
     }
 
     let outputFromSeoFlow: string | null = null;
