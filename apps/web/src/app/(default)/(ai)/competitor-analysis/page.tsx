@@ -14,7 +14,6 @@ import { CompetitorAnalysisForm } from "./_components/competitor-analysis-form";
 import { CompetitorAnalysisWrapper } from "./_components/competitor-analysis-wrapper";
 import { InsightAnalysisForm } from "./_components/insight-analysis-form";
 import { MarketAnalysisForm } from "./_components/market-analysis-form";
-import { MetaInsightPanel } from "./_components/meta-insight-panel";
 
 export const metadata: Metadata = {
   title: "分析AI",
@@ -54,13 +53,9 @@ export default async function Page() {
 
   let currentProjectId = "";
   let projects: { projectId: string; name: string }[] = [];
-  let metaSocialChatEnabled = false;
-  let metaAccountLinkEnabled = false;
   if (projectRes.ok && projectsRes.ok) {
     const projectJson = await projectRes.json();
     currentProjectId = projectJson.projectId;
-    metaSocialChatEnabled = projectJson.metaSocialChatEnabled ?? false;
-    metaAccountLinkEnabled = projectJson.metaAccountLinkEnabled ?? false;
     projects = await projectsRes.json();
   }
 
@@ -71,21 +66,9 @@ export default async function Page() {
     { label: "インサイト分析", id: "insight", content: <InsightAnalysisForm /> },
   ] as TabPanelProps["panels"];
 
-  // NOTE: API 未接続のため、タブはフラグによらず常時表示（UI プレビュー用）
-  const metaTab = [
-    {
-      label: "Meta インサイト",
-      id: "meta-insight",
-      content: (
-        <MetaInsightPanel
-          metaSocialChatEnabled={metaSocialChatEnabled}
-          metaAccountLinkEnabled={metaAccountLinkEnabled}
-        />
-      ),
-    },
-  ] as TabPanelProps["panels"];
-
-  const tabs = [...baseTabs, ...metaTab] as TabPanelProps["panels"];
+  // Meta インサイトは API 未接続のモック段階のため prd では非表示。
+  // stg ではテスト用にタブを表示する（タブ追加は stg 側にのみ存在）。
+  const tabs = baseTabs;
 
   const helpPopoverContents: HelpPopoverProps["contents"] = [
     { title: "市場分析", id: "market" },
@@ -93,10 +76,6 @@ export default async function Page() {
     { title: "自社アカウント分析", id: "account" },
     { title: "インサイト分析", id: "insight" },
   ];
-  helpPopoverContents.push({
-    title: "Meta インサイト（Instagram・Threads）",
-    id: "meta-insight",
-  });
 
   return (
     <CompetitorAnalysisWrapper>
