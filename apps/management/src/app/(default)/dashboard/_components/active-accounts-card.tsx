@@ -34,7 +34,7 @@ export function ActiveAccountsCard({ activeAuth, totalAuth }: Props) {
               letterSpacing: "0.02em",
             })}
           >
-            アクティブアカウント率
+            全体の使用率
           </span>
           <span
             className={css({
@@ -94,8 +94,7 @@ export function ActiveAccountsCard({ activeAuth, totalAuth }: Props) {
             })}
             style={{
               width: `${Math.max(2, pct)}%`,
-              background:
-                "linear-gradient(90deg, #10B981 0%, #06B6D4 100%)",
+              background: "linear-gradient(90deg, #10B981 0%, #06B6D4 100%)",
             }}
           />
         </div>
@@ -128,9 +127,7 @@ function Legend({
         })}
         style={{ background: dotColor }}
       />
-      <span className={css({ fontSize: "xs", color: "fg.muted" })}>
-        {label}
-      </span>
+      <span className={css({ fontSize: "xs", color: "fg.muted" })}>{label}</span>
       <span className={css({ fontSize: "xs", fontWeight: "semibold" })}>
         {value.toLocaleString()}
       </span>

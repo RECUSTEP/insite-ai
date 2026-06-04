@@ -1,6 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import { fileUpload } from "@repo/configuration";
-import { CommonUseCaseError } from "@repo/module/error";
+import { ApiUsageUseCaseError, CommonUseCaseError } from "@repo/module/error";
 import { omit } from "es-toolkit";
 import { streamText } from "hono/streaming";
 import { validator } from "hono/validator";
@@ -294,16 +294,9 @@ const analysisHandler = projectGuard.createHandlers(
     const project = await c.var.projectUseCase.getProject({
       projectId,
     });
-    const monthlyUsage = await c.var.apiUsageUseCase.getMonthlyApiUsageCount({
-      projectId,
-    });
 
-    if (!project.ok || !monthlyUsage.ok) {
+    if (!project.ok) {
       return c.json({ error: "Internal Server Error" }, 500);
-    }
-
-    if (project.val.apiUsageLimit <= monthlyUsage.val) {
-      return c.json({ error: "Monthly API usage limit exceeded" }, 403);
     }
 
     let system: string;
@@ -365,7 +358,20 @@ const analysisHandler = projectGuard.createHandlers(
       form.toneStyle &&
       TONE_STYLE_PROMPTS[form.toneStyle]
     ) {
-      system += "\n\n" + TONE_STYLE_PROMPTS[form.toneStyle];
+      system += `\n\n${TONE_STYLE_PROMPTS[form.toneStyle]}`;
+    }
+
+    // 外部API呼び出し前に使用量を確定する。ストリーム切断時にも未加算にしない。
+    const usageResult = await c.var.apiUsageUseCase.consumeApiUsage({
+      projectId,
+      feature: type,
+    });
+    if (!usageResult.ok) {
+      if (usageResult.val === ApiUsageUseCaseError.MonthlyLimitExceeded) {
+        return c.json({ error: "Monthly API usage limit exceeded" }, 403);
+      }
+      console.error("[POST /analysis] Failed to record API usage:", usageResult.val);
+      return c.json({ error: "Failed to record API usage" }, 500);
     }
 
     let outputFromSeoFlow: string | null = null;
@@ -525,15 +531,6 @@ const analysisHandler = projectGuard.createHandlers(
           output += text;
         }
       }
-
-      // API 使用量はストリーム完了前にコミットする必要がある。
-      // 以前は waitUntil で fire-and-forget していたため、クライアントが
-      // ストリーム終了直後にキャッシュをリバリデートしてもインクリメント前の
-      // データが返り「使用量が増えない」バグになっていた。
-      await c.var.apiUsageUseCase.createApiUsage({
-        projectId,
-        feature: type,
-      });
 
       await c.var.analysisHistoryUseCase.createAnalysisHistory({
         projectId,

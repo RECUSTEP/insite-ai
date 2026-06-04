@@ -1,3 +1,4 @@
+import { ApiUsageUseCaseError } from "@repo/module/error";
 import { omit } from "es-toolkit";
 import { chatgptOnce, replacePlaceholders } from "../libs/chatgpt";
 import { projectGuard } from "./_factory";
@@ -75,6 +76,18 @@ const handler = projectGuard.createHandlers(async (c) => {
     ]),
   );
   const user = replacePlaceholders(USER_PROMPT_TEMPLATE, values);
+
+  const usageResult = await c.var.apiUsageUseCase.consumeApiUsage({
+    projectId,
+    feature: "seo-suggest-keywords",
+  });
+  if (!usageResult.ok) {
+    if (usageResult.val === ApiUsageUseCaseError.MonthlyLimitExceeded) {
+      return c.json({ error: "Monthly API usage limit exceeded" }, 403);
+    }
+    console.error("[POST /seo-suggest-keywords] Failed to record API usage:", usageResult.val);
+    return c.json({ error: "Failed to record API usage" }, 500);
+  }
 
   const responseText = await chatgptOnce(c.var.applicationSettingUseCase, SYSTEM_PROMPT, user);
 

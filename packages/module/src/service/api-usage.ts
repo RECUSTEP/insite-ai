@@ -28,6 +28,62 @@ export const getApiUsageSchema = apiUsageSelectSchema.pick({ projectId: true });
 export type GetApiUsageInput = z.infer<typeof getApiUsageSchema>;
 
 export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
+  /**
+   * 月間上限未満の場合だけ使用量を1件追加する。
+   * 判定と追加を単一SQLで行い、同時リクエストによる上限超過を防ぐ。
+   */
+  async consumeApiUsage(input: CreateApiUsageInput): Promise<Result<ApiUsageSelect, string>> {
+    const parseResult = await createApiUsageSchema.safeParseAsync(input);
+    if (!parseResult.success) {
+      return Err(CommonUseCaseError.InvalidInput);
+    }
+    const apiUsage = parseResult.data;
+    const usedAt = apiUsage.usedAt ?? Date.now();
+    const tz = 9 * 60 * 60 * 1000;
+    const now = new Date(usedAt + tz);
+    const startOfMonth = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0) - tz;
+    const endOfMonth =
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999) - tz;
+
+    try {
+      const db = this.db as Database<"d1">;
+      const [result] = await db.all<ApiUsageSelect>(sql`
+        INSERT INTO api_usage (project_id, used_at, feature)
+        SELECT
+          ${schemas.projects.projectId},
+          ${usedAt},
+          ${apiUsage.feature ?? null}
+        FROM ${schemas.projects}
+        WHERE ${schemas.projects.projectId} = ${apiUsage.projectId}
+          AND (
+            SELECT count(*)
+            FROM ${schemas.apiUsage}
+            WHERE ${schemas.apiUsage.projectId} = ${apiUsage.projectId}
+              AND ${schemas.apiUsage.usedAt} BETWEEN ${startOfMonth} AND ${endOfMonth}
+          ) < ${schemas.projects.apiUsageLimit}
+        RETURNING
+          id AS id,
+          project_id AS "projectId",
+          used_at AS "usedAt",
+          feature AS feature
+      `);
+
+      if (result) {
+        return Ok(result);
+      }
+
+      const project = await this.db.query.projects.findFirst({
+        where: eq(schemas.projects.projectId, apiUsage.projectId),
+      });
+      return Err(
+        project ? ApiUsageUseCaseError.MonthlyLimitExceeded : ApiUsageUseCaseError.ProjectNotFound,
+      );
+    } catch (e) {
+      console.error("[ApiUsageUseCase.consumeApiUsage]", e);
+      return Err(CommonUseCaseError.UnknownError);
+    }
+  }
+
   async createApiUsage(input: CreateApiUsageInput): Promise<Result<ApiUsageSelect, string>> {
     const parseResult = await createApiUsageSchema.safeParseAsync(input);
     if (!parseResult.success) {
@@ -187,12 +243,8 @@ export class ApiUsageUseCase<T extends "d1" | "libsql"> extends UseCase<T> {
         .where(
           and(gte(schemas.apiUsage.usedAt, startOfRange), lte(schemas.apiUsage.usedAt, endOfRange)),
         )
-        .groupBy(
-          sql`strftime('%Y-%m', ${schemas.apiUsage.usedAt}/1000, 'unixepoch', '+9 hours')`,
-        )
-        .orderBy(
-          sql`strftime('%Y-%m', ${schemas.apiUsage.usedAt}/1000, 'unixepoch', '+9 hours')`,
-        );
+        .groupBy(sql`strftime('%Y-%m', ${schemas.apiUsage.usedAt}/1000, 'unixepoch', '+9 hours')`)
+        .orderBy(sql`strftime('%Y-%m', ${schemas.apiUsage.usedAt}/1000, 'unixepoch', '+9 hours')`);
 
       const countByMonth = new Map<string, number>();
       for (let i = 0; i < months; i++) {

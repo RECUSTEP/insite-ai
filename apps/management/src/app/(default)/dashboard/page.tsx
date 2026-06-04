@@ -1,5 +1,6 @@
 import { Text } from "@/components/ui/text";
 import { createClient } from "@/lib/api";
+import { BarChart3, Folder, Users, Zap } from "lucide-react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Box, Container, Grid, HStack, VStack } from "styled-system/jsx";
@@ -25,7 +26,9 @@ export default async function DashboardPage() {
     totalProjects?: number;
     totalAuth?: number;
     activeAuth?: number;
+    loginUsageRate?: number;
     monthlyUsage?: number;
+    last30DaysUsage?: number;
     monthlyUsageStats?: unknown[];
     usageByFeature?: unknown[];
     usageByAccount?: unknown[];
@@ -75,9 +78,7 @@ export default async function DashboardPage() {
               color: "#991b1b",
             }}
           >
-            <p style={{ fontWeight: 600, marginBottom: "0.5rem" }}>
-              データの取得に失敗しました
-            </p>
+            <p style={{ fontWeight: 600, marginBottom: "0.5rem" }}>データの取得に失敗しました</p>
             <p style={{ fontSize: "0.875rem" }}>
               ページを再読み込みするか、しばらく経ってから再度お試しください。
             </p>
@@ -94,31 +95,27 @@ export default async function DashboardPage() {
   const totalProjects = Number(data.totalProjects) || 0;
   const totalAuth = Number(data.totalAuth) || 0;
   const activeAuth = Number(data.activeAuth) || 0;
+  const loginUsageRate = Number(data.loginUsageRate) || 0;
   const monthlyUsage = Number(data.monthlyUsage) || 0;
+  const last30DaysUsage = Number(data.last30DaysUsage) || 0;
   const usageByFeature = (Array.isArray(data.usageByFeature) ? data.usageByFeature : []) as {
     feature: string;
     count: number;
   }[];
-  const usageByAccount = (Array.isArray(data.usageByAccount)
-    ? data.usageByAccount
-    : []) as UsageByAccountRow[];
-  const monthlyUsageStats = (Array.isArray(data.monthlyUsageStats)
-    ? data.monthlyUsageStats
-    : []) as { month: string; count: number }[];
+  const usageByAccount = (
+    Array.isArray(data.usageByAccount) ? data.usageByAccount : []
+  ) as UsageByAccountRow[];
+  const monthlyUsageStats = (
+    Array.isArray(data.monthlyUsageStats) ? data.monthlyUsageStats : []
+  ) as { month: string; count: number }[];
 
   const now = new Date();
   const monthLabel = `${now.getFullYear()}年${now.getMonth() + 1}月`;
-  const activeRatio = totalAuth > 0 ? Math.round((activeAuth / totalAuth) * 1000) / 10 : 0;
   const avgUsagePerActive = activeAuth > 0 ? Math.round(monthlyUsage / activeAuth) : 0;
 
   return (
     <Container py={6} w="full" maxW="full">
-      <Grid
-        columns={{ base: 1, lg: 12 }}
-        gap={6}
-        w="full"
-        alignItems="start"
-      >
+      <Grid columns={{ base: 1, lg: 12 }} gap={6} w="full" alignItems="start">
         {/* 左サイドバー: サマリーカード + セクション内ナビ */}
         <Box
           gridColumn={{ base: "auto", lg: "span 4", xl: "span 3" }}
@@ -130,45 +127,43 @@ export default async function DashboardPage() {
               <Text as="h1" size="xl">
                 ダッシュボード
               </Text>
-              <span style={{ fontSize: "0.75rem", color: "#71717A" }}>
-                集計対象: {monthLabel}
-              </span>
+              <span style={{ fontSize: "0.75rem", color: "#71717A" }}>集計対象: {monthLabel}</span>
             </VStack>
 
             <StatCard
-              label="今月のAPI使用量"
-              value={monthlyUsage}
+              label="直近30日のAPI使用量"
+              value={last30DaysUsage}
               tone="blue"
-              sub={`${monthLabel} 累計`}
-              icon={<IconBolt />}
+              sub="全アカウント合計"
+              icon={<Zap size={18} />}
             />
             <StatCard
-              label="アクティブアカウント"
-              value={activeAuth}
+              label="全体の使用率"
+              value={`${loginUsageRate}%`}
               tone="emerald"
-              sub={`全 ${totalAuth.toLocaleString()} 中 ${activeRatio}%`}
-              icon={<IconUsers />}
+              sub={`ログイン中 ${activeAuth.toLocaleString()} / 全 ${totalAuth.toLocaleString()} アカウント`}
+              icon={<Users size={18} />}
             />
             <StatCard
               label="総プロジェクト数"
               value={totalProjects}
               tone="violet"
               sub="登録済みプロジェクト"
-              icon={<IconFolder />}
+              icon={<Folder size={18} />}
             />
             <StatCard
               label="アクティブ平均使用量"
               value={avgUsagePerActive}
               tone="amber"
               sub="稼働中アカウントあたり"
-              icon={<IconChart />}
+              icon={<BarChart3 size={18} />}
             />
 
             <DashboardSideNav
               items={[
                 { href: "#trend", label: "30日間の推移" },
                 { href: "#monthly", label: "月別推移（折れ線＋棒）" },
-                { href: "#active", label: "アクティブ率" },
+                { href: "#active", label: "全体の使用率" },
                 { href: "#by-account", label: "アカウント別使用量" },
                 { href: "#by-feature", label: "機能別使用量" },
               ]}
@@ -177,10 +172,7 @@ export default async function DashboardPage() {
         </Box>
 
         {/* 右メインカラム: チャート・テーブル */}
-        <Box
-          gridColumn={{ base: "auto", lg: "span 8", xl: "span 9" }}
-          minW={0}
-        >
+        <Box gridColumn={{ base: "auto", lg: "span 8", xl: "span 9" }} minW={0}>
           <VStack gap={6} alignItems="stretch">
             <Section id="trend" title="直近30日間のAPI使用量" subtitle="日別の推移">
               <DashboardChart data={dailyUsage} />
@@ -194,7 +186,7 @@ export default async function DashboardPage() {
               <MonthlyUsageChart data={monthlyUsageStats} />
             </Section>
 
-            <Section id="active" title="アクティブアカウント率" subtitle="ログイン中セッション基準">
+            <Section id="active" title="全体の使用率" subtitle="ログイン中セッション基準">
               <ActiveAccountsCard activeAuth={activeAuth} totalAuth={totalAuth} />
             </Section>
 
@@ -241,39 +233,5 @@ function Section({
       </HStack>
       {children}
     </VStack>
-  );
-}
-
-function IconBolt() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-    </svg>
-  );
-}
-function IconUsers() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
-}
-function IconFolder() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-    </svg>
-  );
-}
-function IconChart() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <line x1="12" y1="20" x2="12" y2="10" />
-      <line x1="18" y1="20" x2="18" y2="4" />
-      <line x1="6" y1="20" x2="6" y2="16" />
-    </svg>
   );
 }

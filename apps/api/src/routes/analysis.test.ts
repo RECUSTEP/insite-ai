@@ -116,10 +116,9 @@ describe("analysis", () => {
     expect(res.status).toBe(200);
   });
 
-  it("API使用数が増える", async () => {
+  it("レスポンスストリームを読み切る前でもAPI使用数が増える", async () => {
     await createProject();
     const session = await createSession();
-    const [wait, resolve, reject] = splitPromise();
     const res = await testClient(
       app,
       {
@@ -128,7 +127,7 @@ describe("analysis", () => {
         },
       },
       {
-        waitUntil: (p) => p.then(resolve).catch(reject),
+        waitUntil: () => undefined,
         passThroughOnException: () => undefined,
       },
     ).index.$post(
@@ -148,7 +147,6 @@ describe("analysis", () => {
       },
     );
     expect(res.status).toBe(200);
-    await wait;
     const usage = await apiUsageUseCase.getMonthlyApiUsageCount({
       projectId: session.projectId ?? "test",
     });

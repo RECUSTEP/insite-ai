@@ -23,6 +23,7 @@ export const ProjectUseCaseError = {
 
 export const ApiUsageUseCaseError = {
   ProjectNotFound: "ApiUsageProjectNotFound",
+  MonthlyLimitExceeded: "ApiUsageMonthlyLimitExceeded",
 } as const;
 
 export const AnalysisHistoryUseCaseError = {

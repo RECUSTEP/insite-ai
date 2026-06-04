@@ -50,6 +50,21 @@ describe("ApiUsageUseCase", () => {
     expect(result.val).toBe(10);
   });
 
+  it("月間上限未満の場合だけAPI利用履歴を消費できる", async () => {
+    const projectUseCase = new ProjectUseCase(db);
+    await projectUseCase.updateProject({
+      projectId: defaultProject.projectId,
+      apiUsageLimit: 1,
+    });
+
+    const first = await usecase.consumeApiUsage({ projectId: defaultProject.projectId });
+    const second = await usecase.consumeApiUsage({ projectId: defaultProject.projectId });
+
+    expect(first.ok).toBe(true);
+    expect(second.ok).toBe(false);
+    expect(second.val).toBe(ApiUsageUseCaseError.MonthlyLimitExceeded);
+  });
+
   it("月間のAPI利用回数が取得できる", async () => {
     const result = await usecase.getMonthlyApiUsageCount({ projectId: defaultProject.projectId });
     expect(result.ok).toBe(true);

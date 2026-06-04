@@ -1,5 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
-import { CommonUseCaseError } from "@repo/module/error";
+import { ApiUsageUseCaseError, CommonUseCaseError } from "@repo/module/error";
 import { omit } from "es-toolkit";
 import { z } from "zod";
 import {
@@ -36,14 +36,8 @@ const handler = projectGuard.createHandlers(
     const project = await c.var.projectUseCase.getProject({
       projectId,
     });
-    const monthlyUsage = await c.var.apiUsageUseCase.getMonthlyApiUsageCount({
-      projectId,
-    });
-    if (!project.ok || !monthlyUsage.ok) {
+    if (!project.ok) {
       return c.json({ error: "Internal Server Error" }, 500);
-    }
-    if (project.val.apiUsageLimit <= monthlyUsage.val) {
-      return c.json({ error: "Monthly API usage limit exceeded" }, 403);
     }
 
     const historyResult = await c.var.analysisHistoryUseCase.getAnalysisHistory({ id: historyId });
@@ -96,6 +90,18 @@ const handler = projectGuard.createHandlers(
         revisionInstruction,
       );
       system = promptResult.system;
+    }
+
+    const usageResult = await c.var.apiUsageUseCase.consumeApiUsage({
+      projectId,
+      feature: "seo-article-revise",
+    });
+    if (!usageResult.ok) {
+      if (usageResult.val === ApiUsageUseCaseError.MonthlyLimitExceeded) {
+        return c.json({ error: "Monthly API usage limit exceeded" }, 403);
+      }
+      console.error("[POST /seo-article-revise] Failed to record API usage:", usageResult.val);
+      return c.json({ error: "Failed to record API usage" }, 500);
     }
 
     const targetSectionIndexes = await detectTargetSectionIndexes(c.var.applicationSettingUseCase, {
@@ -170,13 +176,6 @@ const handler = projectGuard.createHandlers(
     if (!createResult.ok) {
       return c.json({ error: "履歴保存に失敗しました" }, 500);
     }
-
-    // レスポンスを返す前に await して使用量を確定させる
-    // （waitUntil だと revalidate 時点でまだ反映されていない可能性がある）
-    await c.var.apiUsageUseCase.createApiUsage({
-      projectId,
-      feature: "seo-article-revise",
-    });
 
     return c.json({
       output: revisedOutput,
