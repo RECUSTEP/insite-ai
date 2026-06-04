@@ -5,7 +5,6 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Box, Container, Grid, HStack, VStack } from "styled-system/jsx";
 import { ActiveAccountsCard } from "./_components/active-accounts-card";
-import { DashboardChart } from "./_components/dashboard-chart";
 import { DashboardSideNav } from "./_components/dashboard-side-nav";
 import { MonthlyUsageChart } from "./_components/monthly-usage-chart";
 import { StatCard } from "./_components/stat-card";
@@ -88,10 +87,6 @@ export default async function DashboardPage() {
     );
   }
 
-  const dailyUsage = (Array.isArray(data.dailyUsage) ? data.dailyUsage : []) as {
-    date: string;
-    count: number;
-  }[];
   const totalProjects = Number(data.totalProjects) || 0;
   const totalAuth = Number(data.totalAuth) || 0;
   const activeAuth = Number(data.activeAuth) || 0;
@@ -161,7 +156,6 @@ export default async function DashboardPage() {
 
             <DashboardSideNav
               items={[
-                { href: "#trend", label: "30日間の推移" },
                 { href: "#monthly", label: "月別推移（折れ線＋棒）" },
                 { href: "#active", label: "全体の使用率" },
                 { href: "#by-account", label: "アカウント別使用量" },
@@ -174,10 +168,6 @@ export default async function DashboardPage() {
         {/* 右メインカラム: チャート・テーブル */}
         <Box gridColumn={{ base: "auto", lg: "span 8", xl: "span 9" }} minW={0}>
           <VStack gap={6} alignItems="stretch">
-            <Section id="trend" title="直近30日間のAPI使用量" subtitle="日別の推移">
-              <DashboardChart data={dailyUsage} />
-            </Section>
-
             <Section
               id="monthly"
               title="月別API使用量（折れ線＋棒）"
