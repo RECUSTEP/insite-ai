@@ -343,13 +343,25 @@ const analysisHandler = projectGuard.createHandlers(
         user = got.user;
       }
     } else {
-      const got = await getPrompt(c.var.promptUseCase, c.var.projectInfoUseCase)(
-        projectId,
-        type,
-        "instruction" in form ? form.instruction : undefined,
-      );
-      system = got.system;
-      user = got.user;
+      const getPromptFor = getPrompt(c.var.promptUseCase, c.var.projectInfoUseCase);
+      const instruction = "instruction" in form ? form.instruction : undefined;
+      try {
+        const got = await getPromptFor(projectId, type, instruction);
+        system = got.system;
+        user = got.user;
+      } catch (e) {
+        // AIコンサルタント（画像あり=improvement）のプロンプトが未設定の環境では
+        // getPrompt が "Prompt not found" で throw し、画像付き相談が全て
+        // 「エラーが発生しました。」で失敗していた。AI相談（improvement-no-image）の
+        // プロンプトにフォールバックして、画像付き相談を動作させる。
+        if (type === "improvement") {
+          const got = await getPromptFor(projectId, "improvement-no-image", instruction);
+          system = got.system;
+          user = got.user;
+        } else {
+          throw e;
+        }
+      }
     }
 
     if (
