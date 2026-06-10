@@ -50,7 +50,7 @@ function basicAuth() {
 function adminGuard(middleware: NextMiddleware) {
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { pathname } = req.nextUrl;
-    if (pathname.match(/^\/(api|_next\/static|favicon.ico|public|announce)/)) {
+    if (pathname.match(/^\/(api|_next\/static|favicon.ico|public|announce|terms|privacy)/)) {
       return middleware(req, event);
     }
 
