@@ -1,153 +1,95 @@
 "use client";
 
-import { Dialog } from "@/components/ui/dialog";
 import { IconButton } from "@/components/ui/icon-button";
 import { Popover } from "@/components/ui/popover";
-import { FileTextIcon, ScaleIcon, ScrollTextIcon, XIcon } from "lucide-react";
-import { useState } from "react";
+import { FileTextIcon, ScaleIcon, ScrollTextIcon } from "lucide-react";
+import Link from "next/link";
 import { css } from "styled-system/css";
 import { Stack } from "styled-system/jsx";
 
-type DocKey = "privacy" | "terms" | null;
-
 export function LegalDocuments() {
-  const [openDoc, setOpenDoc] = useState<DocKey>(null);
-
   return (
-    <>
-      <Popover.Root positioning={{ placement: "top-end" }}>
-        <div
-          className={css({
-            position: "fixed",
-            right: "16px",
-            bottom: "16px",
-            zIndex: 50,
-          })}
-        >
-          <Popover.Trigger asChild>
-            <IconButton
-              aria-label="利用規約・プライバシーポリシー"
-              variant="outline"
-              size="sm"
-              className={css({
-                bg: { base: "white", _dark: "#18181B" },
-                borderColor: { base: "#E4E4E7", _dark: "#3F3F46" },
-                color: { base: "#71717A", _dark: "#A1A1AA" },
-                shadow: "md",
-                rounded: "full",
-                _hover: {
-                  bg: { base: "#F4F4F5", _dark: "#27272A" },
-                  color: { base: "#09090B", _dark: "#FAFAFA" },
-                },
-              })}
-            >
-              <ScaleIcon size={16} />
-            </IconButton>
-          </Popover.Trigger>
-        </div>
-        <Popover.Positioner>
-          <Popover.Content minW="220px">
-            <Stack gap="1" p="1">
-              <button
-                type="button"
-                onClick={() => setOpenDoc("terms")}
-                className={css({
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "2",
-                  w: "full",
-                  px: "3",
-                  py: "2",
-                  rounded: "md",
-                  fontSize: "sm",
-                  color: { base: "#3F3F46", _dark: "#E4E4E7" },
-                  cursor: "pointer",
-                  _hover: { bg: { base: "#F4F4F5", _dark: "#27272A" } },
-                })}
-              >
-                <ScrollTextIcon size={14} />
-                利用規約
-              </button>
-              <button
-                type="button"
-                onClick={() => setOpenDoc("privacy")}
-                className={css({
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "2",
-                  w: "full",
-                  px: "3",
-                  py: "2",
-                  rounded: "md",
-                  fontSize: "sm",
-                  color: { base: "#3F3F46", _dark: "#E4E4E7" },
-                  cursor: "pointer",
-                  _hover: { bg: { base: "#F4F4F5", _dark: "#27272A" } },
-                })}
-              >
-                <FileTextIcon size={14} />
-                プライバシーポリシー
-              </button>
-            </Stack>
-          </Popover.Content>
-        </Popover.Positioner>
-      </Popover.Root>
-
-      <Dialog.Root
-        open={openDoc !== null}
-        onOpenChange={(e) => {
-          if (!e.open) setOpenDoc(null);
-        }}
+    <Popover.Root positioning={{ placement: "top-end" }}>
+      <div
+        className={css({
+          position: "fixed",
+          right: "16px",
+          bottom: "16px",
+          zIndex: 50,
+        })}
       >
-        <Dialog.Backdrop />
-        <Dialog.Positioner>
-          <Dialog.Content
+        <Popover.Trigger asChild>
+          <IconButton
+            aria-label="利用規約・プライバシーポリシー"
+            variant="outline"
+            size="sm"
             className={css({
-              w: "min(92vw, 800px)",
-              maxH: "85vh",
-              display: "flex",
-              flexDirection: "column",
+              bg: { base: "white", _dark: "#18181B" },
+              borderColor: { base: "#E4E4E7", _dark: "#3F3F46" },
+              color: { base: "#71717A", _dark: "#A1A1AA" },
+              shadow: "md",
+              rounded: "full",
+              _hover: {
+                bg: { base: "#F4F4F5", _dark: "#27272A" },
+                color: { base: "#09090B", _dark: "#FAFAFA" },
+              },
             })}
           >
-            <div
+            <ScaleIcon size={16} />
+          </IconButton>
+        </Popover.Trigger>
+      </div>
+      <Popover.Positioner>
+        <Popover.Content minW="220px">
+          <Stack gap="1" p="1">
+            <Link
+              href="/terms"
               className={css({
-                px: "6",
-                pt: "6",
-                pb: "3",
-                borderBottomWidth: "1px",
-                borderColor: { base: "#E4E4E7", _dark: "#27272A" },
-              })}
-            >
-              <Dialog.Title>
-                {openDoc === "privacy" ? "プライバシーポリシー" : "利用規約"}
-              </Dialog.Title>
-            </div>
-            <div
-              className={css({
-                px: "6",
-                py: "4",
-                overflowY: "auto",
+                display: "flex",
+                alignItems: "center",
+                gap: "2",
+                w: "full",
+                px: "3",
+                py: "2",
+                rounded: "md",
                 fontSize: "sm",
-                lineHeight: 1.8,
-                color: { base: "#3F3F46", _dark: "#D4D4D8" },
-                whiteSpace: "pre-wrap",
+                color: { base: "#3F3F46", _dark: "#E4E4E7" },
+                cursor: "pointer",
+                textDecoration: "none",
+                _hover: { bg: { base: "#F4F4F5", _dark: "#27272A" } },
               })}
             >
-              {openDoc === "privacy" ? PRIVACY_POLICY : openDoc === "terms" ? TERMS_OF_SERVICE : ""}
-            </div>
-            <Dialog.CloseTrigger asChild position="absolute" top="4" right="4">
-              <IconButton aria-label="ダイアログを閉じる" variant="ghost" size="sm">
-                <XIcon />
-              </IconButton>
-            </Dialog.CloseTrigger>
-          </Dialog.Content>
-        </Dialog.Positioner>
-      </Dialog.Root>
-    </>
+              <ScrollTextIcon size={14} />
+              利用規約
+            </Link>
+            <Link
+              href="/privacy"
+              className={css({
+                display: "flex",
+                alignItems: "center",
+                gap: "2",
+                w: "full",
+                px: "3",
+                py: "2",
+                rounded: "md",
+                fontSize: "sm",
+                color: { base: "#3F3F46", _dark: "#E4E4E7" },
+                cursor: "pointer",
+                textDecoration: "none",
+                _hover: { bg: { base: "#F4F4F5", _dark: "#27272A" } },
+              })}
+            >
+              <FileTextIcon size={14} />
+              プライバシーポリシー
+            </Link>
+          </Stack>
+        </Popover.Content>
+      </Popover.Positioner>
+    </Popover.Root>
   );
 }
 
-const PRIVACY_POLICY = `株式会社SAI（以下、「当社」といいます。）は、お客様からお送り頂いた個人情報の取扱いについて、以下のとおりプライバシーポリシー（以下、「本ポリシー」といいます。）を定めます。
+export const PRIVACY_POLICY = `株式会社SAI（以下、「当社」といいます。）は、お客様からお送り頂いた個人情報の取扱いについて、以下のとおりプライバシーポリシー（以下、「本ポリシー」といいます。）を定めます。
 
 第1条（個人情報）
 「個人情報」とは、個人情報保護法にいう「個人情報」を指すものとし、生存する個人に関する情報であって、当該情報に含まれる氏名、住所、電話番号、連絡先その他の記述等により特定の個人を識別できる情報及び容貌、指紋、声紋にかかるデータ、及び健康保険証の保険者番号などの当該情報単体から特定の個人を識別できる情報（個人識別情報）を指します。
@@ -207,7 +149,7 @@ const PRIVACY_POLICY = `株式会社SAI（以下、「当社」といいます�
 本ポリシーに関するお問い合わせは、下記の窓口までお願いいたします。
 メールアドレス：info@sai-official.net`;
 
-const TERMS_OF_SERVICE = `この利用規約（以下、「本規約」といいます。）は、株式会社SAI（以下、「当社」といいます。）が当社のウェブサイト上で提供するINSITE AI（以下、「本サービス」といいます。）の利用条件を定めるものです。登録ユーザーの皆さま（以下、「ユーザー」といいます。）には、本規約を全てお読み頂き本規約に従って、本サービスをご利用いただきます。
+export const TERMS_OF_SERVICE = `この利用規約（以下、「本規約」といいます。）は、株式会社SAI（以下、「当社」といいます。）が当社のウェブサイト上で提供するINSITE AI（以下、「本サービス」といいます。）の利用条件を定めるものです。登録ユーザーの皆さま（以下、「ユーザー」といいます。）には、本規約を全てお読み頂き本規約に従って、本サービスをご利用いただきます。
 
 第1条（適用）
 1. 本規約は、本サービスの提供条件及び本サービス利用に関する当社とユーザーとの間の権利義務関係を定めることを目的とし、ユーザーと当社との間の本サービスの利用に関わる一切の関係に適用されるものとします。
