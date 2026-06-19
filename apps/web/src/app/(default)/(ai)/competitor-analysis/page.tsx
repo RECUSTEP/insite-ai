@@ -54,11 +54,13 @@ export default async function Page() {
 
   let currentProjectId = "";
   let projects: { projectId: string; name: string }[] = [];
+  let metaInsightEnabled = false;
   let metaSocialChatEnabled = false;
   let metaAccountLinkEnabled = false;
   if (projectRes.ok && projectsRes.ok) {
     const projectJson = await projectRes.json();
     currentProjectId = projectJson.projectId;
+    metaInsightEnabled = projectJson.metaInsightEnabled ?? false;
     metaSocialChatEnabled = projectJson.metaSocialChatEnabled ?? false;
     metaAccountLinkEnabled = projectJson.metaAccountLinkEnabled ?? false;
     projects = await projectsRes.json();
@@ -71,19 +73,20 @@ export default async function Page() {
     { label: "インサイト分析", id: "insight", content: <InsightAnalysisForm /> },
   ] as TabPanelProps["panels"];
 
-  // NOTE: API 未接続のため、タブはフラグによらず常時表示（UI プレビュー用）
-  const metaTab = [
-    {
-      label: "Meta インサイト",
-      id: "meta-insight",
-      content: (
-        <MetaInsightPanel
-          metaSocialChatEnabled={metaSocialChatEnabled}
-          metaAccountLinkEnabled={metaAccountLinkEnabled}
-        />
-      ),
-    },
-  ] as TabPanelProps["panels"];
+  const metaTab = metaInsightEnabled
+    ? ([
+        {
+          label: "Meta インサイト",
+          id: "meta-insight",
+          content: (
+            <MetaInsightPanel
+              metaSocialChatEnabled={metaSocialChatEnabled}
+              metaAccountLinkEnabled={metaAccountLinkEnabled}
+            />
+          ),
+        },
+      ] as TabPanelProps["panels"])
+    : [];
 
   const tabs = [...baseTabs, ...metaTab] as TabPanelProps["panels"];
 
@@ -93,10 +96,12 @@ export default async function Page() {
     { title: "自社アカウント分析", id: "account" },
     { title: "インサイト分析", id: "insight" },
   ];
-  helpPopoverContents.push({
-    title: "Meta インサイト（Instagram・Threads）",
-    id: "meta-insight",
-  });
+  if (metaInsightEnabled) {
+    helpPopoverContents.push({
+      title: "Meta インサイト（Instagram・Threads）",
+      id: "meta-insight",
+    });
+  }
 
   return (
     <CompetitorAnalysisWrapper>
