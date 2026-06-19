@@ -24,7 +24,7 @@ jobs:
       # 2) Node.js + pnpm
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: corepack enable
 
       # 3) モノレポ全体の依存をインストール
