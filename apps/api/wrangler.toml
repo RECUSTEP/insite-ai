@@ -18,6 +18,12 @@ binding = "DB"
 database_name = "database"
 database_id = "88fa7318-dd4a-4812-926e-3d718351c52d"
 
+[env.preview.vars]
+META_APP_ID = "1701350637561455"
+META_REDIRECT_URI = "https://insiteai-api-preview.nakata-haruka.workers.dev/meta/callback"
+META_CONFIG_ID = "2495168324281887"
+META_CALLBACK_FRONTEND_URL = "https://stg.insiteai-web.pages.dev"
+
 [[env.preview.r2_buckets]]
 binding = "BUCKET"
 bucket_name = "insiteai"
