@@ -75,8 +75,20 @@ const profileInsightsHandler = projectGuard.createHandlers(async (c) => {
 
   const { instagramUserId, accessToken } = account.val;
   const period = c.req.query("period") || "day";
+  const since = c.req.query("since");
+  const until = c.req.query("until");
 
   const metrics = ["impressions", "reach", "profile_views"].join(",");
+  const params = new URLSearchParams({
+    metric: metrics,
+    period,
+  });
+  if (since) {
+    params.set("since", since);
+  }
+  if (until) {
+    params.set("until", until);
+  }
 
   const data = await metaGet<{
     data?: Array<{
@@ -84,14 +96,23 @@ const profileInsightsHandler = projectGuard.createHandlers(async (c) => {
       period: string;
       values: Array<{ value: number; end_time: string }>;
     }>;
-  }>(`/${instagramUserId}/insights?metric=${metrics}&period=${period}`, accessToken);
+  }>(`/${instagramUserId}/insights?${params.toString()}`, accessToken);
 
   if (data.error) {
     console.error("Profile insights error:", data.error);
     return c.json({ error: `Meta API エラー: ${data.error.message}` }, 400);
   }
 
-  return c.json({ insights: data.data ?? [] });
+  return c.json({
+    insights:
+      data.data?.map((metric) => ({
+        ...metric,
+        values: metric.values.map((value) => ({
+          value: value.value,
+          endTime: value.end_time,
+        })),
+      })) ?? [],
+  });
 });
 
 // ============================================================
