@@ -1,3 +1,6 @@
+import { Hono } from "hono";
+import type { Env } from "../env";
+import { factory } from "../libs/hono";
 import { projectGuard } from "./_factory";
 
 const META_API_VERSION = "v21.0";
@@ -133,7 +136,7 @@ async function findInstagramAccount(pages: PagesResponse["data"]) {
 // ============================================================
 // GET /meta/callback — OAuth コールバック処理
 // ============================================================
-const callbackHandler = projectGuard.createHandlers(async (c) => {
+const callbackHandler = factory.createHandlers(async (c) => {
   const frontendUrl = c.env.META_CALLBACK_FRONTEND_URL;
   const redirectTo = (params: string) =>
     frontendUrl
@@ -150,7 +153,9 @@ const callbackHandler = projectGuard.createHandlers(async (c) => {
   }
 
   if (!code || !stateParam) {
-    return redirectTo("meta_error=code+%E3%81%BE%E3%81%9F%E3%81%AF+state+%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF%E3%81%8C%E3%81%82%E3%82%8A%E3%81%BE%E3%81%9B%E3%82%93");
+    return redirectTo(
+      "meta_error=code+%E3%81%BE%E3%81%9F%E3%81%AF+state+%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF%E3%81%8C%E3%81%82%E3%82%8A%E3%81%BE%E3%81%9B%E3%82%93",
+    );
   }
 
   let projectId: string;
@@ -158,7 +163,9 @@ const callbackHandler = projectGuard.createHandlers(async (c) => {
     const state = JSON.parse(atob(stateParam));
     projectId = state.projectId;
   } catch {
-    return redirectTo("meta_error=%E4%B8%8D%E6%AD%A3%E3%81%AA+state+%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF%E3%81%A7%E3%81%99");
+    return redirectTo(
+      "meta_error=%E4%B8%8D%E6%AD%A3%E3%81%AA+state+%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF%E3%81%A7%E3%81%99",
+    );
   }
 
   const appId = c.env.META_APP_ID;
@@ -190,13 +197,17 @@ const callbackHandler = projectGuard.createHandlers(async (c) => {
     const pagesData = (await pagesRes.json()) as PagesResponse;
 
     if (!pagesData.data || pagesData.data.length === 0) {
-      return redirectTo(`meta_error=${encodeURIComponent("Facebook ページが見つかりません。ビジネスアカウントに紐づくページが必要です")}`);
+      return redirectTo(
+        `meta_error=${encodeURIComponent("Facebook ページが見つかりません。ビジネスアカウントに紐づくページが必要です")}`,
+      );
     }
 
     // Step 4: Instagram ビジネスアカウントを探す
     const igAccount = await findInstagramAccount(pagesData.data);
     if (!igAccount) {
-      return redirectTo(`meta_error=${encodeURIComponent("Instagram ビジネスアカウントが見つかりません。Facebook ページに Instagram ビジネスアカウントを紐づけてください")}`);
+      return redirectTo(
+        `meta_error=${encodeURIComponent("Instagram ビジネスアカウントが見つかりません。Facebook ページに Instagram ビジネスアカウントを紐づけてください")}`,
+      );
     }
 
     // Step 5: DB に保存
@@ -277,9 +288,12 @@ const deleteAccountHandler = projectGuard.createHandlers(async (c) => {
 // ============================================================
 // ルート定義
 // ============================================================
-export const route = projectGuard
+const publicRoute = factory.createApp().get("/callback", ...callbackHandler);
+
+const guardedRoute = projectGuard
   .createApp()
   .get("/auth", ...authHandler)
-  .get("/callback", ...callbackHandler)
   .get("/account", ...getAccountHandler)
   .delete("/account", ...deleteAccountHandler);
+
+export const route = new Hono<Env>().route("/", publicRoute).route("/", guardedRoute);
