@@ -79,6 +79,11 @@ jobs:
           # --- テーブル作成（べき等）: chat_sessions ---
           run_sql "CREATE TABLE IF NOT EXISTS \`chat_sessions\` (\`id\` text PRIMARY KEY NOT NULL, \`project_id\` text NOT NULL, \`title\` text NOT NULL, \`messages\` text NOT NULL, \`created_at\` integer NOT NULL, \`updated_at\` integer NOT NULL, FOREIGN KEY (\`project_id\`) REFERENCES \`project\`(\`project_id\`) ON UPDATE no action ON DELETE cascade);" "chat_sessions table"
           run_sql "CREATE INDEX IF NOT EXISTS \`chat_sessions_project_id_idx\` ON \`chat_sessions\` (\`project_id\`);" "chat_sessions index"
+
+          # --- テーブル作成（べき等）: instagram_account ---
+          run_sql "CREATE TABLE IF NOT EXISTS \`instagram_account\` (\`id\` integer PRIMARY KEY AUTOINCREMENT NOT NULL, \`project_id\` text NOT NULL, \`instagram_user_id\` text NOT NULL, \`instagram_username\` text, \`facebook_page_id\` text NOT NULL, \`access_token\` text NOT NULL, \`token_expires_at\` integer, \`connected_at\` integer NOT NULL, \`updated_at\` integer NOT NULL, FOREIGN KEY (\`project_id\`) REFERENCES \`project\`(\`project_id\`) ON UPDATE no action ON DELETE cascade);" "instagram_account table"
+          run_sql "CREATE UNIQUE INDEX IF NOT EXISTS \`instagram_account_project_id_unique\` ON \`instagram_account\` (\`project_id\`);" "instagram_account unique index"
+          run_sql "CREATE UNIQUE INDEX IF NOT EXISTS \`instagram_account_project_id_idx\` ON \`instagram_account\` (\`project_id\`);" "instagram_account project index"
         env:
           CLOUDFLARE_API_TOKEN:   ${{ env.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID:  ${{ env.CLOUDFLARE_ACCOUNT_ID }}
