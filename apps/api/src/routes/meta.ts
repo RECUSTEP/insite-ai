@@ -171,7 +171,10 @@ const callbackHandler = factory.createHandlers(async (c) => {
     const tokenData = await exchangeCodeForToken(appId, appSecret, redirectUri, code);
     if (!tokenData.access_token) {
       console.error("Token exchange failed:", tokenData);
-      return redirectTo(`meta_error=${encodeURIComponent("アクセストークンの取得に失敗しました")}`);
+      const detail = tokenData.error?.message
+        ? `アクセストークンの取得に失敗しました: ${tokenData.error.message}`
+        : "アクセストークンの取得に失敗しました";
+      return redirectTo(`meta_error=${encodeURIComponent(detail)}`);
     }
 
     // Step 2: 短期 → 長期アクセストークン
