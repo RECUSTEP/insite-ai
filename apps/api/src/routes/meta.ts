@@ -51,21 +51,15 @@ const authHandler = projectGuard.createHandlers(async (c) => {
     return c.json({ error: "Meta API の設定が不完全です" }, 500);
   }
 
-  const configId = c.env.META_CONFIG_ID;
   const state = btoa(JSON.stringify({ projectId }));
 
   const params = new URLSearchParams({
     client_id: appId,
     redirect_uri: redirectUri,
     response_type: "code",
+    scope: SCOPES,
     state,
   });
-  // ビジネス向けFacebookログインの場合は config_id を使用
-  if (configId) {
-    params.set("config_id", configId);
-  } else {
-    params.set("scope", SCOPES);
-  }
   const authUrl = `https://www.facebook.com/${META_API_VERSION}/dialog/oauth?${params.toString()}`;
 
   return c.json({ authUrl });
