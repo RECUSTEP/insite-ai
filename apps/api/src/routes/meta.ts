@@ -17,7 +17,7 @@ const SCOPES = [
 type TokenResponse = {
   access_token?: string;
   expires_in?: number;
-  error?: { message: string };
+  error?: { message: string; type?: string; code?: number; error_subcode?: number };
 };
 
 type PagesResponse = {
@@ -166,13 +166,28 @@ const callbackHandler = factory.createHandlers(async (c) => {
   const appSecret = c.env.META_APP_SECRET;
   const redirectUri = c.env.META_REDIRECT_URI;
 
+  if (!appId || !appSecret || !redirectUri) {
+    return redirectTo(`meta_error=${encodeURIComponent("Meta API の設定が不完全です")}`);
+  }
+
   try {
     // Step 1: code → 短期アクセストークン
     const tokenData = await exchangeCodeForToken(appId, appSecret, redirectUri, code);
     if (!tokenData.access_token) {
       console.error("Token exchange failed:", tokenData);
-      const detail = tokenData.error?.message
-        ? `アクセストークンの取得に失敗しました: ${tokenData.error.message}`
+      const metaError = tokenData.error;
+      const metaErrorSuffix =
+        metaError?.type || metaError?.code || metaError?.error_subcode
+          ? ` (${[
+              metaError.type,
+              metaError.code ? `code:${metaError.code}` : null,
+              metaError.error_subcode ? `subcode:${metaError.error_subcode}` : null,
+            ]
+              .filter(Boolean)
+              .join(", ")})`
+          : "";
+      const detail = metaError?.message
+        ? `アクセストークンの取得に失敗しました: ${metaError.message}${metaErrorSuffix}`
         : "アクセストークンの取得に失敗しました";
       return redirectTo(`meta_error=${encodeURIComponent(detail)}`);
     }
