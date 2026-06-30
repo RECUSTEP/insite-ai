@@ -7,7 +7,13 @@ const INSTAGRAM_API_VERSION = "v21.0";
 const INSTAGRAM_GRAPH_URL = `https://graph.instagram.com/${INSTAGRAM_API_VERSION}`;
 const INSTAGRAM_LOGIN_SOURCE = "instagram_login";
 
-const SCOPES = ["instagram_business_basic", "instagram_business_manage_insights"].join(",");
+const SCOPES = [
+  "instagram_business_basic",
+  "instagram_business_manage_insights",
+  "instagram_business_manage_comments",
+  "instagram_business_manage_messages",
+  "instagram_business_content_publish",
+].join(",");
 
 type InstagramTokenResponse = {
   access_token?: string;
