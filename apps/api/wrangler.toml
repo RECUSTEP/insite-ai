@@ -23,6 +23,9 @@ META_APP_ID = "1701350637561455"
 META_REDIRECT_URI = "https://insiteai-api-preview.nakata-haruka.workers.dev/meta/callback"
 META_CONFIG_ID = "2495168324281887"
 META_CALLBACK_FRONTEND_URL = "https://stg.insiteai-web.pages.dev"
+INSTAGRAM_APP_ID = "1065352859485474"
+INSTAGRAM_REDIRECT_URI = "https://insiteai-api-preview.nakata-haruka.workers.dev/instagram/callback"
+INSTAGRAM_CALLBACK_FRONTEND_URL = "https://stg.insiteai-web.pages.dev"
 
 [[env.preview.r2_buckets]]
 binding = "BUCKET"

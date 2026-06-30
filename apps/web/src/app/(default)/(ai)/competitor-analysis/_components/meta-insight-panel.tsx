@@ -87,6 +87,7 @@ const PERIOD_OPTIONS: Array<{ value: InsightPeriod; label: string; days: number 
 const DEFAULT_PERIOD_OPTION = PERIOD_OPTIONS[0] ?? { value: "day", label: "日次", days: 30 };
 
 const METRIC_LABELS = new Map([
+  ["views", "表示回数"],
   ["impressions", "インプレッション"],
   ["reach", "リーチ"],
   ["profile_views", "プロフィール表示"],
@@ -144,6 +145,26 @@ function metricValue(metrics: InsightMetric[], name: string) {
 
 function metricPreviousValue(metrics: InsightMetric[], name: string) {
   return metrics.find((metric) => metric.name === name)?.values.at(-2)?.value ?? 0;
+}
+
+function metricValueAny(metrics: InsightMetric[], names: string[]) {
+  for (const name of names) {
+    const value = metricValue(metrics, name);
+    if (value) {
+      return value;
+    }
+  }
+  return 0;
+}
+
+function metricPreviousValueAny(metrics: InsightMetric[], names: string[]) {
+  for (const name of names) {
+    const value = metricPreviousValue(metrics, name);
+    if (value) {
+      return value;
+    }
+  }
+  return 0;
 }
 
 function metricLabel(name: string) {
@@ -206,10 +227,10 @@ function normalizeMediaItem(item: Record<string, unknown>): MediaItem {
 function trendSummary(summary: SummaryItem[]) {
   const reach = summary.find((item) => item.label === "リーチ");
   const profileViews = summary.find((item) => item.label === "プロフィール表示");
-  const impressions = summary.find((item) => item.label === "インプレッション");
+  const views = summary.find((item) => item.label === "表示回数");
   const messages: string[] = [];
 
-  for (const item of [reach, impressions, profileViews]) {
+  for (const item of [reach, views, profileViews]) {
     if (!item) {
       continue;
     }
@@ -374,9 +395,9 @@ export function MetaInsightPanel({ metaSocialChatEnabled, metaAccountLinkEnabled
   const profileSummary = useMemo<SummaryItem[]>(
     () => [
       {
-        label: "インプレッション",
-        value: metricValue(profileInsights, "impressions"),
-        previous: metricPreviousValue(profileInsights, "impressions"),
+        label: "表示回数",
+        value: metricValueAny(profileInsights, ["views", "impressions"]),
+        previous: metricPreviousValueAny(profileInsights, ["views", "impressions"]),
       },
       {
         label: "リーチ",
@@ -453,6 +474,8 @@ export function MetaInsightPanel({ metaSocialChatEnabled, metaAccountLinkEnabled
   useEffect(() => {
     const connected = searchParams.get("meta_connected");
     const error = searchParams.get("meta_error");
+    const instagramConnected = searchParams.get("instagram_connected");
+    const instagramError = searchParams.get("instagram_error");
     if (connected === "true") {
       toaster.success({
         title: "Meta 連携完了",
@@ -461,6 +484,15 @@ export function MetaInsightPanel({ metaSocialChatEnabled, metaAccountLinkEnabled
     }
     if (error) {
       toaster.error({ title: "Meta 連携エラー", description: error });
+    }
+    if (instagramConnected === "true") {
+      toaster.success({
+        title: "Instagram 連携完了",
+        description: "Instagram アカウントを接続しました。",
+      });
+    }
+    if (instagramError) {
+      toaster.error({ title: "Instagram 連携エラー", description: instagramError });
     }
   }, [searchParams]);
 
@@ -489,10 +521,10 @@ export function MetaInsightPanel({ metaSocialChatEnabled, metaAccountLinkEnabled
   const connectInstagram = async () => {
     setConnecting(true);
     try {
-      const data = await fetchJson<{ authUrl: string }>("/api/meta/auth");
+      const data = await fetchJson<{ authUrl: string }>("/api/instagram/auth");
       window.location.href = data.authUrl;
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Meta 認可 URL の取得に失敗しました";
+      const message = e instanceof Error ? e.message : "Instagram 認可 URL の取得に失敗しました";
       toaster.error({ title: "エラー", description: message });
       setConnecting(false);
     }
@@ -552,12 +584,11 @@ export function MetaInsightPanel({ metaSocialChatEnabled, metaAccountLinkEnabled
                 Instagram ビジネスアカウントを連携
               </Text>
               <Text size="sm" className={css({ mt: 2, color: "text.secondary" })}>
-                Facebook ページに紐づいた Instagram
-                ビジネスアカウントのプロフィール、投稿、投稿別インサイトを取得します。
+                Instagramログインでプロアカウントのプロフィール、投稿、投稿別インサイトを取得します。
               </Text>
               <Button mt={4} onClick={connectInstagram} loading={connecting}>
                 <LinkIcon />
-                Meta と連携
+                Instagram と連携
               </Button>
             </Box>
           </HStack>
@@ -656,7 +687,7 @@ export function MetaInsightPanel({ metaSocialChatEnabled, metaAccountLinkEnabled
 
         <Box mt={5}>
           <HStack gap={2} mb={3} flexWrap="wrap">
-            {["reach", "impressions", "profile_views"].map((metric) => (
+            {["reach", "views", "impressions", "profile_views"].map((metric) => (
               <button
                 key={metric}
                 type="button"

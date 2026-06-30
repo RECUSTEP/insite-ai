@@ -2,15 +2,65 @@ import { projectGuard } from "./_factory";
 
 const META_API_VERSION = "v21.0";
 const META_GRAPH_URL = `https://graph.facebook.com/${META_API_VERSION}`;
+const INSTAGRAM_GRAPH_URL = `https://graph.instagram.com/${META_API_VERSION}`;
+const INSTAGRAM_LOGIN_SOURCE = "instagram_login";
 
 type MetaApiError = {
   error?: { message: string; type: string; code: number };
 };
 
-async function metaGet<T>(path: string, accessToken: string): Promise<T & MetaApiError> {
+type InsightResponse = {
+  data?: Array<{
+    name: string;
+    period: string;
+    values: Array<{ value: number }>;
+  }>;
+};
+
+async function metaGet<T>(
+  path: string,
+  accessToken: string,
+  baseUrl = META_GRAPH_URL,
+): Promise<T & MetaApiError> {
   const separator = path.includes("?") ? "&" : "?";
-  const res = await fetch(`${META_GRAPH_URL}${path}${separator}access_token=${accessToken}`);
+  const res = await fetch(`${baseUrl}${path}${separator}access_token=${accessToken}`);
   return (await res.json()) as T & MetaApiError;
+}
+
+function getGraphBaseUrl(facebookPageId?: string | null) {
+  return facebookPageId === INSTAGRAM_LOGIN_SOURCE ? INSTAGRAM_GRAPH_URL : META_GRAPH_URL;
+}
+
+async function fetchMediaInsights(
+  mediaId: string,
+  accessToken: string,
+  graphBaseUrl: string,
+  metrics: string[],
+): Promise<InsightResponse & MetaApiError> {
+  const batch = await metaGet<InsightResponse>(
+    `/${mediaId}/insights?metric=${metrics.join(",")}`,
+    accessToken,
+    graphBaseUrl,
+  );
+  if (!batch.error) {
+    return batch;
+  }
+
+  const data: NonNullable<InsightResponse["data"]> = [];
+  for (const metric of metrics) {
+    const single = await metaGet<InsightResponse>(
+      `/${mediaId}/insights?metric=${metric}`,
+      accessToken,
+      graphBaseUrl,
+    );
+    if (single.error) {
+      console.warn("Media insight metric skipped:", metric, single.error);
+      continue;
+    }
+    data.push(...(single.data ?? []));
+  }
+
+  return data.length ? { data } : batch;
 }
 
 // ============================================================
@@ -27,9 +77,12 @@ const profileHandler = projectGuard.createHandlers(async (c) => {
     return c.json({ error: "Instagram アカウントが連携されていません" }, 400);
   }
 
-  const { instagramUserId, accessToken } = account.val;
+  const { instagramUserId, accessToken, facebookPageId } = account.val;
+  const graphBaseUrl = getGraphBaseUrl(facebookPageId);
 
   const data = await metaGet<{
+    id?: string;
+    user_id?: string;
     username?: string;
     name?: string;
     biography?: string;
@@ -38,8 +91,9 @@ const profileHandler = projectGuard.createHandlers(async (c) => {
     media_count?: number;
     profile_picture_url?: string;
   }>(
-    `/${instagramUserId}?fields=username,name,biography,followers_count,follows_count,media_count,profile_picture_url`,
+    `/${facebookPageId === INSTAGRAM_LOGIN_SOURCE ? "me" : instagramUserId}?fields=id,user_id,username,name,biography,followers_count,follows_count,media_count,profile_picture_url`,
     accessToken,
+    graphBaseUrl,
   );
 
   if (data.error) {
@@ -73,12 +127,16 @@ const profileInsightsHandler = projectGuard.createHandlers(async (c) => {
     return c.json({ error: "Instagram アカウントが連携されていません" }, 400);
   }
 
-  const { instagramUserId, accessToken } = account.val;
+  const { instagramUserId, accessToken, facebookPageId } = account.val;
+  const graphBaseUrl = getGraphBaseUrl(facebookPageId);
   const period = c.req.query("period") || "day";
   const since = c.req.query("since");
   const until = c.req.query("until");
 
-  const metrics = ["impressions", "reach", "profile_views"].join(",");
+  const metrics =
+    facebookPageId === INSTAGRAM_LOGIN_SOURCE
+      ? ["views", "reach", "profile_views"].join(",")
+      : ["impressions", "reach", "profile_views"].join(",");
   const params = new URLSearchParams({
     metric: metrics,
     period,
@@ -96,7 +154,11 @@ const profileInsightsHandler = projectGuard.createHandlers(async (c) => {
       period: string;
       values: Array<{ value: number; end_time: string }>;
     }>;
-  }>(`/${instagramUserId}/insights?${params.toString()}`, accessToken);
+  }>(
+    `/${facebookPageId === INSTAGRAM_LOGIN_SOURCE ? "me" : instagramUserId}/insights?${params.toString()}`,
+    accessToken,
+    graphBaseUrl,
+  );
 
   if (data.error) {
     console.error("Profile insights error:", data.error);
@@ -129,7 +191,8 @@ const mediaHandler = projectGuard.createHandlers(async (c) => {
     return c.json({ error: "Instagram アカウントが連携されていません" }, 400);
   }
 
-  const { instagramUserId, accessToken } = account.val;
+  const { instagramUserId, accessToken, facebookPageId } = account.val;
+  const graphBaseUrl = getGraphBaseUrl(facebookPageId);
   const limit = c.req.query("limit") || "25";
 
   const data = await metaGet<{
@@ -145,8 +208,9 @@ const mediaHandler = projectGuard.createHandlers(async (c) => {
       permalink: string;
     }>;
   }>(
-    `/${instagramUserId}/media?fields=id,caption,media_type,media_url,thumbnail_url,timestamp,like_count,comments_count,permalink&limit=${limit}`,
+    `/${facebookPageId === INSTAGRAM_LOGIN_SOURCE ? "me" : instagramUserId}/media?fields=id,caption,media_type,media_url,thumbnail_url,timestamp,like_count,comments_count,permalink&limit=${limit}`,
     accessToken,
+    graphBaseUrl,
   );
 
   if (data.error) {
@@ -171,13 +235,15 @@ const mediaInsightsHandler = projectGuard.createHandlers(async (c) => {
     return c.json({ error: "Instagram アカウントが連携されていません" }, 400);
   }
 
-  const { accessToken } = account.val;
+  const { accessToken, facebookPageId } = account.val;
+  const graphBaseUrl = getGraphBaseUrl(facebookPageId);
   const mediaId = c.req.param("mediaId");
 
   // IMAGE/VIDEO/CAROUSEL_ALBUM で取得可能なメトリクスが異なるため、まず media_type を確認
   const mediaInfo = await metaGet<{ media_type?: string }>(
     `/${mediaId}?fields=media_type`,
     accessToken,
+    graphBaseUrl,
   );
 
   if (mediaInfo.error) {
@@ -185,18 +251,26 @@ const mediaInsightsHandler = projectGuard.createHandlers(async (c) => {
   }
 
   const isReelOrVideo = mediaInfo.media_type === "VIDEO" || mediaInfo.media_type === "REEL";
+  const isInstagramLogin = facebookPageId === INSTAGRAM_LOGIN_SOURCE;
 
-  const metrics = isReelOrVideo
-    ? "impressions,reach,saved,likes,comments,shares,plays,total_interactions"
-    : "impressions,reach,saved,likes,comments,shares,total_interactions";
+  const metrics = isInstagramLogin
+    ? isReelOrVideo
+      ? ["views", "reach", "saved", "likes", "comments", "shares", "plays", "total_interactions"]
+      : ["views", "reach", "saved", "likes", "comments", "shares", "total_interactions"]
+    : isReelOrVideo
+      ? [
+          "impressions",
+          "reach",
+          "saved",
+          "likes",
+          "comments",
+          "shares",
+          "plays",
+          "total_interactions",
+        ]
+      : ["impressions", "reach", "saved", "likes", "comments", "shares", "total_interactions"];
 
-  const data = await metaGet<{
-    data?: Array<{
-      name: string;
-      period: string;
-      values: Array<{ value: number }>;
-    }>;
-  }>(`/${mediaId}/insights?metric=${metrics}`, accessToken);
+  const data = await fetchMediaInsights(mediaId, accessToken, graphBaseUrl, metrics);
 
   if (data.error) {
     console.error("Media insights error:", data.error);

@@ -6,6 +6,7 @@ import { route as chatSessionsRoute } from "./chat-sessions";
 import { route as helpsRoute } from "./helps";
 import { route as historyRoute } from "./history";
 import { route as imageRoute } from "./image";
+import { route as instagramRoute } from "./instagram";
 import { route as instructionGuideRoute } from "./instruction-guide";
 import { route as loginRoute } from "./login";
 import { route as logoutRoute } from "./logout";
@@ -24,6 +25,7 @@ export const route = new Hono()
   .route("/helps", helpsRoute)
   .route("/history", historyRoute)
   .route("/image", imageRoute)
+  .route("/instagram", instagramRoute)
   .route("/login", loginRoute)
   .route("/logout", logoutRoute)
   .route("/project", projectRoute)
