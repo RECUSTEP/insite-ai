@@ -18,6 +18,8 @@ import { route as projectsRoute } from "./projects";
 import { route as seoArticleReviseRoute } from "./seo-article-revise";
 import { route as seoSuggestKeywordsRoute } from "./seo-suggest-keywords";
 import { route as sessionRoute } from "./session";
+import { route as threadsRoute } from "./threads";
+import { route as threadsInsightsRoute } from "./threads-insights";
 
 export const route = new Hono()
   .route("/admin", adminRoute)
@@ -38,4 +40,6 @@ export const route = new Hono()
   .route("/announces", announcesRoute)
   .route("/chat-sessions", chatSessionsRoute)
   .route("/meta", metaRoute)
-  .route("/meta-insights", metaInsightsRoute);
+  .route("/meta-insights", metaInsightsRoute)
+  .route("/threads", threadsRoute)
+  .route("/threads-insights", threadsInsightsRoute);

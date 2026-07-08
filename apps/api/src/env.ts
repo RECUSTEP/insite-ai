@@ -13,6 +13,7 @@ import type {
   ProjectUseCase,
   PromptUseCase,
   SessionUseCase,
+  ThreadsAccountUseCase,
 } from "@repo/module/service";
 
 export type Bindings = {
@@ -29,6 +30,10 @@ export type Bindings = {
   INSTAGRAM_APP_SECRET: string;
   INSTAGRAM_REDIRECT_URI: string;
   INSTAGRAM_CALLBACK_FRONTEND_URL: string;
+  THREADS_APP_ID: string;
+  THREADS_APP_SECRET: string;
+  THREADS_REDIRECT_URI: string;
+  THREADS_CALLBACK_FRONTEND_URL: string;
 };
 
 export type Variables = {
@@ -46,6 +51,7 @@ export type Variables = {
   announceUsecase: AnnounceUseCase<"d1">;
   chatSessionUseCase: ChatSessionUseCase<"d1">;
   instagramAccountUseCase: InstagramAccountUseCase<"d1">;
+  threadsAccountUseCase: ThreadsAccountUseCase<"d1">;
 };
 
 export type Env = {

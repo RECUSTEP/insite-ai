@@ -16,7 +16,7 @@ export function MetaInsightToggle({ projectId, initialEnabled }: MetaInsightTogg
   const handleToggle = async () => {
     const newState = !enabled;
     const confirmed = window.confirm(
-      `Meta インサイトを${newState ? "有効化" : "無効化"}しますか？`
+      `Meta インサイト（Instagram・Threads）を${newState ? "有効化" : "無効化"}しますか？`,
     );
 
     if (!confirmed) return;
@@ -26,7 +26,7 @@ export function MetaInsightToggle({ projectId, initialEnabled }: MetaInsightTogg
       const result = await toggleMetaInsightAction(projectId, newState);
       if (result.success) {
         setEnabled(newState);
-        alert(`Meta インサイトを${newState ? "有効化" : "無効化"}しました`);
+        alert(`Meta インサイト（Instagram・Threads）を${newState ? "有効化" : "無効化"}しました`);
       } else {
         alert(`エラー: ${result.error || "更新に失敗しました"}`);
       }
@@ -79,7 +79,7 @@ export function MetaInsightToggle({ projectId, initialEnabled }: MetaInsightTogg
         },
       })}
     >
-      {loading ? "更新中..." : `Meta ${enabled ? "ON" : "OFF"}`}
+      {loading ? "更新中..." : `Meta連携 ${enabled ? "ON" : "OFF"}`}
     </button>
   );
 }
