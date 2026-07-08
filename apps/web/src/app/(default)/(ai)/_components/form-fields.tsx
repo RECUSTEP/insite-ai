@@ -230,8 +230,101 @@ export function GenerateButton({ children, ...props }: ButtonProps) {
   );
 }
 
-function OutputContent() {
+type OutputBlock = {
+  title: string;
+  body: string;
+};
+
+const proposalHeadingRegex =
+  /^(?:#{1,6}\s*)?(?:[-*]\s*)?(?:\*\*)?(?:[【\[(（]?\s*)?(?:(?:投稿文|キャプション|フィード投稿|Threads投稿)?(?:案|パターン|候補)\s*(?:その)?[0-9０-９一二三A-CＡ-Ｃ]+|[0-9０-９一二三]+\s*(?:案目|つ目)|[0-9０-９]+\s*[.)．、]\s*(?:投稿文|キャプション|フィード投稿|Threads投稿)?(?:案|パターン|候補))(?:\s*[】\])）]?)?(?:\s*[:：.)、．-])?\s*(.*?)(?:\*\*)?$/;
+
+function normalizeGeneratedTitle(line: string, index: number) {
+  const trimmed = line
+    .trim()
+    .replace(/^#{1,6}\s*/, "")
+    .replace(/^[-*]\s*/, "")
+    .replace(/^\*\*|\*\*$/g, "")
+    .replace(/^[【\[(（]\s*/, "")
+    .replace(/\s*[】\])）]$/, "")
+    .trim();
+
+  return trimmed || `案 ${index + 1}`;
+}
+
+function splitGeneratedOutput(output: string): OutputBlock[] {
+  const lines = output.replace(/\r\n/g, "\n").split("\n");
+  const blocks: OutputBlock[] = [];
+  let currentTitle = "";
+  let currentLines: string[] = [];
+
+  const pushCurrent = () => {
+    const body = currentLines.join("\n").trim();
+    if (!body) {
+      return;
+    }
+    blocks.push({
+      title: currentTitle || `案 ${blocks.length + 1}`,
+      body,
+    });
+  };
+
+  for (const line of lines) {
+    const isProposalHeading = proposalHeadingRegex.test(line.trim());
+    if (isProposalHeading) {
+      pushCurrent();
+      currentTitle = normalizeGeneratedTitle(line, blocks.length);
+      currentLines = [];
+      continue;
+    }
+    currentLines.push(line);
+  }
+  pushCurrent();
+
+  if (blocks.length >= 2) {
+    return blocks;
+  }
+
+  return [
+    {
+      title: "生成結果",
+      body: output.trim(),
+    },
+  ];
+}
+
+function CopyButton({ text, children }: { text: string; children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <Tooltip.Root open={isOpen}>
+      <Tooltip.Trigger asChild>
+        <Button
+          size="sm"
+          variant="outline"
+          w="fit-content"
+          onClick={() => {
+            navigator.clipboard.writeText(text);
+            setIsOpen(true);
+            setTimeout(() => setIsOpen(false), 1000);
+          }}
+        >
+          {children}
+          <Copy size={14} />
+        </Button>
+      </Tooltip.Trigger>
+      <Tooltip.Positioner>
+        <Tooltip.Content>
+          <Tooltip.Arrow>
+            <Tooltip.ArrowTip />
+          </Tooltip.Arrow>
+          コピーしました
+        </Tooltip.Content>
+      </Tooltip.Positioner>
+    </Tooltip.Root>
+  );
+}
+
+function OutputContent() {
   const { loading, output } = useContext(FormContext);
 
   if (loading && !output) {
@@ -245,36 +338,55 @@ function OutputContent() {
     );
   }
 
-  if (!output) return null;
+  if (!output) {
+    return null;
+  }
+
+  const outputBlocks = splitGeneratedOutput(output);
+  const hasMultipleBlocks = outputBlocks.length > 1;
 
   return (
     <Stack gap={3}>
-      <Tooltip.Root open={isOpen}>
-        <Tooltip.Trigger asChild>
-          <Button
-            size="sm"
-            variant="outline"
-            w="fit-content"
-            onClick={() => {
-              navigator.clipboard.writeText(output);
-              setIsOpen(true);
-              setTimeout(() => setIsOpen(false), 1000);
-            }}
-          >
-            結果をコピーする
-            <Copy size={14} />
-          </Button>
-        </Tooltip.Trigger>
-        <Tooltip.Positioner>
-          <Tooltip.Content>
-            <Tooltip.Arrow>
-              <Tooltip.ArrowTip />
-            </Tooltip.Arrow>
-            コピーしました
-          </Tooltip.Content>
-        </Tooltip.Positioner>
-      </Tooltip.Root>
-      <MarkdownRenderer>{output}</MarkdownRenderer>
+      {hasMultipleBlocks && <CopyButton text={output}>全文をコピーする</CopyButton>}
+      {outputBlocks.map((block, index) => (
+        <Box
+          key={`${block.title}-${index}`}
+          css={{
+            border: "1px solid",
+            borderColor: { base: "#E4E4E7", _dark: "#27272A" },
+            borderRadius: "10px",
+            bg: { base: "#FFFFFF", _dark: "#18181B" },
+            p: 4,
+          }}
+        >
+          <Stack gap={3}>
+            <Box
+              css={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 3,
+                flexWrap: "wrap",
+              }}
+            >
+              <h3
+                className={css({
+                  color: "fg.default",
+                  fontSize: "md",
+                  fontWeight: 700,
+                  lineHeight: "1.5",
+                })}
+              >
+                {hasMultipleBlocks ? block.title : "生成結果"}
+              </h3>
+              <CopyButton text={block.body}>
+                {hasMultipleBlocks ? `${block.title}をコピー` : "結果をコピーする"}
+              </CopyButton>
+            </Box>
+            <MarkdownRenderer>{block.body}</MarkdownRenderer>
+          </Stack>
+        </Box>
+      ))}
     </Stack>
   );
 }
@@ -287,7 +399,9 @@ export function Output() {
 export function OutputSection({ title = "生成結果" }: { title?: string }) {
   const { output, loading } = useContext(FormContext);
 
-  if (!output && !loading) return null;
+  if (!output && !loading) {
+    return null;
+  }
 
   return (
     <Box className={cardCss}>
