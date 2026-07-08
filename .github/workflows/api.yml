@@ -84,6 +84,10 @@ jobs:
           run_sql "CREATE TABLE IF NOT EXISTS \`instagram_account\` (\`id\` integer PRIMARY KEY AUTOINCREMENT NOT NULL, \`project_id\` text NOT NULL, \`instagram_user_id\` text NOT NULL, \`instagram_username\` text, \`facebook_page_id\` text NOT NULL, \`access_token\` text NOT NULL, \`token_expires_at\` integer, \`connected_at\` integer NOT NULL, \`updated_at\` integer NOT NULL, FOREIGN KEY (\`project_id\`) REFERENCES \`project\`(\`project_id\`) ON UPDATE no action ON DELETE cascade);" "instagram_account table"
           run_sql "CREATE UNIQUE INDEX IF NOT EXISTS \`instagram_account_project_id_unique\` ON \`instagram_account\` (\`project_id\`);" "instagram_account unique index"
           run_sql "CREATE UNIQUE INDEX IF NOT EXISTS \`instagram_account_project_id_idx\` ON \`instagram_account\` (\`project_id\`);" "instagram_account project index"
+
+          # --- テーブル作成（べき等）: threads_account ---
+          run_sql "CREATE TABLE IF NOT EXISTS \`threads_account\` (\`id\` integer PRIMARY KEY AUTOINCREMENT NOT NULL, \`project_id\` text NOT NULL, \`threads_user_id\` text NOT NULL, \`threads_username\` text, \`access_token\` text NOT NULL, \`token_expires_at\` integer, \`connected_at\` integer NOT NULL, \`updated_at\` integer NOT NULL, FOREIGN KEY (\`project_id\`) REFERENCES \`project\`(\`project_id\`) ON UPDATE no action ON DELETE cascade);" "threads_account table"
+          run_sql "CREATE UNIQUE INDEX IF NOT EXISTS \`threads_account_project_id_idx\` ON \`threads_account\` (\`project_id\`);" "threads_account project index"
         env:
           CLOUDFLARE_API_TOKEN:   ${{ env.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID:  ${{ env.CLOUDFLARE_ACCOUNT_ID }}

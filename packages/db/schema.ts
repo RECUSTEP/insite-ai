@@ -22,7 +22,9 @@ const projects = sqliteTable(
     projectPass: text("project_pass").notNull(),
     apiUsageLimit: integer("api_usage_limit").notNull(),
     seoAddonEnabled: integer("seo_addon_enabled", { mode: "boolean" }).notNull().default(false),
-    metaInsightEnabled: integer("meta_insight_enabled", { mode: "boolean" }).notNull().default(false),
+    metaInsightEnabled: integer("meta_insight_enabled", { mode: "boolean" })
+      .notNull()
+      .default(false),
   },
   (table) => ({
     projectIdIdx: uniqueIndex("project_project_id_idx").on(table.projectId),
@@ -213,6 +215,26 @@ const instagramAccounts = sqliteTable(
   }),
 );
 
+const threadsAccounts = sqliteTable(
+  "threads_account",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    projectId: text("project_id")
+      .notNull()
+      .unique()
+      .references(() => projects.projectId, { onDelete: "cascade" }),
+    threadsUserId: text("threads_user_id").notNull(),
+    threadsUsername: text("threads_username"),
+    accessToken: text("access_token").notNull(),
+    tokenExpiresAt: integer("token_expires_at"),
+    connectedAt: integer("connected_at").notNull(),
+    updatedAt: integer("updated_at").notNull(),
+  },
+  (table) => ({
+    projectIdIdx: uniqueIndex("threads_account_project_id_idx").on(table.projectId),
+  }),
+);
+
 const announces = sqliteTable("announce", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
@@ -224,6 +246,13 @@ const announces = sqliteTable("announce", {
 const instagramAccountRelations = relations(instagramAccounts, ({ one }) => ({
   project: one(projects, {
     fields: [instagramAccounts.projectId],
+    references: [projects.projectId],
+  }),
+}));
+
+const threadsAccountRelations = relations(threadsAccounts, ({ one }) => ({
+  project: one(projects, {
+    fields: [threadsAccounts.projectId],
     references: [projects.projectId],
   }),
 }));
@@ -246,6 +275,7 @@ const projectRelations = relations(projects, ({ one, many }) => ({
   chatSessions: many(chatSessions),
   projectInfo: one(projectInfo),
   instagramAccount: one(instagramAccounts),
+  threadsAccount: one(threadsAccounts),
   sessions: many(sessions),
 }));
 
@@ -291,6 +321,7 @@ export {
   applicationSettings,
   instructionGuide,
   instagramAccounts,
+  threadsAccounts,
   announces,
   authRelations,
   projectRelations,
@@ -299,5 +330,6 @@ export {
   chatSessionsRelations,
   projectInfoRelations,
   instagramAccountRelations,
+  threadsAccountRelations,
   sessionRelations,
 };

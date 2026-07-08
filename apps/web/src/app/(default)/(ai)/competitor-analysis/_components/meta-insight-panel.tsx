@@ -34,6 +34,15 @@ type ConnectedAccount = {
   };
 };
 
+type ThreadsConnectedAccount = {
+  connected: boolean;
+  account?: {
+    threadsUserId: string;
+    threadsUsername: string | null;
+    connectedAt: number;
+  };
+};
+
 type ProfileData = {
   username?: string;
   name?: string;
@@ -99,6 +108,9 @@ const METRIC_LABELS = new Map([
   ["saved", "保存"],
   ["likes", "いいね"],
   ["comments", "コメント"],
+  ["replies", "返信"],
+  ["reposts", "再投稿"],
+  ["quotes", "引用"],
   ["shares", "シェア"],
   ["plays", "再生"],
   ["total_interactions", "合計反応"],
@@ -208,6 +220,9 @@ function periodRange(period: InsightPeriod) {
 }
 
 function mediaLabel(mediaType: string) {
+  if (mediaType === "TEXT_POST") {
+    return "テキスト";
+  }
   if (mediaType === "VIDEO" || mediaType === "REEL") {
     return "動画";
   }
@@ -240,6 +255,35 @@ function normalizeMediaItem(item: Record<string, unknown>): MediaItem {
     timestamp: typeof item.timestamp === "string" ? item.timestamp : "",
     likeCount: typeof item.like_count === "number" ? item.like_count : undefined,
     commentsCount: typeof item.comments_count === "number" ? item.comments_count : undefined,
+    permalink: typeof item.permalink === "string" ? item.permalink : "#",
+    insights,
+    insightError: typeof item.insight_error === "string" ? item.insight_error : undefined,
+  };
+}
+
+function normalizeThreadsMediaItem(item: Record<string, unknown>): MediaItem {
+  const insights: Record<string, number> | undefined =
+    item.insights && typeof item.insights === "object"
+      ? Object.entries(item.insights as Record<string, unknown>).reduce<Record<string, number>>(
+          (acc, [key, value]) => {
+            if (typeof value === "number") {
+              acc[key] = value;
+            }
+            return acc;
+          },
+          {},
+        )
+      : undefined;
+
+  return {
+    id: String(item.id ?? ""),
+    caption: typeof item.text === "string" ? item.text : undefined,
+    mediaType: typeof item.media_type === "string" ? item.media_type : "TEXT_POST",
+    mediaUrl: typeof item.media_url === "string" ? item.media_url : undefined,
+    thumbnailUrl: typeof item.thumbnail_url === "string" ? item.thumbnail_url : undefined,
+    timestamp: typeof item.timestamp === "string" ? item.timestamp : "",
+    likeCount: typeof insights?.likes === "number" ? insights.likes : undefined,
+    commentsCount: typeof insights?.replies === "number" ? insights.replies : undefined,
     permalink: typeof item.permalink === "string" ? item.permalink : "#",
     insights,
     insightError: typeof item.insight_error === "string" ? item.insight_error : undefined,
@@ -279,9 +323,11 @@ function mediaEngagementScore(item: MediaItem) {
   }
   return (
     (item.likeCount ?? mediaInsightValue(item, ["likes"])) +
-    (item.commentsCount ?? mediaInsightValue(item, ["comments"])) +
+    (item.commentsCount ?? mediaInsightValue(item, ["comments", "replies"])) +
     mediaSaved(item) +
-    mediaShares(item)
+    mediaShares(item) +
+    mediaInsightValue(item, ["reposts"]) +
+    mediaInsightValue(item, ["quotes"])
   );
 }
 
@@ -633,6 +679,8 @@ export function MetaInsightPanel({ metaSocialChatEnabled, metaAccountLinkEnabled
     const error = searchParams.get("meta_error");
     const instagramConnected = searchParams.get("instagram_connected");
     const instagramError = searchParams.get("instagram_error");
+    const threadsConnected = searchParams.get("threads_connected");
+    const threadsError = searchParams.get("threads_error");
     if (connected === "true") {
       toaster.success({
         title: "Meta 連携完了",
@@ -650,6 +698,15 @@ export function MetaInsightPanel({ metaSocialChatEnabled, metaAccountLinkEnabled
     }
     if (instagramError) {
       toaster.error({ title: "Instagram 連携エラー", description: instagramError });
+    }
+    if (threadsConnected === "true") {
+      toaster.success({
+        title: "Threads 連携完了",
+        description: "Threads アカウントを接続しました。",
+      });
+    }
+    if (threadsError) {
+      toaster.error({ title: "Threads 連携エラー", description: threadsError });
     }
   }, [searchParams]);
 
@@ -756,7 +813,7 @@ export function MetaInsightPanel({ metaSocialChatEnabled, metaAccountLinkEnabled
             </Box>
           </HStack>
         </Box>
-        <ThreadsNotice metaSocialChatEnabled={metaSocialChatEnabled} />
+        <ThreadsInsightPanel metaSocialChatEnabled={metaSocialChatEnabled} />
       </VStack>
     );
   }
@@ -765,7 +822,7 @@ export function MetaInsightPanel({ metaSocialChatEnabled, metaAccountLinkEnabled
     <VStack gap={6} alignItems="stretch">
       <InsightSourceTabs active={activeInsightTab} onChange={setActiveInsightTab} />
       {activeInsightTab === "threads" ? (
-        <ThreadsNotice metaSocialChatEnabled={metaSocialChatEnabled} />
+        <ThreadsInsightPanel metaSocialChatEnabled={metaSocialChatEnabled} />
       ) : (
         <>
           <Box className={cardStyle}>
@@ -1104,42 +1161,478 @@ export function MetaInsightPanel({ metaSocialChatEnabled, metaAccountLinkEnabled
   );
 }
 
-function ThreadsNotice({ metaSocialChatEnabled }: { metaSocialChatEnabled: boolean }) {
+function ThreadsInsightPanel({ metaSocialChatEnabled }: { metaSocialChatEnabled: boolean }) {
+  const [account, setAccount] = useState<ThreadsConnectedAccount | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [profileInsights, setProfileInsights] = useState<InsightMetric[]>([]);
+  const [media, setMedia] = useState<MediaItem[]>([]);
+  const [selectedMediaId, setSelectedMediaId] = useState<string>("");
+  const [mediaInsights, setMediaInsights] = useState<MediaInsights | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [connecting, setConnecting] = useState(false);
+  const [insightLoading, setInsightLoading] = useState(false);
+
+  const selectedMedia = useMemo(
+    () => media.find((item) => item.id === selectedMediaId) ?? null,
+    [media, selectedMediaId],
+  );
+
+  const profileSummary = useMemo<SummaryItem[]>(
+    () => [
+      {
+        label: "表示回数",
+        value: metricValue(profileInsights, "views"),
+        previous: metricPreviousValue(profileInsights, "views"),
+      },
+    ],
+    [profileInsights],
+  );
+
+  const chartPoints = useMemo(() => buildChartPoints(profileInsights, "views"), [profileInsights]);
+
+  const rankedMedia = useMemo(
+    () =>
+      [...media]
+        .map((item) => ({
+          ...item,
+          engagementScore: mediaEngagementScore(item),
+          views: mediaViews(item),
+          replies: mediaInsightValue(item, ["replies"]),
+          reposts: mediaInsightValue(item, ["reposts"]),
+          quotes: mediaInsightValue(item, ["quotes"]),
+          shares: mediaShares(item),
+        }))
+        .sort((a, b) => b.engagementScore - a.engagementScore),
+    [media],
+  );
+
+  const averageMediaScore = useMemo(() => {
+    if (rankedMedia.length === 0) {
+      return 0;
+    }
+    return rankedMedia.reduce((sum, item) => sum + item.engagementScore, 0) / rankedMedia.length;
+  }, [rankedMedia]);
+
+  const loadThreadsData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const accountData = await fetchJson<ThreadsConnectedAccount>("/api/threads/account");
+      setAccount(accountData);
+
+      if (!accountData.connected) {
+        setProfile(null);
+        setProfileInsights([]);
+        setMedia([]);
+        setSelectedMediaId("");
+        setMediaInsights(null);
+        return;
+      }
+
+      const { since, until } = periodRange("day");
+      const [profileData, profileInsightData, mediaData] = await Promise.all([
+        fetchJson<ProfileData>("/api/threads-insights/profile"),
+        fetchJson<{ insights: InsightMetric[] }>(
+          `/api/threads-insights/profile-insights?since=${since}&until=${until}`,
+        ),
+        fetchJson<{ media: Record<string, unknown>[] }>(
+          "/api/threads-insights/media?limit=25&includeInsights=true",
+        ),
+      ]);
+      const normalizedMedia = mediaData.media
+        .map(normalizeThreadsMediaItem)
+        .filter((item) => item.id);
+
+      setProfile(profileData);
+      setProfileInsights(profileInsightData.insights);
+      setMedia(normalizedMedia);
+      setSelectedMediaId((current) => current || normalizedMedia[0]?.id || "");
+      setMediaInsights(null);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Threads インサイトの取得に失敗しました";
+      toaster.error({ title: "エラー", description: message });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadThreadsData();
+  }, [loadThreadsData]);
+
+  useEffect(() => {
+    if (!selectedMediaId) {
+      return;
+    }
+
+    const selected = media.find((item) => item.id === selectedMediaId);
+    if (selected?.insights && Object.keys(selected.insights).length > 0) {
+      setMediaInsights({ mediaId: selectedMediaId, insights: selected.insights });
+      return;
+    }
+
+    const loadMediaInsights = async () => {
+      setInsightLoading(true);
+      try {
+        const data = await fetchJson<MediaInsights>(
+          `/api/threads-insights/media/${selectedMediaId}`,
+        );
+        setMediaInsights(data);
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "投稿インサイトの取得に失敗しました";
+        setMediaInsights(null);
+        toaster.error({ title: "エラー", description: message });
+      } finally {
+        setInsightLoading(false);
+      }
+    };
+
+    loadMediaInsights();
+  }, [selectedMediaId, media]);
+
+  const connectThreads = async () => {
+    setConnecting(true);
+    try {
+      const data = await fetchJson<{ authUrl: string }>("/api/threads/auth");
+      window.location.href = data.authUrl;
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Threads 認可 URL の取得に失敗しました";
+      toaster.error({ title: "エラー", description: message });
+      setConnecting(false);
+    }
+  };
+
+  const disconnectThreads = async () => {
+    if (!window.confirm("Threads アカウント連携を解除しますか？")) {
+      return;
+    }
+    setLoading(true);
+    try {
+      await fetchJson<{ ok: true }>("/api/threads/account", { method: "DELETE" });
+      toaster.success({
+        title: "連携解除",
+        description: "Threads アカウント連携を解除しました。",
+      });
+      await loadThreadsData();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Threads 連携解除に失敗しました";
+      toaster.error({ title: "エラー", description: message });
+      setLoading(false);
+    }
+  };
+
+  if (loading && account === null) {
+    return (
+      <Box className={cardStyle}>
+        <HStack gap={3}>
+          <Spinner />
+          <Text size="sm">Threads 連携状態を確認しています</Text>
+        </HStack>
+      </Box>
+    );
+  }
+
+  if (!account?.connected) {
+    return (
+      <Box className={cardStyle}>
+        <HStack gap={3} alignItems="flex-start">
+          <MessageCircleIcon className={css({ width: 20, height: 20, mt: 0.5 })} />
+          <Box flex={1}>
+            <Text size="sm" fontWeight={600}>
+              Threads アカウントを連携
+            </Text>
+            <Text size="sm" className={css({ mt: 2, color: "text.secondary" })}>
+              Threads のプロフィール、投稿、投稿別インサイトを取得します。
+            </Text>
+            <Button mt={4} onClick={connectThreads} loading={connecting}>
+              <LinkIcon />
+              Threads と連携
+            </Button>
+            <Text size="xs" className={css({ mt: 3, color: "text.secondary" })}>
+              Meta 連携チャット: {metaSocialChatEnabled ? "有効" : "無効"}
+            </Text>
+          </Box>
+        </HStack>
+      </Box>
+    );
+  }
+
   return (
-    <Box className={cardStyle}>
-      <HStack gap={3} alignItems="flex-start">
-        <MessageCircleIcon className={css({ width: 20, height: 20, mt: 0.5 })} />
-        <Box>
+    <VStack gap={6} alignItems="stretch">
+      <Box className={cardStyle}>
+        <HStack justify="space-between" gap={4} flexWrap="wrap">
+          <HStack gap={3}>
+            <MessageCircleIcon className={css({ width: 24, height: 24 })} />
+            <Box>
+              <Text size="sm" fontWeight={600}>
+                @{profile?.username ?? account.account?.threadsUsername ?? "threads"}
+              </Text>
+              <Text size="xs" className={css({ color: "text.secondary" })}>
+                Threads アカウント
+              </Text>
+            </Box>
+          </HStack>
+          <HStack gap={2}>
+            <Button size="sm" variant="outline" onClick={loadThreadsData} loading={loading}>
+              <RefreshCwIcon />
+              更新
+            </Button>
+            <Button size="sm" variant="outline" onClick={disconnectThreads}>
+              <UnlinkIcon />
+              解除
+            </Button>
+          </HStack>
+        </HStack>
+
+        <HStack gap={3} mt={4} flexWrap="wrap">
+          <Box className={statStyle}>
+            <Text size="lg" fontWeight={700}>
+              {formatNumber(media.length)}
+            </Text>
+            <Text size="xs" className={css({ color: "text.secondary" })}>
+              取得投稿数
+            </Text>
+          </Box>
+          <Box className={statStyle}>
+            <Text size="lg" fontWeight={700}>
+              {formatNumber(metricValue(profileInsights, "views"))}
+            </Text>
+            <Text size="xs" className={css({ color: "text.secondary" })}>
+              表示回数
+            </Text>
+          </Box>
+          <Box className={statStyle}>
+            <Text size="lg" fontWeight={700}>
+              {formatNumber(rankedMedia.reduce((sum, item) => sum + item.engagementScore, 0))}
+            </Text>
+            <Text size="xs" className={css({ color: "text.secondary" })}>
+              投稿反応
+            </Text>
+          </Box>
+        </HStack>
+      </Box>
+
+      <Box className={cardStyle}>
+        <HStack gap={2} mb={4}>
+          <BarChart3Icon className={css({ width: 18, height: 18 })} />
           <Text size="sm" fontWeight={600}>
-            Threads インサイト（準備中）
+            プロフィールインサイト
           </Text>
-          <Text size="sm" className={css({ mt: 2, color: "text.secondary" })}>
-            Threads は Instagram とは別の Threads Graph API
-            認可トークンが必要です。画面はタブ分け済みで、次に Threads
-            OAuth、投稿一覧、投稿別インサイトをこの枠に接続できます。
+        </HStack>
+        <HStack gap={3} flexWrap="wrap">
+          {profileSummary.map((item) => (
+            <SummaryCard key={item.label} item={item} />
+          ))}
+        </HStack>
+        <Box mt={5}>
+          <MiniLineChart points={chartPoints} color="#111827" />
+        </Box>
+      </Box>
+
+      <Box className={cardStyle}>
+        <HStack justify="space-between" gap={4} mb={3} flexWrap="wrap">
+          <Text size="sm" fontWeight={600}>
+            Threads 投稿ランキング
           </Text>
-          <HStack gap={2} mt={3} flexWrap="wrap">
-            {["Threads OAuth", "投稿一覧", "投稿別インサイト"].map((item) => (
-              <Text
-                key={item}
-                size="xs"
+          <Text size="xs" className={css({ color: "text.secondary" })}>
+            直近25件 / いいね・返信・再投稿・引用・シェア順
+          </Text>
+        </HStack>
+        {rankedMedia.length === 0 ? (
+          <Text size="sm" className={css({ color: "text.secondary" })}>
+            ランキング対象の投稿がありません。
+          </Text>
+        ) : (
+          <VStack gap={2} alignItems="stretch">
+            {rankedMedia.slice(0, 5).map((item, index) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setSelectedMediaId(item.id)}
                 className={css({
-                  px: 2,
-                  py: 1,
-                  rounded: "sm",
-                  bg: { base: "#F4F4F5", _dark: "#27272A" },
-                  color: "text.secondary",
+                  display: "grid",
+                  gridTemplateColumns: "auto 1fr auto",
+                  alignItems: "center",
+                  gap: 3,
+                  width: "100%",
+                  textAlign: "left",
+                  p: 3,
+                  rounded: "md",
+                  border: "1px solid",
+                  borderColor:
+                    selectedMediaId === item.id
+                      ? "accent.default"
+                      : { base: "#E4E4E7", _dark: "#3F3F46" },
+                  bg:
+                    selectedMediaId === item.id
+                      ? "bg.subtle"
+                      : { base: "#FAFAFA", _dark: "#1C1C1E" },
+                  cursor: "pointer",
                 })}
               >
-                {item}
-              </Text>
+                <Text fontWeight={700} className={css({ color: "accent.default" })}>
+                  #{index + 1}
+                </Text>
+                <Box minW={0}>
+                  <Text
+                    size="sm"
+                    className={css({
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    })}
+                  >
+                    {item.caption?.slice(0, 80) || "(本文なし)"}
+                  </Text>
+                  <Text size="xs" className={css({ color: "text.secondary" })}>
+                    {mediaLabel(item.mediaType)} /{" "}
+                    {new Date(item.timestamp).toLocaleDateString("ja-JP")}
+                  </Text>
+                  <HStack gap={2} mt={1} flexWrap="wrap">
+                    <Text size="xs" className={css({ color: "text.secondary" })}>
+                      表示 {formatNumber(item.views)}
+                    </Text>
+                    <Text size="xs" className={css({ color: "text.secondary" })}>
+                      返信 {formatNumber(item.replies)}
+                    </Text>
+                    <Text size="xs" className={css({ color: "text.secondary" })}>
+                      再投稿 {formatNumber(item.reposts)}
+                    </Text>
+                    <Text size="xs" className={css({ color: "text.secondary" })}>
+                      引用 {formatNumber(item.quotes)}
+                    </Text>
+                  </HStack>
+                  {item.insightError && (
+                    <Text size="xs" className={css({ mt: 1, color: "#DC2626" })}>
+                      一部指標を取得できませんでした
+                    </Text>
+                  )}
+                </Box>
+                <VStack gap={0} alignItems="flex-end">
+                  <Text size="sm" fontWeight={700}>
+                    {formatNumber(item.engagementScore)}
+                  </Text>
+                  <Text size="xs" className={css({ color: "text.secondary" })}>
+                    反応
+                  </Text>
+                  <Text size="xs" className={css({ color: "text.secondary" })}>
+                    {postQualityLabel(item.engagementScore, averageMediaScore)}
+                  </Text>
+                </VStack>
+              </button>
             ))}
-          </HStack>
-          <Text size="xs" className={css({ mt: 2, color: "text.secondary" })}>
-            Meta 連携チャット: {metaSocialChatEnabled ? "有効" : "無効"}
+          </VStack>
+        )}
+      </Box>
+
+      <Box className={cardStyle}>
+        <HStack justify="space-between" gap={4} mb={3}>
+          <Text size="sm" fontWeight={600}>
+            最新 Threads 投稿
           </Text>
+          <Text size="xs" className={css({ color: "text.secondary" })}>
+            クリックで投稿別インサイトを表示
+          </Text>
+        </HStack>
+        {media.length === 0 ? (
+          <Text size="sm" className={css({ color: "text.secondary" })}>
+            取得できる投稿がありません。
+          </Text>
+        ) : (
+          <VStack gap={2} alignItems="stretch">
+            {media.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setSelectedMediaId(item.id)}
+                className={css({
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: 3,
+                  width: "100%",
+                  textAlign: "left",
+                  p: 3,
+                  rounded: "md",
+                  border: "1px solid",
+                  borderColor: selectedMediaId === item.id ? "accent.default" : "transparent",
+                  bg:
+                    selectedMediaId === item.id
+                      ? "bg.subtle"
+                      : { base: "#FAFAFA", _dark: "#1C1C1E" },
+                  cursor: "pointer",
+                })}
+              >
+                <Box flex={1} minW={0}>
+                  <Text
+                    size="sm"
+                    className={css({
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    })}
+                  >
+                    {item.caption?.slice(0, 80) || "(本文なし)"}
+                  </Text>
+                  <Text size="xs" className={css({ color: "text.secondary" })}>
+                    {mediaLabel(item.mediaType)} /{" "}
+                    {new Date(item.timestamp).toLocaleDateString("ja-JP")}
+                  </Text>
+                  <Text size="xs" className={css({ mt: 1, color: "text.secondary" })}>
+                    表示 {formatNumber(mediaViews(item))} / いいね{" "}
+                    {formatNumber(mediaInsightValue(item, ["likes"]))} / 返信{" "}
+                    {formatNumber(mediaInsightValue(item, ["replies"]))}
+                  </Text>
+                </Box>
+                <HStack gap={3} flexShrink={0}>
+                  <Text size="xs">{formatNumber(mediaInsightValue(item, ["reposts"]))}</Text>
+                  <Text size="xs">{formatNumber(mediaInsightValue(item, ["quotes"]))}</Text>
+                  <ExternalLinkIcon className={css({ width: 14, height: 14 })} />
+                </HStack>
+              </button>
+            ))}
+          </VStack>
+        )}
+      </Box>
+
+      {selectedMedia && (
+        <Box className={cardStyle}>
+          <HStack justify="space-between" gap={4} mb={3}>
+            <Text size="sm" fontWeight={600}>
+              Threads 投稿別インサイト
+            </Text>
+            <a
+              href={selectedMedia.permalink}
+              target="_blank"
+              rel="noreferrer"
+              className={css({ color: "accent.default", fontSize: "sm" })}
+            >
+              Threadsで開く
+            </a>
+          </HStack>
+          {insightLoading ? (
+            <HStack gap={3}>
+              <Spinner />
+              <Text size="sm">投稿インサイトを取得しています</Text>
+            </HStack>
+          ) : Object.entries(mediaInsights?.insights ?? {}).length === 0 ? (
+            <Text size="sm" className={css({ color: "text.secondary" })}>
+              この投稿で取得できるインサイトがありません。
+            </Text>
+          ) : (
+            <HStack gap={3} flexWrap="wrap">
+              {Object.entries(mediaInsights?.insights ?? {}).map(([name, value]) => (
+                <Box key={name} className={statStyle}>
+                  <Text size="md" fontWeight={700}>
+                    {formatNumber(value)}
+                  </Text>
+                  <Text size="xs" className={css({ color: "text.secondary" })}>
+                    {metricLabel(name)}
+                  </Text>
+                </Box>
+              ))}
+            </HStack>
+          )}
         </Box>
-      </HStack>
-    </Box>
+      )}
+    </VStack>
   );
 }

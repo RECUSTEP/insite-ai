@@ -84,3 +84,9 @@ export const instagramAccountInsertSchema = createInsertSchema(schemas.instagram
 
 export type InstagramAccountSelect = typeof schemas.instagramAccounts.$inferSelect;
 export const instagramAccountSelectSchema = createSelectSchema(schemas.instagramAccounts);
+
+export type ThreadsAccountInsert = typeof schemas.threadsAccounts.$inferInsert;
+export const threadsAccountInsertSchema = createInsertSchema(schemas.threadsAccounts);
+
+export type ThreadsAccountSelect = typeof schemas.threadsAccounts.$inferSelect;
+export const threadsAccountSelectSchema = createSelectSchema(schemas.threadsAccounts);

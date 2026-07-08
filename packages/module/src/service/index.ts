@@ -11,3 +11,4 @@ export * from "./instruction-guide";
 export * from "./announce";
 export * from "./chat-sessions";
 export * from "./instagram-account";
+export * from "./threads-account";

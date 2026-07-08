@@ -14,6 +14,7 @@ import {
   ProjectUseCase,
   PromptUseCase,
   SessionUseCase,
+  ThreadsAccountUseCase,
 } from "@repo/module/service";
 import { drizzle } from "drizzle-orm/d1";
 import type { Hono } from "hono";
@@ -41,6 +42,7 @@ export const initApp = <E extends Env>(app: Hono<E>) => {
     const announceUsecase = new AnnounceUseCase<"d1">(db);
     const chatSessionUseCase = new ChatSessionUseCase<"d1">(db);
     const instagramAccountUseCase = new InstagramAccountUseCase<"d1">(db);
+    const threadsAccountUseCase = new ThreadsAccountUseCase<"d1">(db);
     c.set("authUseCase", authUseCase);
     c.set("projectUseCase", projectUseCase);
     c.set("apiUsageUseCase", apiUsageUseCase);
@@ -55,6 +57,7 @@ export const initApp = <E extends Env>(app: Hono<E>) => {
     c.set("announceUsecase", announceUsecase);
     c.set("chatSessionUseCase", chatSessionUseCase);
     c.set("instagramAccountUseCase", instagramAccountUseCase);
+    c.set("threadsAccountUseCase", threadsAccountUseCase);
     await next();
   });
 };
