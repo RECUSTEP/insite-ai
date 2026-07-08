@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import type { Env } from "../env";
 import { factory } from "../libs/hono";
+import { getMetaInsightAccessStatus } from "../libs/meta-insight-access";
 import { projectGuard } from "./_factory";
 
 const META_API_VERSION = "v21.0";
@@ -42,6 +43,11 @@ const authHandler = projectGuard.createHandlers(async (c) => {
   const { projectId } = c.var.session;
   if (!projectId) {
     return c.json({ error: "プロジェクトが選択されていません" }, 400);
+  }
+
+  const access = await getMetaInsightAccessStatus(c, projectId);
+  if (!access.ok) {
+    return c.json({ error: access.message }, access.status);
   }
 
   const appId = c.env.META_APP_ID;
@@ -162,6 +168,11 @@ const callbackHandler = factory.createHandlers(async (c) => {
     );
   }
 
+  const access = await getMetaInsightAccessStatus(c, projectId);
+  if (!access.ok) {
+    return redirectTo(`meta_error=${encodeURIComponent(access.message)}`);
+  }
+
   const appId = c.env.META_APP_ID;
   const appSecret = c.env.META_APP_SECRET;
   const redirectUri = c.env.META_REDIRECT_URI;
@@ -261,6 +272,11 @@ const getAccountHandler = projectGuard.createHandlers(async (c) => {
     return c.json({ error: "プロジェクトが選択されていません" }, 400);
   }
 
+  const access = await getMetaInsightAccessStatus(c, projectId);
+  if (!access.ok) {
+    return c.json({ error: access.message }, access.status);
+  }
+
   const result = await c.var.instagramAccountUseCase.getByProjectId(projectId);
   if (!result.ok) {
     return c.json({ error: result.val }, 500);
@@ -287,6 +303,11 @@ const deleteAccountHandler = projectGuard.createHandlers(async (c) => {
   const { projectId } = c.var.session;
   if (!projectId) {
     return c.json({ error: "プロジェクトが選択されていません" }, 400);
+  }
+
+  const access = await getMetaInsightAccessStatus(c, projectId);
+  if (!access.ok) {
+    return c.json({ error: access.message }, access.status);
   }
 
   const result = await c.var.instagramAccountUseCase.deleteByProjectId(projectId);

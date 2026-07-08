@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import type { Env } from "../env";
 import { factory } from "../libs/hono";
+import { getMetaInsightAccessStatus } from "../libs/meta-insight-access";
 import { projectGuard } from "./_factory";
 
 const INSTAGRAM_API_VERSION = "v21.0";
@@ -203,10 +204,15 @@ async function fetchInstagramProfile(accessToken: string): Promise<InstagramProf
 }
 
 // GET /instagram/auth - Instagram Login OAuth 認可 URL を返す
-const authHandler = projectGuard.createHandlers((c) => {
+const authHandler = projectGuard.createHandlers(async (c) => {
   const { projectId } = c.var.session;
   if (!projectId) {
     return c.json({ error: "プロジェクトが選択されていません" }, 400);
+  }
+
+  const access = await getMetaInsightAccessStatus(c, projectId);
+  if (!access.ok) {
+    return c.json({ error: access.message }, access.status);
   }
 
   const appId = c.env.INSTAGRAM_APP_ID;
@@ -254,6 +260,11 @@ const callbackHandler = factory.createHandlers(async (c) => {
   const projectId = parseProjectIdFromState(stateParam);
   if (!projectId) {
     return redirectTo(`instagram_error=${encodeURIComponent("不正な state パラメータです")}`);
+  }
+
+  const access = await getMetaInsightAccessStatus(c, projectId);
+  if (!access.ok) {
+    return redirectTo(`instagram_error=${encodeURIComponent(access.message)}`);
   }
 
   const config = getInstagramConfig(c.env);

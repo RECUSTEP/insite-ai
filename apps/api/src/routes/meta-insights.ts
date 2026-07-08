@@ -1,3 +1,4 @@
+import { getMetaInsightAccessStatus } from "../libs/meta-insight-access";
 import { projectGuard } from "./_factory";
 
 const META_API_VERSION = "v21.0";
@@ -134,6 +135,11 @@ const profileHandler = projectGuard.createHandlers(async (c) => {
     return c.json({ error: "プロジェクトが選択されていません" }, 400);
   }
 
+  const access = await getMetaInsightAccessStatus(c, projectId);
+  if (!access.ok) {
+    return c.json({ error: access.message }, access.status);
+  }
+
   const account = await c.var.instagramAccountUseCase.getByProjectId(projectId);
   if (!account.ok || !account.val) {
     return c.json({ error: "Instagram アカウントが連携されていません" }, 400);
@@ -182,6 +188,11 @@ const profileInsightsHandler = projectGuard.createHandlers(async (c) => {
   const { projectId } = c.var.session;
   if (!projectId) {
     return c.json({ error: "プロジェクトが選択されていません" }, 400);
+  }
+
+  const access = await getMetaInsightAccessStatus(c, projectId);
+  if (!access.ok) {
+    return c.json({ error: access.message }, access.status);
   }
 
   const account = await c.var.instagramAccountUseCase.getByProjectId(projectId);
@@ -248,6 +259,11 @@ const mediaHandler = projectGuard.createHandlers(async (c) => {
     return c.json({ error: "プロジェクトが選択されていません" }, 400);
   }
 
+  const access = await getMetaInsightAccessStatus(c, projectId);
+  if (!access.ok) {
+    return c.json({ error: access.message }, access.status);
+  }
+
   const account = await c.var.instagramAccountUseCase.getByProjectId(projectId);
   if (!account.ok || !account.val) {
     return c.json({ error: "Instagram アカウントが連携されていません" }, 400);
@@ -311,6 +327,11 @@ const mediaInsightsHandler = projectGuard.createHandlers(async (c) => {
   const { projectId } = c.var.session;
   if (!projectId) {
     return c.json({ error: "プロジェクトが選択されていません" }, 400);
+  }
+
+  const access = await getMetaInsightAccessStatus(c, projectId);
+  if (!access.ok) {
+    return c.json({ error: access.message }, access.status);
   }
 
   const account = await c.var.instagramAccountUseCase.getByProjectId(projectId);

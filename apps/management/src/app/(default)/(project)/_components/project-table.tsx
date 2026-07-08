@@ -5,6 +5,7 @@ import Link from "next/link";
 import { HStack } from "styled-system/jsx";
 import type { z } from "zod";
 import { DeleteProject } from "./delete-project";
+import { MetaInsightToggle } from "./meta-insight-toggle";
 import { SeoAddonToggle } from "./seo-addon-toggle";
 
 export type ProjectTableProps = {
@@ -25,9 +26,15 @@ export function ProjectTable({ projects }: ProjectTableProps) {
             <Table.Cell textAlign="center">{project.authId}</Table.Cell>
             <Table.Cell textAlign="center">{project.apiUsageLimit}</Table.Cell>
             <Table.Cell textAlign="center">
-              <SeoAddonToggle 
-                projectId={project.projectId} 
+              <SeoAddonToggle
+                projectId={project.projectId}
                 initialEnabled={project.seoAddonEnabled ?? false}
+              />
+            </Table.Cell>
+            <Table.Cell textAlign="center">
+              <MetaInsightToggle
+                projectId={project.projectId}
+                initialEnabled={project.metaInsightEnabled ?? false}
               />
             </Table.Cell>
             <Table.Cell maxW="min-content">
@@ -58,6 +65,7 @@ function Header() {
         <Table.Header textAlign="center">認証ID</Table.Header>
         <Table.Header textAlign="center">API使用可能回数/月</Table.Header>
         <Table.Header textAlign="center">SEO/AIO</Table.Header>
+        <Table.Header textAlign="center">Metaインサイト</Table.Header>
         <Table.Header textAlign="center" maxW="min-content" />
       </Table.Row>
     </Table.Head>
