@@ -1,10 +1,9 @@
 name = "insiteai-api"
 compatibility_date = "2024-07-30"
 main = "src/index.ts"
+keep_vars = true
 
 [vars]
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "password"
 META_APP_ID = "1701350637561455"
 META_REDIRECT_URI = "https://insiteai-api.nakata-haruka.workers.dev/meta/callback"
 META_CONFIG_ID = "2495168324281887"
