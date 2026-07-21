@@ -10,9 +10,10 @@ import { SeoAddonToggle } from "./seo-addon-toggle";
 
 export type ProjectTableProps = {
   projects: z.infer<typeof projectSchema>[];
+  globalMetaInsightEnabled: boolean | null;
 };
 
-export function ProjectTable({ projects }: ProjectTableProps) {
+export function ProjectTable({ projects, globalMetaInsightEnabled }: ProjectTableProps) {
   return (
     <Table.Root variant="outline">
       <Header />
@@ -35,6 +36,7 @@ export function ProjectTable({ projects }: ProjectTableProps) {
               <MetaInsightToggle
                 projectId={project.projectId}
                 initialEnabled={project.metaInsightEnabled ?? false}
+                globalEnabled={globalMetaInsightEnabled}
               />
             </Table.Cell>
             <Table.Cell maxW="min-content">

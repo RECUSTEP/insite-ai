@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { authSchema } from "@repo/module/service";
+import type { authSchema } from "@repo/module/service";
+import type { projectSchema } from "api/schema";
 import {
   ChevronDownIcon,
   ChevronRightIcon,
@@ -16,7 +17,6 @@ import { useState } from "react";
 import { css } from "styled-system/css";
 import { Box, Flex, HStack, Stack } from "styled-system/jsx";
 import type { z } from "zod";
-import type { projectSchema } from "api/schema";
 import { DeleteAuth } from "../../auth/_components/delete-auth";
 import { DeleteProject } from "./delete-project";
 import { MetaInsightToggle } from "./meta-insight-toggle";
@@ -33,17 +33,13 @@ export type AuthWithProjects = {
 
 type Props = {
   authWithProjects: AuthWithProjects[];
+  globalMetaInsightEnabled: boolean | null;
 };
 
-export function AuthProjectTree({ authWithProjects }: Props) {
+export function AuthProjectTree({ authWithProjects, globalMetaInsightEnabled }: Props) {
   if (authWithProjects.length === 0) {
     return (
-      <Box
-        py={16}
-        textAlign="center"
-        color="fg.muted"
-        fontSize="sm"
-      >
+      <Box py={16} textAlign="center" color="fg.muted" fontSize="sm">
         アカウントが見つかりませんでした
       </Box>
     );
@@ -52,13 +48,19 @@ export function AuthProjectTree({ authWithProjects }: Props) {
   return (
     <Stack gap={3}>
       {authWithProjects.map((auth) => (
-        <AuthNode key={auth.id} auth={auth} />
+        <AuthNode key={auth.id} auth={auth} globalMetaInsightEnabled={globalMetaInsightEnabled} />
       ))}
     </Stack>
   );
 }
 
-function AuthNode({ auth }: { auth: AuthWithProjects }) {
+function AuthNode({
+  auth,
+  globalMetaInsightEnabled,
+}: {
+  auth: AuthWithProjects;
+  globalMetaInsightEnabled: boolean | null;
+}) {
   const [expanded, setExpanded] = useState(true);
 
   const authForDelete: Auth = { id: auth.id, password: "" };
@@ -179,7 +181,11 @@ function AuthNode({ auth }: { auth: AuthWithProjects }) {
       {expanded && auth.projects.length > 0 && (
         <Stack gap={0} divideY="1px" divideColor="border.subtle">
           {auth.projects.map((project) => (
-            <ProjectRow key={project.projectId} project={project} />
+            <ProjectRow
+              key={project.projectId}
+              project={project}
+              globalMetaInsightEnabled={globalMetaInsightEnabled}
+            />
           ))}
         </Stack>
       )}
@@ -199,7 +205,13 @@ function AuthNode({ auth }: { auth: AuthWithProjects }) {
   );
 }
 
-function ProjectRow({ project }: { project: Project }) {
+function ProjectRow({
+  project,
+  globalMetaInsightEnabled,
+}: {
+  project: Project;
+  globalMetaInsightEnabled: boolean | null;
+}) {
   return (
     <Flex
       align="center"
@@ -248,6 +260,7 @@ function ProjectRow({ project }: { project: Project }) {
           <MetaInsightToggle
             projectId={project.projectId}
             initialEnabled={project.metaInsightEnabled ?? false}
+            globalEnabled={globalMetaInsightEnabled}
           />
         </HStack>
       </Box>

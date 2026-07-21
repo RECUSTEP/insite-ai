@@ -16,21 +16,25 @@ export function SeoAddonToggle({ projectId, initialEnabled }: SeoAddonToggleProp
   const handleToggle = async () => {
     const newState = !enabled;
     const confirmed = window.confirm(
-      `SEO/AIOアドオンを${newState ? "有効化" : "無効化"}しますか？`
+      `SEO/AIOアドオンを${newState ? "有効化" : "無効化"}しますか？`,
     );
-    
-    if (!confirmed) return;
+
+    if (!confirmed) {
+      return;
+    }
 
     setLoading(true);
     try {
       const result = await toggleSeoAddonAction(projectId, newState);
       if (result.success) {
         setEnabled(newState);
-        alert(`SEO/AIOアドオンを${newState ? "有効化" : "無効化"}しました`);
+        alert(
+          `SEO/AIOアドオンを${newState ? "有効化" : "無効化"}しました。ユーザー画面を再読み込みしてください。`,
+        );
       } else {
         alert(`エラー: ${result.error || "更新に失敗しました"}`);
       }
-    } catch (error) {
+    } catch {
       alert("エラー: 更新に失敗しました");
     } finally {
       setLoading(false);

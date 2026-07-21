@@ -21,36 +21,48 @@ export default async function Home({
   let authWithProjects: AuthWithProjects[] = [];
   let hasNext = false;
   let fetchError = false;
+  let globalMetaInsightEnabled: boolean | null = null;
 
   try {
     const client = createClient();
-    const response = await client.admin.auth["with-projects"].$get(
-      {
-        query: {
-          offset: `${(page - 1) * PAGE_SIZE}`,
-          limit: `${PAGE_SIZE}`,
-          searchText: text,
-        },
+    const requestOptions = {
+      headers: {
+        cookie: cookies().toString(),
       },
-      {
-        headers: {
-          cookie: cookies().toString(),
+    };
+    const [response, applicationSettingsResponse] = await Promise.all([
+      client.admin.auth["with-projects"].$get(
+        {
+          query: {
+            offset: `${(page - 1) * PAGE_SIZE}`,
+            limit: `${PAGE_SIZE}`,
+            searchText: text,
+          },
         },
-      },
-    );
+        requestOptions,
+      ),
+      client.admin["application-settings"].$get({}, requestOptions),
+    ]);
 
-    if (response.status === 401) {
+    if (response.status === 401 || applicationSettingsResponse.status === 401) {
       const { redirect } = await import("next/navigation");
       redirect("/login");
     }
 
-    if (!response.ok) {
-      console.error("[Home] API error:", response.status, await response.text());
-      fetchError = true;
-    } else {
+    if (response.ok) {
       const json = await response.json();
       authWithProjects = (json.authWithProjects ?? []) as AuthWithProjects[];
       hasNext = json.hasNext ?? false;
+    } else {
+      console.error("[Home] API error:", response.status, await response.text());
+      fetchError = true;
+    }
+
+    if (applicationSettingsResponse.ok) {
+      const applicationSettings = await applicationSettingsResponse.json();
+      globalMetaInsightEnabled = applicationSettings.metaInsightEnabled === "true";
+    } else {
+      console.error("[Home] Application settings API error:", applicationSettingsResponse.status);
     }
   } catch (e) {
     if (e instanceof Error && "digest" in e && e.message === "NEXT_REDIRECT") {
@@ -96,8 +108,33 @@ export default async function Home({
         </HStack>
       </Flex>
 
+      {globalMetaInsightEnabled === false && (
+        <div
+          style={{
+            marginBottom: "1rem",
+            padding: "0.75rem 1rem",
+            background: "#fffbeb",
+            border: "1px solid #fde68a",
+            borderRadius: "0.5rem",
+            color: "#92400e",
+            fontSize: "0.875rem",
+          }}
+        >
+          Metaの全体設定がOFFです。プロジェクトをONにしてもユーザー画面では利用できません。{" "}
+          <Link
+            href="/application-setting"
+            style={{ fontWeight: 600, textDecoration: "underline" }}
+          >
+            アプリケーション設定を確認
+          </Link>
+        </div>
+      )}
+
       {/* ツリービュー */}
-      <AuthProjectTree authWithProjects={authWithProjects} />
+      <AuthProjectTree
+        authWithProjects={authWithProjects}
+        globalMetaInsightEnabled={globalMetaInsightEnabled}
+      />
 
       {/* ページネーション */}
       <HStack justify="center" pt={8}>
@@ -120,7 +157,13 @@ type PaginationButtonProps = {
   children: React.ReactNode;
 };
 
-function PaginationButton({ direction, page, searchText, hasNext, children }: PaginationButtonProps) {
+function PaginationButton({
+  direction,
+  page,
+  searchText,
+  hasNext,
+  children,
+}: PaginationButtonProps) {
   const disabled = direction === "prev" ? page === 1 : !hasNext;
   const href =
     direction === "prev"
