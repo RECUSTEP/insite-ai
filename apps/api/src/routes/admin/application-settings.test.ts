@@ -90,7 +90,7 @@ describe("application-settings", () => {
       await testClient(app).index.$put({ json: settings }, { headers });
       const updated = {
         openAiApiKey: "updated",
-        chatGptModel: "gpt-5.6-terra" as const,
+        chatGptModel: "gpt-5-mini" as const,
         metaInsightEnabled: "true" as const,
         metaSocialChatEnabled: "true" as const,
         metaAccountLinkEnabled: "false" as const,
@@ -140,16 +140,16 @@ describe("application-settings", () => {
           json: {
             ...settings,
             openAiApiKey: "",
-            chatGptModel: "gpt-5.6-luna",
+            chatGptModel: "gpt-5.4-mini",
           },
         },
         { headers },
       );
-      retrieveModel.mockResolvedValue({ id: "gpt-5.6-luna" });
+      retrieveModel.mockResolvedValue({ id: "gpt-5.4-mini" });
 
       const res = await testClient(app)["test-openai"].$post(
         {
-          json: { openAiApiKey: "", chatGptModel: "gpt-5.6-luna" },
+          json: { openAiApiKey: "", chatGptModel: "gpt-5.4-mini" },
         },
         { headers },
       );

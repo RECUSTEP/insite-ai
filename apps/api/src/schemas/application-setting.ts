@@ -2,12 +2,20 @@ import { z } from "zod";
 
 export const CHAT_GPT_MODEL_OPTIONS = [
   {
+    value: "gpt-5-mini",
+    label: "GPT-5 mini（推奨・低コスト）",
+  },
+  {
+    value: "gpt-5.4-mini",
+    label: "GPT-5.4 mini（品質重視）",
+  },
+  {
     value: "gpt-5.6-terra",
-    label: "GPT-5.6 Terra（推奨・品質とコストのバランス）",
+    label: "GPT-5.6 Terra（高品質・高コスト）",
   },
   {
     value: "gpt-5.6-luna",
-    label: "GPT-5.6 Luna（低コスト・大量処理向け）",
+    label: "GPT-5.6 Luna（5.6系の低コスト版）",
   },
   {
     value: "gpt-5.6-sol",
@@ -20,6 +28,8 @@ export const CHAT_GPT_MODEL_OPTIONS = [
 ] as const;
 
 export const chatGptModelSchema = z.enum([
+  "gpt-5-mini",
+  "gpt-5.4-mini",
   "gpt-5.6-terra",
   "gpt-5.6-luna",
   "gpt-5.6-sol",
