@@ -1,21 +1,33 @@
 "use client";
 
 import { SubmitButton } from "@/components/submit-button";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { Text } from "@/components/ui/text";
+import { Portal } from "@ark-ui/react";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
-import { applicationSettingSchema } from "api/schema";
-import { CheckCircleIcon } from "lucide-react";
-import { useState } from "react";
+import {
+  CHAT_GPT_MODEL_OPTIONS,
+  type ChatGptModel,
+  applicationSettingSchema,
+  chatGptModelSchema,
+} from "api/schema";
+import { CheckCircleIcon, ChevronDownIcon } from "lucide-react";
+import { useRef, useState, useTransition } from "react";
 import { useFormState } from "react-dom";
 import { css } from "styled-system/css";
 import { Box, HStack } from "styled-system/jsx";
 import { stack } from "styled-system/patterns";
 import type { z } from "zod";
-import { saveApplicationSettingAction } from "../_actions/save-application-setting";
+import {
+  type OpenAiConnectionTestResult,
+  saveApplicationSettingAction,
+  testOpenAiConnectionAction,
+} from "../_actions/save-application-setting";
 
 type Schema = z.infer<typeof applicationSettingSchema>;
 type Props = {
@@ -23,10 +35,15 @@ type Props = {
 };
 
 export function SaveApplicationSettingForm({ defaultValue }: Props) {
+  const formRef = useRef<HTMLFormElement>(null);
   const [lastResult, formAction] = useFormState(saveApplicationSettingAction, {});
-  const [metaInsight, setMetaInsight] = useState(
-    defaultValue?.metaInsightEnabled === "true",
+  const defaultModel = chatGptModelSchema.safeParse(defaultValue?.chatGptModel);
+  const [chatGptModel, setChatGptModel] = useState<ChatGptModel>(
+    defaultModel.success ? defaultModel.data : "gpt-4o-mini",
   );
+  const [connectionResult, setConnectionResult] = useState<OpenAiConnectionTestResult>();
+  const [isTestingConnection, startConnectionTest] = useTransition();
+  const [metaInsight, setMetaInsight] = useState(defaultValue?.metaInsightEnabled === "true");
   const [metaSocialChat, setMetaSocialChat] = useState(
     defaultValue?.metaSocialChatEnabled === "true",
   );
@@ -43,8 +60,20 @@ export function SaveApplicationSettingForm({ defaultValue }: Props) {
     shouldRevalidate: "onInput",
   });
 
+  const handleConnectionTest = () => {
+    if (!formRef.current) {
+      return;
+    }
+    const formData = new FormData(formRef.current);
+    setConnectionResult(undefined);
+    startConnectionTest(async () => {
+      setConnectionResult(await testOpenAiConnectionAction(formData));
+    });
+  };
+
   return (
     <form
+      ref={formRef}
       className={stack({ gap: 6 })}
       id={form.id}
       onSubmit={form.onSubmit}
@@ -52,11 +81,7 @@ export function SaveApplicationSettingForm({ defaultValue }: Props) {
       noValidate
     >
       <input type="hidden" name="metaInsightEnabled" value={metaInsight ? "true" : "false"} />
-      <input
-        type="hidden"
-        name="metaSocialChatEnabled"
-        value={metaSocialChat ? "true" : "false"}
-      />
+      <input type="hidden" name="metaSocialChatEnabled" value={metaSocialChat ? "true" : "false"} />
       <input
         type="hidden"
         name="metaAccountLinkEnabled"
@@ -79,26 +104,79 @@ export function SaveApplicationSettingForm({ defaultValue }: Props) {
             />
           </Field.Input>
           <Field.HelperText>
-            既存のキーを維持する場合は変更しないでください。入力すると上書きされます。
+            保存済みのキーは表示されません。変更する場合のみ新しいキーを入力してください。
           </Field.HelperText>
           {fields.openAiApiKey.errors?.map((error) => (
             <Field.ErrorText key={error}>{error}</Field.ErrorText>
           ))}
         </Field.Root>
         <Field.Root className={stack({ gap: 1.5 })} invalid={!!fields.chatGptModel.errors?.length}>
-          <Field.Label>GhatGPTモデル</Field.Label>
-          <Field.Input asChild>
-            <Input
-              key={fields.chatGptModel.key}
-              name={fields.chatGptModel.name}
-              defaultValue={fields.chatGptModel.initialValue}
-              placeholder="gpt-4o"
-            />
-          </Field.Input>
+          <Field.Label>ChatGPTモデル</Field.Label>
+          <Select.Root
+            items={[...CHAT_GPT_MODEL_OPTIONS]}
+            name={fields.chatGptModel.name}
+            value={[chatGptModel]}
+            onValueChange={(event) => {
+              const parsed = chatGptModelSchema.safeParse(event.value[0]);
+              if (parsed.success) {
+                setChatGptModel(parsed.data);
+                setConnectionResult(undefined);
+              }
+            }}
+          >
+            <Select.Control>
+              <Select.Trigger>
+                <Select.ValueText />
+                <Select.Indicator>
+                  <ChevronDownIcon />
+                </Select.Indicator>
+              </Select.Trigger>
+            </Select.Control>
+            <Portal>
+              <Select.Positioner>
+                <Select.Content>
+                  <Select.ItemGroup>
+                    <Select.ItemGroupLabel>利用するモデル</Select.ItemGroupLabel>
+                    {CHAT_GPT_MODEL_OPTIONS.map((item) => (
+                      <Select.Item key={item.value} item={item}>
+                        <Select.ItemText>{item.label}</Select.ItemText>
+                        <Select.ItemIndicator>✓</Select.ItemIndicator>
+                      </Select.Item>
+                    ))}
+                  </Select.ItemGroup>
+                </Select.Content>
+              </Select.Positioner>
+            </Portal>
+            <Select.HiddenSelect />
+          </Select.Root>
           {fields.chatGptModel.errors?.map((error) => (
             <Field.ErrorText key={error}>{error}</Field.ErrorText>
           ))}
         </Field.Root>
+        <HStack alignItems="center" gap={3} flexWrap="wrap">
+          <Button
+            type="button"
+            variant="outline"
+            loading={isTestingConnection}
+            loadingText="接続確認中..."
+            onClick={handleConnectionTest}
+          >
+            接続テスト
+          </Button>
+          {connectionResult ? (
+            <Text
+              size="sm"
+              role={connectionResult.ok ? "status" : "alert"}
+              className={css({ color: connectionResult.ok ? "accent.default" : "fg.error" })}
+            >
+              {connectionResult.message}
+            </Text>
+          ) : (
+            <Text size="sm" className={css({ color: "text.secondary" })}>
+              保存済みAPIキーで認証とモデルの利用可否を確認します。
+            </Text>
+          )}
+        </HStack>
       </section>
 
       <section className={stack({ gap: 4 })}>
@@ -106,11 +184,14 @@ export function SaveApplicationSettingForm({ defaultValue }: Props) {
           Meta / Instagram・Threads 連携
         </Text>
         <Text size="sm" className={css({ color: "text.secondary" })}>
-          ユーザー画面の分析AI（Meta インサイト・チャット・連携）の表示と API の利用可否を制御します。OAuth
-          実装後に連携フローを接続してください。
+          ユーザー画面の分析AI（Meta インサイト・チャット・連携）の表示と API
+          の利用可否を制御します。OAuth 実装後に連携フローを接続してください。
         </Text>
         <Field.Root className={stack({ gap: 1.5 })}>
-          <Checkbox checked={metaInsight} onCheckedChange={(d) => setMetaInsight(d.checked === true)}>
+          <Checkbox
+            checked={metaInsight}
+            onCheckedChange={(d) => setMetaInsight(d.checked === true)}
+          >
             Instagram・Threads インサイト分析タブを有効化
           </Checkbox>
         </Field.Root>
