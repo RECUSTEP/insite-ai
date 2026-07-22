@@ -47,7 +47,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID:  ${{ env.CLOUDFLARE_ACCOUNT_ID }}
       
       # 5.5) 最新マイグレーションを個別に適用（冪等性保証）
-      - name: Apply Latest Migration - Add Revision Columns & SEO Addon & Project Info
+      - name: Apply Latest Migration - Add Revision Columns, Project Info & Credit Purchases
         run: |
           cd apps/api
           run_sql() {
@@ -88,6 +88,14 @@ jobs:
           # --- テーブル作成（べき等）: threads_account ---
           run_sql "CREATE TABLE IF NOT EXISTS \`threads_account\` (\`id\` integer PRIMARY KEY AUTOINCREMENT NOT NULL, \`project_id\` text NOT NULL, \`threads_user_id\` text NOT NULL, \`threads_username\` text, \`access_token\` text NOT NULL, \`token_expires_at\` integer, \`connected_at\` integer NOT NULL, \`updated_at\` integer NOT NULL, FOREIGN KEY (\`project_id\`) REFERENCES \`project\`(\`project_id\`) ON UPDATE no action ON DELETE cascade);" "threads_account table"
           run_sql "CREATE UNIQUE INDEX IF NOT EXISTS \`threads_account_project_id_idx\` ON \`threads_account\` (\`project_id\`);" "threads_account project index"
+
+          # --- テーブル作成（べき等）: credit_purchase_request ---
+          # 既存環境では初期マイグレーション履歴が揃っていない場合があるため、
+          # 通常の migrations apply に加えて最新機能のテーブルを明示的に保証する。
+          run_sql "CREATE TABLE IF NOT EXISTS \`credit_purchase_request\` (\`id\` text PRIMARY KEY NOT NULL, \`project_id\` text NOT NULL, \`payment_method\` text NOT NULL, \`transfer_name\` text, \`note\` text, \`credits\` integer NOT NULL, \`amount_yen\` integer NOT NULL, \`status\` text NOT NULL, \`created_at\` integer NOT NULL, \`updated_at\` integer NOT NULL, \`reviewed_at\` integer, \`approved_at\` integer, FOREIGN KEY (\`project_id\`) REFERENCES \`project\`(\`project_id\`) ON UPDATE no action ON DELETE cascade);" "credit_purchase_request table"
+          run_sql "CREATE INDEX IF NOT EXISTS \`credit_purchase_request_project_id_idx\` ON \`credit_purchase_request\` (\`project_id\`);" "credit_purchase_request project index"
+          run_sql "CREATE INDEX IF NOT EXISTS \`credit_purchase_request_status_idx\` ON \`credit_purchase_request\` (\`status\`);" "credit_purchase_request status index"
+          run_sql "CREATE INDEX IF NOT EXISTS \`credit_purchase_request_approved_at_idx\` ON \`credit_purchase_request\` (\`approved_at\`);" "credit_purchase_request approved index"
         env:
           CLOUDFLARE_API_TOKEN:   ${{ env.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID:  ${{ env.CLOUDFLARE_ACCOUNT_ID }}
