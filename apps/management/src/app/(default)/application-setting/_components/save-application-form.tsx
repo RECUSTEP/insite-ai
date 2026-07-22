@@ -158,7 +158,7 @@ export function SaveApplicationSettingForm({ defaultValue }: Props) {
             type="button"
             variant="outline"
             loading={isTestingConnection}
-            loadingText="接続確認中..."
+            loadingText={isTestingConnection ? "接続確認中..." : undefined}
             onClick={handleConnectionTest}
           >
             接続テスト
