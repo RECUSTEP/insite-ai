@@ -25,6 +25,13 @@ export const ApiUsageUseCaseError = {
   ProjectNotFound: "ApiUsageProjectNotFound",
 } as const;
 
+export const CreditPurchaseUseCaseError = {
+  ProjectNotFound: "CreditPurchaseProjectNotFound",
+  PendingRequestAlreadyExists: "CreditPurchasePendingRequestAlreadyExists",
+  RequestNotFound: "CreditPurchaseRequestNotFound",
+  RequestAlreadyReviewed: "CreditPurchaseRequestAlreadyReviewed",
+} as const;
+
 export const AnalysisHistoryUseCaseError = {
   ProjectNotFound: "AnalysisHistoryProjectNotFound",
   AnalysisHistoryNotFound: "AnalysisHistoryNotFound",

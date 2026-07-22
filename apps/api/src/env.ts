@@ -6,6 +6,7 @@ import type {
   ApplicationSettingUseCase,
   AuthUseCase,
   ChatSessionUseCase,
+  CreditPurchaseUseCase,
   HelpUseCase,
   InstagramAccountUseCase,
   InstructionGuideUseCase,
@@ -50,6 +51,7 @@ export type Variables = {
   instructionGuideUsecase: InstructionGuideUseCase<"d1">;
   announceUsecase: AnnounceUseCase<"d1">;
   chatSessionUseCase: ChatSessionUseCase<"d1">;
+  creditPurchaseUseCase: CreditPurchaseUseCase<"d1">;
   instagramAccountUseCase: InstagramAccountUseCase<"d1">;
   threadsAccountUseCase: ThreadsAccountUseCase<"d1">;
 };

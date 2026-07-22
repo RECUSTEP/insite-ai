@@ -5,6 +5,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   ArrowRightIcon,
   AtSignIcon,
+  CoinsIcon,
   FileTextIcon,
   Instagram,
   MapPinIcon,
@@ -138,6 +139,7 @@ export default async function HomePage() {
   );
 
   const usagePercent = apiUsageLimit > 0 ? (apiUsageCount / apiUsageLimit) * 100 : 0;
+  const remainingCredits = Math.max(0, apiUsageLimit - apiUsageCount);
 
   return (
     <Flex
@@ -216,15 +218,46 @@ export default async function HomePage() {
             })}
           />
         </Box>
-        <Text
-          className={css({
-            fontSize: "xs",
-            color: "text.muted",
-            mt: 2,
-          })}
+        <Flex
+          mt={3}
+          gap={3}
+          align={{ base: "flex-start", sm: "center" }}
+          justify="space-between"
+          direction={{ base: "column", sm: "row" }}
         >
-          残り {Math.max(0, apiUsageLimit - apiUsageCount).toLocaleString()} 回
-        </Text>
+          <Text
+            className={css({
+              fontSize: "xs",
+              color: remainingCredits === 0 ? "#E74C3C" : "text.muted",
+              fontWeight: remainingCredits === 0 ? 700 : 400,
+            })}
+          >
+            {remainingCredits === 0
+              ? "クレジットがありません"
+              : `残り ${remainingCredits.toLocaleString()} credit`}
+          </Text>
+          <Link
+            href="/credits"
+            className={css({
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 1.5,
+              px: 3,
+              py: 2,
+              borderRadius: "8px",
+              fontSize: "sm",
+              fontWeight: 600,
+              color: remainingCredits <= 20 ? "white" : "text.primary",
+              bg: remainingCredits <= 20 ? "brand.DEFAULT" : "transparent",
+              border: "1px solid",
+              borderColor: remainingCredits <= 20 ? "brand.DEFAULT" : "#D4D4D8",
+              _hover: { opacity: 0.85 },
+            })}
+          >
+            <CoinsIcon size={16} />
+            クレジットを追加
+          </Link>
+        </Flex>
       </Box>
 
       {/* AIツール一覧 */}

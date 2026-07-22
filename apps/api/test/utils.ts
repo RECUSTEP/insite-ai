@@ -11,6 +11,7 @@ import {
   AnalysisHistoryUseCase,
   ApiUsageUseCase,
   ApplicationSettingUseCase,
+  CreditPurchaseUseCase,
   HelpUseCase,
   ProjectInfoUseCase,
   ProjectUseCase,
@@ -40,6 +41,7 @@ export function mockUseCase(db: LibSQLDatabase<typeof schema>) {
   return createMiddleware(async (c, next) => {
     c.set("projectUseCase", new ProjectUseCase(db));
     c.set("apiUsageUseCase", new ApiUsageUseCase(db));
+    c.set("creditPurchaseUseCase", new CreditPurchaseUseCase(db));
     c.set("analysisHistoryUseCase", new AnalysisHistoryUseCase(db));
     c.set("projectInfoUseCase", new ProjectInfoUseCase(db));
     c.set("adminSessionUseCase", new AdminSessionUseCase(db, { sessionDuration: 1000 * 60 * 60 }));

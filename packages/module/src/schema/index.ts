@@ -19,6 +19,12 @@ export const apiUsageInsertSchema = createInsertSchema(schemas.apiUsage);
 export type ApiUsageSelect = typeof schemas.apiUsage.$inferSelect;
 export const apiUsageSelectSchema = createSelectSchema(schemas.apiUsage);
 
+export type CreditPurchaseRequestInsert = typeof schemas.creditPurchaseRequests.$inferInsert;
+export const creditPurchaseRequestInsertSchema = createInsertSchema(schemas.creditPurchaseRequests);
+
+export type CreditPurchaseRequestSelect = typeof schemas.creditPurchaseRequests.$inferSelect;
+export const creditPurchaseRequestSelectSchema = createSelectSchema(schemas.creditPurchaseRequests);
+
 export type AnalysisHistoryInsert = typeof schemas.analysisHistory.$inferInsert;
 export const analysisHistoryInsertSchema = createInsertSchema(schemas.analysisHistory);
 

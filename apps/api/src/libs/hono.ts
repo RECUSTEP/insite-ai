@@ -7,6 +7,7 @@ import {
   ApplicationSettingUseCase,
   AuthUseCase,
   ChatSessionUseCase,
+  CreditPurchaseUseCase,
   HelpUseCase,
   InstagramAccountUseCase,
   InstructionGuideUseCase,
@@ -41,6 +42,7 @@ export const initApp = <E extends Env>(app: Hono<E>) => {
     const instructionGuideUsecase = new InstructionGuideUseCase<"d1">(db);
     const announceUsecase = new AnnounceUseCase<"d1">(db);
     const chatSessionUseCase = new ChatSessionUseCase<"d1">(db);
+    const creditPurchaseUseCase = new CreditPurchaseUseCase<"d1">(db);
     const instagramAccountUseCase = new InstagramAccountUseCase<"d1">(db);
     const threadsAccountUseCase = new ThreadsAccountUseCase<"d1">(db);
     c.set("authUseCase", authUseCase);
@@ -56,6 +58,7 @@ export const initApp = <E extends Env>(app: Hono<E>) => {
     c.set("instructionGuideUsecase", instructionGuideUsecase);
     c.set("announceUsecase", announceUsecase);
     c.set("chatSessionUseCase", chatSessionUseCase);
+    c.set("creditPurchaseUseCase", creditPurchaseUseCase);
     c.set("instagramAccountUseCase", instagramAccountUseCase);
     c.set("threadsAccountUseCase", threadsAccountUseCase);
     await next();

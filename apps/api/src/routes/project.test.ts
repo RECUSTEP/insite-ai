@@ -62,6 +62,8 @@ describe("project", () => {
         projectId: project.projectId,
         name: project.name,
         apiUsageLimit: project.apiUsageLimit,
+        baseApiUsageLimit: project.apiUsageLimit,
+        additionalCredits: 0,
         apiUsageCount: 0,
         metaInsightEnabled: false,
         metaSocialChatEnabled: false,

@@ -47,6 +47,34 @@ const apiUsage = sqliteTable(
   }),
 );
 
+const creditPurchaseRequests = sqliteTable(
+  "credit_purchase_request",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.projectId, { onDelete: "cascade" }),
+    paymentMethod: text("payment_method").notNull(),
+    transferName: text("transfer_name"),
+    note: text("note"),
+    credits: integer("credits").notNull(),
+    amountYen: integer("amount_yen").notNull(),
+    status: text("status").notNull(),
+    createdAt: integer("created_at").notNull(),
+    updatedAt: integer("updated_at").notNull(),
+    reviewedAt: integer("reviewed_at"),
+    approvedAt: integer("approved_at"),
+  },
+  (table) => ({
+    projectIdIdx: index("credit_purchase_request_project_id_idx").on(table.projectId),
+    statusIdx: index("credit_purchase_request_status_idx").on(table.status),
+    approvedAtIdx: index("credit_purchase_request_approved_at_idx").on(table.approvedAt),
+  }),
+);
+
 const analysisHistory = sqliteTable(
   "analysis_history",
   {
@@ -271,12 +299,20 @@ const authRelations = relations(auth, ({ many }) => ({
 const projectRelations = relations(projects, ({ one, many }) => ({
   auth: one(auth, { fields: [projects.authId], references: [auth.id] }),
   apiUsage: many(apiUsage),
+  creditPurchaseRequests: many(creditPurchaseRequests),
   analysisHistory: many(analysisHistory),
   chatSessions: many(chatSessions),
   projectInfo: one(projectInfo),
   instagramAccount: one(instagramAccounts),
   threadsAccount: one(threadsAccounts),
   sessions: many(sessions),
+}));
+
+const creditPurchaseRequestRelations = relations(creditPurchaseRequests, ({ one }) => ({
+  project: one(projects, {
+    fields: [creditPurchaseRequests.projectId],
+    references: [projects.projectId],
+  }),
 }));
 
 const apiUsageRelations = relations(apiUsage, ({ one }) => ({
@@ -311,6 +347,7 @@ export {
   auth,
   projects,
   apiUsage,
+  creditPurchaseRequests,
   analysisHistory,
   chatSessions,
   projectInfo,
@@ -326,6 +363,7 @@ export {
   authRelations,
   projectRelations,
   apiUsageRelations,
+  creditPurchaseRequestRelations,
   analysisHistoryRelations,
   chatSessionsRelations,
   projectInfoRelations,

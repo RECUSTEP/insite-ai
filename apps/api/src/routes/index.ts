@@ -3,6 +3,7 @@ import { route as adminRoute } from "./admin";
 import { route as analysisRoute } from "./analysis";
 import { route as announcesRoute } from "./announces";
 import { route as chatSessionsRoute } from "./chat-sessions";
+import { route as creditPurchasesRoute } from "./credit-purchases";
 import { route as helpsRoute } from "./helps";
 import { route as historyRoute } from "./history";
 import { route as imageRoute } from "./image";
@@ -39,6 +40,7 @@ export const route = new Hono()
   .route("/seo-suggest-keywords", seoSuggestKeywordsRoute)
   .route("/announces", announcesRoute)
   .route("/chat-sessions", chatSessionsRoute)
+  .route("/credit-purchases", creditPurchasesRoute)
   .route("/meta", metaRoute)
   .route("/meta-insights", metaInsightsRoute)
   .route("/threads", threadsRoute)

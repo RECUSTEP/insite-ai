@@ -297,13 +297,21 @@ const analysisHandler = projectGuard.createHandlers(
     const monthlyUsage = await c.var.apiUsageUseCase.getMonthlyApiUsageCount({
       projectId,
     });
+    const additionalCredits =
+      await c.var.creditPurchaseUseCase.getApprovedCreditsForCurrentMonth(projectId);
 
-    if (!project.ok || !monthlyUsage.ok) {
+    if (!project.ok || !monthlyUsage.ok || !additionalCredits.ok) {
       return c.json({ error: "Internal Server Error" }, 500);
     }
 
-    if (project.val.apiUsageLimit <= monthlyUsage.val) {
-      return c.json({ error: "Monthly API usage limit exceeded" }, 403);
+    if (project.val.apiUsageLimit + additionalCredits.val <= monthlyUsage.val) {
+      return c.json(
+        {
+          error:
+            "クレジットが不足しています。ホームの「クレジットを追加」から購入申請してください。",
+        },
+        403,
+      );
     }
 
     let system: string;

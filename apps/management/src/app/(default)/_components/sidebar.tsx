@@ -11,6 +11,7 @@ const navigation = [
   { path: "/dashboard", label: "ダッシュボード" },
   { path: "/", label: "プロジェクト管理" },
   { path: "/auth", label: "アカウント管理" },
+  { path: "/credit-purchases", label: "クレジット購入申請" },
   { path: "/application-setting", label: "アプリケーション設定" },
   { path: "/prompt", label: "プロンプト設定" },
   { path: "/help", label: "ヘルプ設定" },

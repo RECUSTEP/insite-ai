@@ -19,6 +19,11 @@ const getProjectHandler = projectGuard.createHandlers(async (c) => {
   if (!apiUsageResult.ok) {
     return c.json({ error: apiUsageResult.val }, 400);
   }
+  const additionalCreditsResult =
+    await c.var.creditPurchaseUseCase.getApprovedCreditsForCurrentMonth(projectId);
+  if (!additionalCreditsResult.ok) {
+    return c.json({ error: additionalCreditsResult.val }, 400);
+  }
   const appSettingsResult = await c.var.applicationSettingUseCase.getApplicationSetting();
   const globalMetaFlags = appSettingsResult.ok
     ? metaFeatureFlagsFromSettings(appSettingsResult.val)
@@ -30,10 +35,14 @@ const getProjectHandler = projectGuard.createHandlers(async (c) => {
   // プロジェクト単位のフラグ: グローバルON かつ プロジェクトON の場合のみ有効
   const metaInsightEnabled =
     globalMetaFlags.metaInsightEnabled && (projectResult.val.metaInsightEnabled ?? false);
+  const baseApiUsageLimit = projectResult.val.apiUsageLimit;
+  const additionalCredits = additionalCreditsResult.val;
   return c.json({
     projectId: projectResult.val.projectId,
     name: projectResult.val.name,
-    apiUsageLimit: projectResult.val.apiUsageLimit,
+    apiUsageLimit: baseApiUsageLimit + additionalCredits,
+    baseApiUsageLimit,
+    additionalCredits,
     apiUsageCount: apiUsageResult.val,
     seoAddonEnabled: projectResult.val.seoAddonEnabled ?? false,
     metaInsightEnabled,

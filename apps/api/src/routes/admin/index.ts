@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { route as announcesRoute } from "./announces";
 import { route as applicationSettingsRoute } from "./application-settings";
 import { route as authRoute } from "./auth";
+import { route as creditPurchasesRoute } from "./credit-purchases";
 import { route as dashboardStatsRoute } from "./dashboard-stats";
 import { route as helpsRoute } from "./helps";
 import { route as instructionGuideRoute } from "./instruction-guide";
@@ -13,6 +14,7 @@ import { route as sessionRoute } from "./session";
 export const route = new Hono()
   .route("/application-settings", applicationSettingsRoute)
   .route("/dashboard-stats", dashboardStatsRoute)
+  .route("/credit-purchases", creditPurchasesRoute)
   .route("/helps", helpsRoute)
   .route("/login", loginRoute)
   .route("/projects", projectsRoute)
